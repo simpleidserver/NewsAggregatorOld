@@ -1,4 +1,4 @@
-﻿using NewsAggregator.ML.Extensions;
+﻿using NewsAggregator.Core.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;

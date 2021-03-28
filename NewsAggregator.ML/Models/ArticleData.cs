@@ -7,6 +7,8 @@ namespace NewsAggregator.ML.Models
         [LoadColumn(0)]
         public string Id { get; set; }
         [LoadColumn(1)]
+        public string ExternalId { get; set; }
+        [LoadColumn(2)]
         public string Text { get; set; }
     }
 }

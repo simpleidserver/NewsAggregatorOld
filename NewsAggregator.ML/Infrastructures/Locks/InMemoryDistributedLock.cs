@@ -1,4 +1,5 @@
-﻿using NewsAggregator.ML.Extensions;
+﻿using NewsAggregator.Core.Extensions;
+using NewsAggregator.ML.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;

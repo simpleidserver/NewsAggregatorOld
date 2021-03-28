@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace NewsAggregator.ML.Extensions
+namespace NewsAggregator.Core.Extensions
 {
     public static class ConcurrentBagExtensions
     {

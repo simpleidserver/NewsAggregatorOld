@@ -22,7 +22,13 @@ namespace NewsAggregator.ML.Helpers
         public static string GetCSVArticles(string language)
         {
             var currentDateTime = DateTime.UtcNow;
-            return Path.Combine(GetDirectoryPath(), $"articles-{language}-{currentDateTime.ToString("dd-MM-yyyy")}.csv");
+            return Path.Combine(GetDirectoryPath(), $"articles-{language}-{currentDateTime.ToString("MM-yyyy")}.csv");
+        }
+
+        public static string GetTmpCSVArticles(string language)
+        {
+            var currentDateTime = DateTime.UtcNow;
+            return Path.Combine(GetDirectoryPath(), $"articles-{language}-{currentDateTime.ToString("MM-yyyy")}-tmp.csv");
         }
 
         public static string GetLDAArticles(string language)
