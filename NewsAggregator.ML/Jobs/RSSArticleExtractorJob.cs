@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NewsAggregator.Core.Repositories;
 using NewsAggregator.Domain.Articles;
-using NewsAggregator.Domain.Articles.Events;
 using NewsAggregator.Domain.RSSFeeds;
 using NewsAggregator.ML.Articles;
-using NewsAggregator.ML.Infrastructures.Jobs;
 using NewsAggregator.ML.Infrastructures.Locks;
 using System;
 using System.Collections.Generic;
@@ -18,64 +15,87 @@ using System.Xml;
 
 namespace NewsAggregator.ML.Jobs
 {
-    public class RSSArticleExtractorJob : BaseScheduledJob
+    public class RSSArticleExtractorJob : IRSSArticleExtractorJob
     {
+        private const string LockName = "extract-rss-articles";
         private readonly IRSSFeedRepository _rssFeedRepository;
+        private readonly IArticleRepository _articleRepository;
         private readonly IArticleManager _articleManager;
+        private readonly IDistributedLock _distributedLock;
+        private readonly ILogger<RSSArticleExtractorJob> _logger;
+        private static object _obj = new object();
 
         public RSSArticleExtractorJob(
             IRSSFeedRepository rssFeedRepository,
+            IArticleRepository articleRepository,
             IArticleManager articleManager,
-            IDistributedLock distributedLock, 
-            IOptions<NewsAggregatorMLOptions> options, 
-            ILogger<BaseScheduledJob> logger) : base(distributedLock, options, logger)
+            IDistributedLock distributedLock,
+            ILogger<RSSArticleExtractorJob> logger)
         {
             _rssFeedRepository = rssFeedRepository;
+            _articleRepository = articleRepository;
             _articleManager = articleManager;
+            _distributedLock = distributedLock;
+            _logger = logger;
         }
 
-        protected override string LockName => "rss-article-extractor";
-        protected override int IntervalMS => 10 * 1000;
-
-        protected override async Task Execute(CancellationToken cancellationToken)
+        public async Task Run(CancellationToken cancellationToken)
         {
-            var rssFeeds = await _rssFeedRepository.GetAll(cancellationToken);
-            foreach(var rssFeed in rssFeeds)
+            if (!await _distributedLock.TryAcquireLock(LockName, cancellationToken))
             {
-                try
-                {
-                    ExtractArticlesFromFeed(rssFeed);
-                }
-                catch(Exception ex)
-                {
-                    Logger.LogError(ex.ToString());   
-                }
+                return;
             }
 
-            await _rssFeedRepository.Update(rssFeeds, cancellationToken);
-            await _rssFeedRepository.SaveChanges(cancellationToken);
+            try
+            {
+                var rssFeeds = await _rssFeedRepository.GetAll(cancellationToken);
+                foreach (var rssFeed in rssFeeds)
+                {
+                    try
+                    {
+                        await ExtractArticlesFromFeed(rssFeed, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.ToString());
+                    }
+                }
+
+                await _rssFeedRepository.Update(rssFeeds, cancellationToken);
+                await _rssFeedRepository.SaveChanges(cancellationToken);
+            }
+            finally
+            {
+                await _distributedLock.ReleaseLock(LockName, cancellationToken);
+            }
         }
 
-        private void ExtractArticlesFromFeed(RSSFeedAggregate rssFeed)
+        private async Task ExtractArticlesFromFeed(RSSFeedAggregate rssFeed, CancellationToken cancellationToken)
         {
             var reader = XmlReader.Create(rssFeed.Url);
             var feed = SyndicationFeed.Load(reader);
             reader.Close();
-            var result = new List<ArticleAddedEvent>();
-            foreach(var item in feed.Items.OrderBy(i => i.PublishDate))
+            var result = new List<ArticleAggregate>();
+            foreach (var item in feed.Items.OrderBy(i => i.PublishDate))
             {
                 if (!rssFeed.IsArticleExtracted(item.PublishDate))
                 {
-                    ArticleAggregate.Create(item.Id, item.Title.Text, item.Summary.Text, null, "en", item.PublishDate, out ArticleAddedEvent evt);
-                    result.Add(evt);
+                    var article = ArticleAggregate.Create(item.Id, item.Title.Text, item.Summary.Text, null, "en", item.PublishDate);
+                    result.Add(article);
                 }
             }
 
             if (result.Any())
             {
-                using (var transactionScope = new TransactionScope())
+                using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     _articleManager.AddArticles(result);
+                    foreach(var article in result)
+                    {
+                        await _articleRepository.Add(article, cancellationToken);
+                    }
+
+                    await _articleRepository.SaveChanges(cancellationToken);
                     transactionScope.Complete();
                 }
 

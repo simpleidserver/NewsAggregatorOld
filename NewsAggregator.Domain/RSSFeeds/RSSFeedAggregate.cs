@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NewsAggregator.Domain.RSSFeeds
 {
-    public class RSSFeedAggregate
+    public class RSSFeedAggregate : BaseAggregate
     {
         private RSSFeedAggregate()
         {
@@ -34,8 +34,13 @@ namespace NewsAggregator.Domain.RSSFeeds
 
         public static RSSFeedAggregate Create(string title, string description, string url)
         {
-            var result = new RSSFeedAggregate { Title = title, Description = description, Url = url };
+            var result = new RSSFeedAggregate { Id = Guid.NewGuid().ToString(), Title = title, Description = description, Url = url };
             return result;
+        }
+
+        protected override void Handle(dynamic evt)
+        {
+
         }
     }
 }

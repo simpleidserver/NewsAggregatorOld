@@ -58,7 +58,7 @@ namespace NewsAggregator.ML.Helpers
 
         public static IEnumerable<SessionFileInformation> GetSessionFiles()
         {
-            var files = Directory.GetFiles(GetDirectoryPath(), "session-(.*).csv");
+            var files = Directory.GetFiles(GetDirectoryPath(), "session-*.csv");
             foreach(var file in files)
             {
                 var fileName = Path.GetFileName(file);

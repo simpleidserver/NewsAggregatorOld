@@ -1,4 +1,5 @@
-﻿using NewsAggregator.Domain.Articles.Events;
+﻿using NewsAggregator.Domain.Articles;
+using NewsAggregator.Domain.Articles.Events;
 using NewsAggregator.ML.Exceptions;
 using NewsAggregator.ML.Helpers;
 using NewsAggregator.ML.Models;
@@ -13,19 +14,19 @@ namespace NewsAggregator.ML.Articles.Operations
 {
     public class AppendArticlesOperation : IOperation
     {
-        private readonly IEnumerable<ArticleAddedEvent> _evts;
+        private readonly IEnumerable<ArticleAggregate> _articles;
 
-        public AppendArticlesOperation(IEnumerable<ArticleAddedEvent> evts)
+        public AppendArticlesOperation(IEnumerable<ArticleAggregate> articles)
         {
-            _evts = evts;
+            _articles = articles;
         }
 
         public Task Execute(CancellationToken cancellationToken)
         {
-            var firstArticle = _evts.First();
+            var firstArticle = _articles.First();
             var csvFilePath = DirectoryHelper.GetCSVArticles(firstArticle.Language);
             var csvFileReader = new CSVFileReader();
-            var externalIds = _evts.Select(e => e.ExternalId);
+            var externalIds = _articles.Select(e => e.ExternalId);
             if (csvFileReader.TryGetRecord(csvFilePath, art => externalIds.Contains(art.ExternalId), out ArticleData articleData))
             {
                 throw new InternalArticleOperationException(Global.ArticlesAlreadyExists);
@@ -34,9 +35,9 @@ namespace NewsAggregator.ML.Articles.Operations
             DirectoryHelper.CreateFile(csvFilePath);
             using (var streamWriter = new StreamWriter(csvFilePath))
             {
-                foreach(var evt in _evts)
+                foreach(var article in _articles)
                 {
-                    streamWriter.WriteLine($"{evt.Id},{evt.ExternalId},\"{evt.Title} {evt.Summary}\"");
+                    streamWriter.WriteLine($"{article.Id},{article.ExternalId},\"{article.Title} {article.Summary}\"");
                 }
             }
 
@@ -45,12 +46,12 @@ namespace NewsAggregator.ML.Articles.Operations
 
         public void Rollback()
         {
-            var firstArticle = _evts.First();
+            var firstArticle = _articles.First();
             var csvFilePath = DirectoryHelper.GetCSVArticles(firstArticle.Language);
             var tmpCsvFilePath = DirectoryHelper.GetTmpCSVArticles(firstArticle.Language);
             DirectoryHelper.CreateFile(tmpCsvFilePath);
             var csvFileReader = new CSVFileReader();
-            var externalIds = _evts.Select(e => e.ExternalId);
+            var externalIds = _articles.Select(e => e.ExternalId);
             using (var streamWriter = new StreamWriter(tmpCsvFilePath))
             {
                 foreach (var records in csvFileReader.Read<ArticleData>(csvFilePath))

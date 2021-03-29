@@ -11,9 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Domain", "Ne
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Startup Layer", "02. Startup Layer", "{B7FEA081-88CA-49D7-8C0C-6B7A715F10CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsAggregator.ML.Startup", "NewsAggregator.ML.Startup\NewsAggregator.ML.Startup.csproj", "{59D4928B-DA38-44F1-BDF5-ACAFD0C08244}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.ML.Startup", "NewsAggregator.ML.Startup\NewsAggregator.ML.Startup.csproj", "{59D4928B-DA38-44F1-BDF5-ACAFD0C08244}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Core", "NewsAggregator.Core\NewsAggregator.Core.csproj", "{7D79628B-69E2-4725-B7C1-9BF2181C0133}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Api", "NewsAggregator.Api\NewsAggregator.Api.csproj", "{0231558B-00F3-44C9-B069-DDFD4194F377}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.EF", "NewsAggregator.EF\NewsAggregator.EF.csproj", "{A7D9D98A-5E28-4CA7-83D5-4D9AB7A21548}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Api.Startup", "NewsAggregator.Api.Startup\NewsAggregator.Api.Startup.csproj", "{AC049DCC-33B7-4FEB-925E-11D57B43CE2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +43,18 @@ Global
 		{7D79628B-69E2-4725-B7C1-9BF2181C0133}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D79628B-69E2-4725-B7C1-9BF2181C0133}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D79628B-69E2-4725-B7C1-9BF2181C0133}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0231558B-00F3-44C9-B069-DDFD4194F377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0231558B-00F3-44C9-B069-DDFD4194F377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0231558B-00F3-44C9-B069-DDFD4194F377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0231558B-00F3-44C9-B069-DDFD4194F377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7D9D98A-5E28-4CA7-83D5-4D9AB7A21548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D9D98A-5E28-4CA7-83D5-4D9AB7A21548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D9D98A-5E28-4CA7-83D5-4D9AB7A21548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D9D98A-5E28-4CA7-83D5-4D9AB7A21548}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC049DCC-33B7-4FEB-925E-11D57B43CE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC049DCC-33B7-4FEB-925E-11D57B43CE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC049DCC-33B7-4FEB-925E-11D57B43CE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC049DCC-33B7-4FEB-925E-11D57B43CE2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +64,9 @@ Global
 		{A8008400-3949-4995-BF31-E0D55B814D81} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
 		{59D4928B-DA38-44F1-BDF5-ACAFD0C08244} = {B7FEA081-88CA-49D7-8C0C-6B7A715F10CB}
 		{7D79628B-69E2-4725-B7C1-9BF2181C0133} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
+		{0231558B-00F3-44C9-B069-DDFD4194F377} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
+		{A7D9D98A-5E28-4CA7-83D5-4D9AB7A21548} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
+		{AC049DCC-33B7-4FEB-925E-11D57B43CE2D} = {B7FEA081-88CA-49D7-8C0C-6B7A715F10CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C7BA5EB-A78B-4C72-BF92-AE810C98F64D}

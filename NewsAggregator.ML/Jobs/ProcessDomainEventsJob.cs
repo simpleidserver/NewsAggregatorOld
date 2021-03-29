@@ -11,12 +11,17 @@ using System.Threading.Tasks;
 
 namespace NewsAggregator.ML.Jobs
 {
+    /*
     public class ProcessDomainEventsJob : BaseJob<DomainEventNotification>
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IDistributedLock _distributedLock;
 
-        public ProcessDomainEventsJob(IMessageBroker messageBroker, IOptions<NewsAggregatorMLOptions> options, IServiceProvider serviceProvider, IDistributedLock distributedLock) : base(messageBroker, options)
+        public ProcessDomainEventsJob(
+            IMessageBroker messageBroker, 
+            IOptions<NewsAggregatorMLOptions> options, 
+            IServiceProvider serviceProvider, 
+            IDistributedLock distributedLock) : base(messageBroker, options)
         {
             _serviceProvider = serviceProvider;
             _distributedLock = distributedLock;
@@ -55,4 +60,5 @@ namespace NewsAggregator.ML.Jobs
             }
         }
     }
+    */
 }

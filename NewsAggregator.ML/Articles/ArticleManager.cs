@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NewsAggregator.Domain.Articles.Events;
+using NewsAggregator.Domain.Articles;
 using NewsAggregator.ML.Articles.Operations;
 using NewsAggregator.ML.Factories;
 using System;
@@ -26,11 +26,11 @@ namespace NewsAggregator.ML.Articles
             _logger = logger;
         }
 
-        public void AddArticles(IEnumerable<ArticleAddedEvent> evts)
+        public void AddArticles(IEnumerable<ArticleAggregate> articles)
         {
-            EnlisteOperation(_logger, new AppendArticlesOperation(evts));
-            EnlisteOperation(_logger, new TrainWord2VecOperation(evts.First(), _options, _httpClientFactory, _logger));
-            EnlisteOperation(_logger, new TrainLDAOperation(evts.First(), _options));
+            EnlisteOperation(_logger, new AppendArticlesOperation(articles));
+            EnlisteOperation(_logger, new TrainWord2VecOperation(articles.First(), _options, _httpClientFactory, _logger));
+            EnlisteOperation(_logger, new TrainLDAOperation(articles.First(), _options));
         }
 
         private static readonly object _enlistmentsLock = new object();

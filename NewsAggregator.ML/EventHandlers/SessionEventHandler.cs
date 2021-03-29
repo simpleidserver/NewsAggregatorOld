@@ -23,7 +23,7 @@ namespace NewsAggregator.ML.EventHandlers
         {
             var csvFilePath = DirectoryHelper.GetCSVSessionFilePath(evt.PersonId, evt.SessionId);
             DirectoryHelper.CreateFile(csvFilePath);
-            File.WriteAllLines(csvFilePath, new string[] { $"{evt.EventType.Id},{evt.ArticleId},{evt.ArticleLanguage}"});
+            File.AppendAllLines(csvFilePath, new string[] { $"{evt.EventType.Id},{evt.ArticleId},{evt.ArticleLanguage}"});
         }
     }
 }

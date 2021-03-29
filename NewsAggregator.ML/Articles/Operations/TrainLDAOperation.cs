@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML;
+using NewsAggregator.Domain.Articles;
 using NewsAggregator.Domain.Articles.Events;
 using NewsAggregator.ML.Helpers;
 using NewsAggregator.ML.Models;
@@ -9,21 +10,21 @@ namespace NewsAggregator.ML.Articles.Operations
 {
     public class TrainLDAOperation : IOperation
     {
-        private readonly ArticleAddedEvent _evt;
+        private readonly ArticleAggregate _article;
         private readonly NewsAggregatorMLOptions _options;
 
         public TrainLDAOperation(
-            ArticleAddedEvent evt,
+            ArticleAggregate article,
             NewsAggregatorMLOptions options)
         {
-            _evt = evt;
+            _article = article;
             _options = options;
         }
 
         public Task Execute(CancellationToken cancellationToken)
         {
             var mlContext = new MLContext();
-            var fullDataView = mlContext.Data.LoadFromTextFile<ArticleData>(DirectoryHelper.GetCSVArticles(_evt.Language), hasHeader: false, separatorChar: ',');
+            var fullDataView = mlContext.Data.LoadFromTextFile<ArticleData>(DirectoryHelper.GetCSVArticles(_article.Language), hasHeader: false, separatorChar: ',');
             var textPipeline = mlContext.Transforms.Text
                 .NormalizeText("NormalizedText", "Text")
                  .Append(mlContext.Transforms.Text.TokenizeIntoWords("Tokens", "NormalizedText")) // Extract tokens.
@@ -32,7 +33,7 @@ namespace NewsAggregator.ML.Articles.Operations
                  .Append(mlContext.Transforms.Text.ProduceNgrams("Tokens")) // Produces a vector of counts of n-gram
                  .Append(mlContext.Transforms.Text.LatentDirichletAllocation("Features", "Tokens", numberOfTopics: _options.LDANbTopics)); // Create a LDA (uses LightLDA) to transform text into a vector of Single indicating the similarity of the text with each topic identified.
             var textTransformer = textPipeline.Fit(fullDataView);
-            mlContext.Model.Save(textTransformer, fullDataView.Schema, DirectoryHelper.GetLDAArticles(_evt.Language));
+            mlContext.Model.Save(textTransformer, fullDataView.Schema, DirectoryHelper.GetLDAArticles(_article.Language));
             return Task.CompletedTask;
         }
 

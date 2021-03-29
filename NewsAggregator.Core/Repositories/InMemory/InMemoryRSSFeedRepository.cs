@@ -27,9 +27,9 @@ namespace NewsAggregator.Core.Repositories.InMemory
             return Task.CompletedTask;
         }
 
-        public Task SaveChanges(CancellationToken cancellationToken)
+        public Task<int> SaveChanges(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(1);
         }
     }
 }

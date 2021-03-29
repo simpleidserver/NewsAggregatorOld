@@ -9,6 +9,6 @@ namespace NewsAggregator.Core.Repositories
     {
         Task<IEnumerable<RSSFeedAggregate>> GetAll(CancellationToken cancellationToken);
         Task Update(IEnumerable<RSSFeedAggregate> rssFeeds, CancellationToken cancellationToken);
-        Task SaveChanges(CancellationToken cancellationToken);
+        Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 }

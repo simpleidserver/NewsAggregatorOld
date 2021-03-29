@@ -14,10 +14,10 @@ namespace NewsAggregator.Domain.Articles
         public string Language { get; set; }
         public DateTimeOffset PublishDate { get; set; }
 
-        public static ArticleAggregate Create(string externalId, string title, string summary, string content, string language, DateTimeOffset publishDate, out ArticleAddedEvent evt)
+        public static ArticleAggregate Create(string externalId, string title, string summary, string content, string language, DateTimeOffset publishDate)
         {
             var result = new ArticleAggregate();
-            evt = new ArticleAddedEvent(Guid.NewGuid().ToString(), externalId, title, summary, content, language, publishDate);
+            var evt = new ArticleAddedEvent(Guid.NewGuid().ToString(), externalId, title, summary, content, language, publishDate);
             result.Handle(evt);
             result.DomainEvts.Add(evt);
             return result;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.ML;
+using NewsAggregator.Domain.Articles;
 using NewsAggregator.Domain.Articles.Events;
 using NewsAggregator.ML.Factories;
 using NewsAggregator.ML.Helpers;
@@ -17,18 +18,18 @@ namespace NewsAggregator.ML.Articles.Operations
 {
     public class TrainWord2VecOperation : IOperation
     {
-        private readonly ArticleAddedEvent _evt;
+        private readonly ArticleAggregate _article;
         private readonly NewsAggregatorMLOptions _options;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ArticleManager> _logger;
 
         public TrainWord2VecOperation(
-            ArticleAddedEvent evt,
+            ArticleAggregate article,
             NewsAggregatorMLOptions options,
             IHttpClientFactory httpClientFactory,
              ILogger<ArticleManager> logger)
         {
-            _evt = evt;
+            _article = article;
             _options = options;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
@@ -36,19 +37,19 @@ namespace NewsAggregator.ML.Articles.Operations
 
         public virtual async Task Execute(CancellationToken cancellationToken)
         {
-            var vectorFilePath = await DownloadAndExtractWordEmbedding(_evt.Language, cancellationToken);
-            if(Directory.Exists(DirectoryHelper.GetTrainedWordEmbeddingFilePath(_evt.Language)))
+            var vectorFilePath = await DownloadAndExtractWordEmbedding(_article.Language, cancellationToken);
+            if(Directory.Exists(DirectoryHelper.GetTrainedWordEmbeddingFilePath(_article.Language)))
             {
                 return;
             }
 
             var mlContext = new MLContext();
-            var fullDataView = mlContext.Data.LoadFromTextFile<ArticleData>(DirectoryHelper.GetCSVArticles(_evt.Language), hasHeader: false, separatorChar: ',');
+            var fullDataView = mlContext.Data.LoadFromTextFile<ArticleData>(DirectoryHelper.GetCSVArticles(_article.Language), hasHeader: false, separatorChar: ',');
             var textPipeline = mlContext.Transforms.Text.NormalizeText("Text")
                 .Append(mlContext.Transforms.Text.TokenizeIntoWords("Tokens", "Text"))
                 .Append(mlContext.Transforms.Text.ApplyWordEmbedding("Features", vectorFilePath, "Tokens"));
             var trainedModel = textPipeline.Fit(fullDataView);
-            mlContext.Model.Save(trainedModel, fullDataView.Schema, DirectoryHelper.GetTrainedWordEmbeddingFilePath(_evt.Language));
+            mlContext.Model.Save(trainedModel, fullDataView.Schema, DirectoryHelper.GetTrainedWordEmbeddingFilePath(_article.Language));
         }
 
         public void Rollback() { }
