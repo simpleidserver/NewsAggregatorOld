@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NewsAggregator.Domain.RSSFeeds;
+using NewsAggregator.Domain.DataSources;
 using NewsAggregator.EF;
 using NewsAggregator.ML.Jobs;
 using System;
@@ -30,9 +30,12 @@ namespace NewsAggregator.ML.Startup
             GlobalConfiguration.Configuration
                 .UseSqlServerStorage(connectionString)
                 .UseActivator(new HangfireActivator(serviceProvider));
-            using (var server = new BackgroundJobServer())
+            using (var server = new BackgroundJobServer(new BackgroundJobServerOptions
             {
-                RecurringJob.AddOrUpdate<IRSSArticleExtractorJob>("rssExtractArticles", j => j.Run(CancellationToken.None), Cron.MinuteInterval(5));
+                WorkerCount = 1
+            }))
+            {
+                RecurringJob.AddOrUpdate<IArticleExtractorJob>("rssExtractArticles", j => j.Run(CancellationToken.None), Cron.MinuteInterval(5));
                 RecurringJob.AddOrUpdate<INextArticleRecommenderJob>("nextArticlesRecommender", j => j.Run(CancellationToken.None), Cron.HourInterval(1));
                 Console.WriteLine("Press Enter to quit the application !");
                 Console.ReadLine();
@@ -44,12 +47,12 @@ namespace NewsAggregator.ML.Startup
             using (var dbContext = serviceProvider.GetService<NewsAggregatorDBContext>())
             {
                 dbContext.Database.Migrate();
-                if (dbContext.RSSFeeds.AnyAsync().Result)
+                if (dbContext.Feeds.AnyAsync().Result)
                 {
                     return;
                 }
 
-                dbContext.RSSFeeds.Add(RSSFeedAggregate.Create("BBC", "Top stories", "http://feeds.bbci.co.uk/news/rss.xml"));
+                dbContext.DataSources.Add(DataSourceAggregate.Create("BBC", "Top stories", "http://feeds.bbci.co.uk/news/rss.xml"));
                 dbContext.SaveChanges();
             }
         }

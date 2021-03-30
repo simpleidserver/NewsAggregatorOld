@@ -33,14 +33,7 @@ namespace NewsAggregator.ML.Articles.Operations
             }
 
             DirectoryHelper.CreateFile(csvFilePath);
-            using (var streamWriter = new StreamWriter(csvFilePath))
-            {
-                foreach(var article in _articles)
-                {
-                    streamWriter.WriteLine($"{article.Id},{article.ExternalId},\"{article.Title} {article.Summary}\"");
-                }
-            }
-
+            File.AppendAllLines(csvFilePath, _articles.Select(article => $"{article.Id},{article.ExternalId},\"{article.Title} {article.Summary}\""));
             return Task.CompletedTask;
         }
 

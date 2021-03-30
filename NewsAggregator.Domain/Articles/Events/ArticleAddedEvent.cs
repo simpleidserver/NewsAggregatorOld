@@ -6,7 +6,7 @@ namespace NewsAggregator.Domain.Articles.Events
     [DebuggerDisplay("Add article")]
     public class ArticleAddedEvent : DomainEvent
     {
-        public ArticleAddedEvent(string id, string externalId, string title, string summary, string content, string language, DateTimeOffset publishDate) : base(id) 
+        public ArticleAddedEvent(string id, string aggregateId, int version, string externalId, string title, string summary, string content, string language, DateTimeOffset publishDate) : base(id, aggregateId, version) 
         {
             ExternalId = externalId;
             Title = title;

@@ -10,6 +10,7 @@ namespace NewsAggregator.Domain
         }
         
         public string Id { get; set; }
+        public int Version { get; set; }
         public ICollection<DomainEvent> DomainEvts { get; private set; }
 
         protected abstract void Handle(dynamic evt);

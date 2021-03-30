@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NewsAggregator.Domain.Articles;
-using NewsAggregator.Domain.RSSFeeds;
+using NewsAggregator.Domain.DataSources;
+using NewsAggregator.Domain.Feeds;
 
 namespace NewsAggregator.EF
 {
@@ -8,8 +9,9 @@ namespace NewsAggregator.EF
     {
         public NewsAggregatorDBContext(DbContextOptions<NewsAggregatorDBContext> dbContextOptions) : base(dbContextOptions) { }
 
-        public DbSet<RSSFeedAggregate> RSSFeeds { get; set; }
+        public DbSet<FeedAggregate> Feeds { get; set; }
         public DbSet<ArticleAggregate> Articles { get; set; }
+        public DbSet<DataSourceAggregate> DataSources { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

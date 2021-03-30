@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using NewsAggregator.ML.Jobs;
 using System;
 
 namespace NewsAggregator.ML.Startup

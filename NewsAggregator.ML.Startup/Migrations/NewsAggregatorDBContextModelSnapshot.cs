@@ -42,12 +42,15 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Articles");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.RSSFeeds.RSSFeedAggregate", b =>
+            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceAggregate", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -61,14 +64,20 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("RSSFeeds");
+                    b.ToTable("DataSources");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.RSSFeeds.RSSFeedExtractionHistory", b =>
+            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceExtractionHistory", b =>
                 {
                     b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DataSourceAggregateId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset>("LastArticlePublicationDate")
@@ -77,27 +86,82 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.Property<int>("NbExtractedArticle")
                         .HasColumnType("int");
 
-                    b.Property<string>("RSSFeedAggregateId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSourceAggregateId");
+
+                    b.ToTable("DataSourceExtractionHistory");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedAggregate", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Feeds");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedDatasource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("DatasourceId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeedAggregateId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RSSFeedAggregateId");
+                    b.HasIndex("FeedAggregateId");
 
-                    b.ToTable("RSSFeedExtractionHistory");
+                    b.ToTable("FeedDatasource");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.RSSFeeds.RSSFeedExtractionHistory", b =>
+            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceExtractionHistory", b =>
                 {
-                    b.HasOne("NewsAggregator.Domain.RSSFeeds.RSSFeedAggregate", null)
+                    b.HasOne("NewsAggregator.Domain.DataSources.DataSourceAggregate", null)
                         .WithMany("ExtractionHistories")
-                        .HasForeignKey("RSSFeedAggregateId")
+                        .HasForeignKey("DataSourceAggregateId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.RSSFeeds.RSSFeedAggregate", b =>
+            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedDatasource", b =>
+                {
+                    b.HasOne("NewsAggregator.Domain.Feeds.FeedAggregate", null)
+                        .WithMany("DataSources")
+                        .HasForeignKey("FeedAggregateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceAggregate", b =>
                 {
                     b.Navigation("ExtractionHistories");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedAggregate", b =>
+                {
+                    b.Navigation("DataSources");
                 });
 #pragma warning restore 612, 618
         }

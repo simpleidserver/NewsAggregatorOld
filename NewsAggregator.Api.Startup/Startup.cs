@@ -1,29 +1,65 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace NewsAggregator.Api.Startup
 {
     public class Startup
     {
-        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment env)
         {
-            _configuration = configuration;
+            _env = env;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             const string connectionString = "Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=NewsAggregator;Integrated Security=True";
             GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
-            services.AddNewsAggregatorApi().AddNewsAggregatorEF(o => o.UseSqlServer(connectionString));
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = ExtractKey("openid_puk.txt"),
+                    ValidAudiences = new List<string>
+                    {
+                        "https://localhost:60000"
+                    },
+                    ValidIssuers = new List<string>
+                    {
+                        "https://localhost:60000"
+                    }
+                };
+            });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Authenticated", builder =>
+                {
+                    builder.RequireAuthenticatedUser();
+                });
+            });
+            services
+                .AddNewsAggregatorApi()
+                .AddNewsAggregatorEF(o => o.UseSqlServer(connectionString))
+                .AddNewsAggregatorQuerySQL(connectionString);
             services.AddHangfire(configuration => configuration.UseSqlServerStorage(connectionString));
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
             services.Configure<ForwardedHeadersOptions>(options =>
@@ -35,6 +71,7 @@ namespace NewsAggregator.Api.Startup
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseAuthentication();
             app.UseForwardedHeaders();
             app.UseCors("AllowAll");
             app.UseSwagger();
@@ -53,6 +90,42 @@ namespace NewsAggregator.Api.Startup
                     name: "DefaultRoute",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private RsaSecurityKey ExtractKey(string fileName)
+        {
+            var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, fileName));
+            var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            var rsa = RSA.Create();
+            var rsaParameters = new RSAParameters
+            {
+                Modulus = Base64DecodeBytes(dic["n"].ToString()),
+                Exponent = Base64DecodeBytes(dic["e"].ToString())
+            };
+            rsa.ImportParameters(rsaParameters);
+            return new RsaSecurityKey(rsa);
+        }
+
+        private static byte[] Base64DecodeBytes(string base64EncodedData)
+        {
+            var s = base64EncodedData
+                .Trim()
+                .Replace(" ", "+")
+                .Replace('-', '+')
+                .Replace('_', '/');
+            switch (s.Length % 4)
+            {
+                case 0:
+                    return Convert.FromBase64String(s);
+                case 2:
+                    s += "==";
+                    goto case 0;
+                case 3:
+                    s += "=";
+                    goto case 0;
+                default:
+                    throw new InvalidOperationException("Illegal base64url string!");
+            }
         }
     }
 }

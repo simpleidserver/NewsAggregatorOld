@@ -17,7 +17,7 @@ namespace NewsAggregator.Domain.Articles
         public static ArticleAggregate Create(string externalId, string title, string summary, string content, string language, DateTimeOffset publishDate)
         {
             var result = new ArticleAggregate();
-            var evt = new ArticleAddedEvent(Guid.NewGuid().ToString(), externalId, title, summary, content, language, publishDate);
+            var evt = new ArticleAddedEvent(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 0, externalId, title, summary, content, language, publishDate);
             result.Handle(evt);
             result.DomainEvts.Add(evt);
             return result;
@@ -30,13 +30,14 @@ namespace NewsAggregator.Domain.Articles
 
         private void Handle(ArticleAddedEvent evt)
         {
-            Id = evt.Id;
+            Id = evt.AggregateId;
             ExternalId = evt.ExternalId;
             Title = evt.Title;
             Summary = evt.Summary;
             Content = evt.Content;
             Language = evt.Language;
             PublishDate = evt.PublishDate;
+            Version = evt.Version;
         }
     }
 }

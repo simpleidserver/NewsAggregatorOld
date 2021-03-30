@@ -16,13 +16,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.Configure<WordEmbeddingOption>((o) => { });
             services.AddTransient<INextArticleRecommenderJob, NextArticleRecommenderJob>();
-            services.AddTransient<IRSSArticleExtractorJob, RSSArticleExtractorJob>();
+            services.AddTransient<IArticleExtractorJob, ArticleExtractorJob>();
             services.AddTransient<IArticleManager, ArticleManager>();
             services.AddTransient<IHttpClientFactory, HttpClientFactory>();
             services.AddTransient(typeof(IEventHandler<SessionInteractionOccuredEvent>), typeof(SessionEventHandler));
             services.AddSingleton<IDistributedLock, InMemoryDistributedLock>();
             services.AddSingleton<IMessageBroker, InMemoryMessageBroker>();
-            services.AddNewsAggregatorCore();
             return services;
         }
     }

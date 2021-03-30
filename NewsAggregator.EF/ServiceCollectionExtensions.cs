@@ -11,8 +11,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddNewsAggregatorEF(this IServiceCollection services, Action<DbContextOptionsBuilder> optionsAction = null)
         {
             services.AddDbContext<NewsAggregatorDBContext>(optionsAction, ServiceLifetime.Transient);
-            services.AddTransient<IRSSFeedRepository, RSSFeedRepository>();
-            services.AddTransient<IArticleRepository, ArticleRepository>();
+            services.AddTransient<IFeedCommandRepository, FeedCommandRepository>();
+            services.AddTransient<IArticleCommandRepository, ArticleCommandRepository>();
+            services.AddTransient<IDataSourceCommandRepository, DataSourceCommandRepository>();
             return services;
         }
     }

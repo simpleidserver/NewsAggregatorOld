@@ -6,7 +6,7 @@ namespace NewsAggregator.Domain.Sessions.Events
     [DebuggerDisplay("An interaction occured")]
     public class SessionInteractionOccuredEvent : DomainEvent
     {
-        public SessionInteractionOccuredEvent(string id, string personId, string sessionId, InteractionTypes eventType, string articleId, string articleLanguage) : base(id)
+        public SessionInteractionOccuredEvent(string id, string aggregateId, int version, string personId, string sessionId, InteractionTypes eventType, string articleId, string articleLanguage) : base(id, aggregateId, version)
         {
             PersonId = personId;
             SessionId = sessionId;
