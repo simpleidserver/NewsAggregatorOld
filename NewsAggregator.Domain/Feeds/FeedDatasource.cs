@@ -8,7 +8,7 @@
 
         public static FeedDatasource Create(string datasourceId)
         {
-            var result = new FeedDatasource { };
+            var result = new FeedDatasource { DatasourceId = datasourceId };
             return result;
         }
     }

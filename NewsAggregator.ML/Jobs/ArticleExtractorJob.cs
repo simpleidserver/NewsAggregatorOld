@@ -80,7 +80,7 @@ namespace NewsAggregator.ML.Jobs
             {
                 if (!datasource.IsArticleExtracted(item.PublishDate))
                 {
-                    var article = ArticleAggregate.Create(item.Id, item.Title.Text, item.Summary.Text, null, "en", item.PublishDate);
+                    var article = ArticleAggregate.Create(item.Id, item.Title.Text, item.Summary.Text, null, "en", datasource.Id, item.PublishDate);
                     result.Add(article);
                 }
             }

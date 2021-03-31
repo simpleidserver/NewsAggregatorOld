@@ -17,12 +17,12 @@ namespace NewsAggregator.EF.Repositories
 
         public Task<FeedAggregate> Get(string id, CancellationToken cancellationToken)
         {
-            return _dbContext.Feeds.FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
+            return _dbContext.Feeds.Include(f => f.DataSources).FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
         }
 
         public Task<FeedAggregate> Get(string userId, string title, CancellationToken cancellationToken)
         {
-            return _dbContext.Feeds.FirstOrDefaultAsync(f => f.UserId == userId && f.Title == title, cancellationToken);
+            return _dbContext.Feeds.Include(f => f.DataSources).FirstOrDefaultAsync(f => f.UserId == userId && f.Title == title, cancellationToken);
         }
 
         public Task Add(FeedAggregate feed, CancellationToken cancellationToken)

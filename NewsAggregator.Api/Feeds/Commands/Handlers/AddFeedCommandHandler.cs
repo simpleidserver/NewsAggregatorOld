@@ -26,7 +26,7 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
         {
             var newFeed = FeedAggregate.Create(request.UserId, request.Title);
             var feed = await _feedCommandRepository.Get(request.UserId, request.Title, cancellationToken);
-            if (feed == null)
+            if (feed != null)
             {
                 _logger.LogError($"Feed with the title {request.Title} already exists");
                 throw new NewsAggregatorException(string.Format(Global.FeedAlreadyExists, request.Title));
@@ -35,7 +35,7 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
             await _feedCommandRepository.Add(newFeed, cancellationToken);
             await _feedCommandRepository.SaveChanges(cancellationToken);
             _logger.LogInformation($"User {request.UserId} adds the feed {request.Title}");
-            return feed.Id;
+            return newFeed.Id;
         }
     }
 }

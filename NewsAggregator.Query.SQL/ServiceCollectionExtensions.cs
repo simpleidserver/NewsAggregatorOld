@@ -11,6 +11,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             serviceCollection.AddSingleton(typeof(ISqlConnectionFactory), new SqlConnectionFactory(connectionString));
             serviceCollection.AddTransient<IFeedQueryRepository, FeedQueryRepository>();
+            serviceCollection.AddTransient<IDataSourceQueryRepository, DataSourceQueryRepository>();
+            serviceCollection.AddTransient<IArticleQueryRepository, ArticleQueryRepository>();
             return serviceCollection;
         }
     }

@@ -12,12 +12,13 @@ namespace NewsAggregator.Domain.Articles
         public string Summary { get; set; }
         public string Content { get; set; }
         public string Language { get; set; }
+        public string DataSourceId { get; set; }
         public DateTimeOffset PublishDate { get; set; }
 
-        public static ArticleAggregate Create(string externalId, string title, string summary, string content, string language, DateTimeOffset publishDate)
+        public static ArticleAggregate Create(string externalId, string title, string summary, string content, string language, string datasourceId, DateTimeOffset publishDate)
         {
             var result = new ArticleAggregate();
-            var evt = new ArticleAddedEvent(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 0, externalId, title, summary, content, language, publishDate);
+            var evt = new ArticleAddedEvent(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 0, externalId, title, summary, content, language, datasourceId, publishDate);
             result.Handle(evt);
             result.DomainEvts.Add(evt);
             return result;
@@ -36,6 +37,7 @@ namespace NewsAggregator.Domain.Articles
             Summary = evt.Summary;
             Content = evt.Content;
             Language = evt.Language;
+            DataSourceId = evt.DataSourceId;
             PublishDate = evt.PublishDate;
             Version = evt.Version;
         }

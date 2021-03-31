@@ -47,7 +47,7 @@ namespace NewsAggregator.ML.Startup
             using (var dbContext = serviceProvider.GetService<NewsAggregatorDBContext>())
             {
                 dbContext.Database.Migrate();
-                if (dbContext.Feeds.AnyAsync().Result)
+                if (dbContext.DataSources.AnyAsync().Result)
                 {
                     return;
                 }

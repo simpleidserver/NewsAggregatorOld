@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewsAggregator.EF;
 
 namespace NewsAggregator.ML.Startup.Migrations
 {
     [DbContext(typeof(NewsAggregatorDBContext))]
-    partial class NewsAggregatorDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210331144602_AddDataSourceIdColumn")]
+    partial class AddDataSourceIdColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

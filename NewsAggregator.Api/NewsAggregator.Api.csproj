@@ -11,9 +11,6 @@
     <ProjectReference Include="..\NewsAggregator.Core\NewsAggregator.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DataSources\" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Resources\Global.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

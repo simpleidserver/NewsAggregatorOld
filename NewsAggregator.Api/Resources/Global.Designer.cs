@@ -61,6 +61,15 @@ namespace NewsAggregator.Api.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Datasource {0} doesn&apos;t exist.
+        /// </summary>
+        internal static string DataSourceDoesntExist {
+            get {
+                return ResourceManager.GetString("DataSourceDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Feed with the title {0} already exists.
         /// </summary>
         internal static string FeedAlreadyExists {

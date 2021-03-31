@@ -22,8 +22,8 @@ namespace NewsAggregator.Query.SQL.Repositories
                             "[datasources].[Title] as [DatasourceTitle], " +
                             "[datasources].[Description] as [DatasourceDescription] " +
                             "FROM [dbo].[Feeds] as [feeds] " +
-                            "INNER JOIN[dbo].[FeedDatasource] as [feedDatasource] ON[feedDatasource].[FeedAggregateId] = [feeds].[Id] " +
-                            "INNER JOIN[dbo].[DataSources] as [datasources] ON[datasources].[Id] = [feedDatasource].[DatasourceId] " +
+                            "LEFT JOIN [dbo].[FeedDatasource] as [feedDatasource] ON [feedDatasource].[FeedAggregateId] = [feeds].[Id] " +
+                            "LEFT JOIN [dbo].[DataSources] as [datasources] ON [datasources].[Id] = [feedDatasource].[DatasourceId] " +
                             "where [feeds].[UserId] = @userId";
             var connection = _sqlConnectionFactory.GetOpenConnection();
             return connection.QueryAsync<FeedQueryResult>(sql, new

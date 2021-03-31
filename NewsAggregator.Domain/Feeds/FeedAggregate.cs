@@ -64,6 +64,7 @@ namespace NewsAggregator.Domain.Feeds
 
             Id = evt.AggregateId;
             UserId = evt.UserId;
+            Title = evt.Title;
             CreateDateTime = evt.CreateDateTime;
         }
 
