@@ -19,7 +19,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("NewsAggregator.Domain.Articles.ArticleAggregate", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Articles.ArticleAggregate", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -36,6 +36,12 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.Property<string>("Language")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("NbLikes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NbViews")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("PublishDate")
                         .HasColumnType("datetimeoffset");
 
@@ -45,6 +51,9 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Version")
                         .HasColumnType("int");
 
@@ -53,7 +62,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.ToTable("Articles");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceAggregate", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -75,7 +84,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.ToTable("DataSources");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceExtractionHistory", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceExtractionHistory", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -96,7 +105,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.ToTable("DataSourceExtractionHistory");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedAggregate", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Feeds.FeedAggregate", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -121,7 +130,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.ToTable("Feeds");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedDatasource", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Feeds.FeedDatasource", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,30 +150,143 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.ToTable("FeedDatasource");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceExtractionHistory", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Recommendations.RecommendationAggregate", b =>
                 {
-                    b.HasOne("NewsAggregator.Domain.DataSources.DataSourceAggregate", null)
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Recommendations");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Recommendations.RecommendationArticle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ArticleId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecommendationAggregateId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecommendationAggregateId");
+
+                    b.ToTable("RecommendationArticle");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Sessions.SessionAction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("ActionDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ArticleId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ArticleLanguage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("InteractionType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SessionAggregateId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionAggregateId");
+
+                    b.ToTable("SessionAction");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Sessions.SessionAggregate", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SessionAggregate");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceExtractionHistory", b =>
+                {
+                    b.HasOne("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", null)
                         .WithMany("ExtractionHistories")
                         .HasForeignKey("DataSourceAggregateId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedDatasource", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Feeds.FeedDatasource", b =>
                 {
-                    b.HasOne("NewsAggregator.Domain.Feeds.FeedAggregate", null)
+                    b.HasOne("NewsAggregator.Core.Domains.Feeds.FeedAggregate", null)
                         .WithMany("DataSources")
                         .HasForeignKey("FeedAggregateId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.DataSources.DataSourceAggregate", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Recommendations.RecommendationArticle", b =>
+                {
+                    b.HasOne("NewsAggregator.Core.Domains.Recommendations.RecommendationAggregate", null)
+                        .WithMany("Articles")
+                        .HasForeignKey("RecommendationAggregateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Sessions.SessionAction", b =>
+                {
+                    b.HasOne("NewsAggregator.Core.Domains.Sessions.SessionAggregate", null)
+                        .WithMany("Actions")
+                        .HasForeignKey("SessionAggregateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", b =>
                 {
                     b.Navigation("ExtractionHistories");
                 });
 
-            modelBuilder.Entity("NewsAggregator.Domain.Feeds.FeedAggregate", b =>
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Feeds.FeedAggregate", b =>
                 {
                     b.Navigation("DataSources");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Recommendations.RecommendationAggregate", b =>
+                {
+                    b.Navigation("Articles");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Sessions.SessionAggregate", b =>
+                {
+                    b.Navigation("Actions");
                 });
 #pragma warning restore 612, 618
         }

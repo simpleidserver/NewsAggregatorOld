@@ -1,60 +1,27 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NewsAggregator.Domain.Articles;
-using NewsAggregator.ML.Articles.Operations;
-using NewsAggregator.ML.Factories;
-using System;
+﻿using NewsAggregator.ML.Articles.Operations;
 using System.Collections.Generic;
-using System.Linq;
-using System.Transactions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NewsAggregator.ML.Articles
 {
     public class ArticleManager : IArticleManager
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly NewsAggregatorMLOptions _options;
-        private readonly ILogger<ArticleManager> _logger;
+        private readonly IEnumerable<IArticleOperation> _articleOperations;
 
-        public ArticleManager(
-            IHttpClientFactory httpClientFactory,
-            IOptions<NewsAggregatorMLOptions> options,
-            ILogger<ArticleManager> logger)
+        public ArticleManager(IEnumerable<IArticleOperation> articleOperations)
         {
-            _httpClientFactory = httpClientFactory;
-            _options = options.Value;
-            _logger = logger;
+            _articleOperations = articleOperations;
         }
 
-        public void AddArticles(IEnumerable<ArticleAggregate> articles)
+        public async Task TrainArticles(IEnumerable<string> languages, CancellationToken cancellationToken)
         {
-            EnlisteOperation(_logger, new AppendArticlesOperation(articles));
-            EnlisteOperation(_logger, new TrainWord2VecOperation(articles.First(), _options, _httpClientFactory, _logger));
-            EnlisteOperation(_logger, new TrainLDAOperation(articles.First(), _options));
-        }
-
-        private static readonly object _enlistmentsLock = new object();
-        [ThreadStatic]
-        private static Dictionary<string, ArticleEnlistment> _enlistments;
-
-        private static void EnlisteOperation(ILogger<ArticleManager> logger, IOperation operation)
-        {
-            var tx = Transaction.Current;
-            ArticleEnlistment enlistment;
-            lock (_enlistmentsLock)
+            foreach(var articleOperation in _articleOperations)
             {
-                if (_enlistments == null)
+                foreach(var language in languages)
                 {
-                    _enlistments = new Dictionary<string, ArticleEnlistment>();
+                    await articleOperation.Execute(language, cancellationToken);
                 }
-
-                if (!_enlistments.TryGetValue(tx.TransactionInformation.LocalIdentifier, out enlistment))
-                {
-                    enlistment = new ArticleEnlistment(logger, tx);
-                    _enlistments.Add(tx.TransactionInformation.LocalIdentifier, enlistment);
-                }
-
-                enlistment.Enlist(operation);
             }
         }
     }

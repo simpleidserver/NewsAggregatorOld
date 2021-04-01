@@ -1,4 +1,4 @@
-﻿using NewsAggregator.Domain.DataSources;
+﻿using NewsAggregator.Core.Domains.DataSources;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

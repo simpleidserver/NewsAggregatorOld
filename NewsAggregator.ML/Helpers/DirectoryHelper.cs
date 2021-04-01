@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace NewsAggregator.ML.Helpers
@@ -17,18 +16,6 @@ namespace NewsAggregator.ML.Helpers
         public static string GetDirectoryPath()
         {
             return Path.GetDirectoryName(typeof(DirectoryHelper).Assembly.Location);
-        }
-
-        public static string GetCSVArticles(string language)
-        {
-            var currentDateTime = DateTime.UtcNow;
-            return Path.Combine(GetDirectoryPath(), $"articles-{language}-{currentDateTime.ToString("MM-yyyy")}.csv");
-        }
-
-        public static string GetTmpCSVArticles(string language)
-        {
-            var currentDateTime = DateTime.UtcNow;
-            return Path.Combine(GetDirectoryPath(), $"articles-{language}-{currentDateTime.ToString("MM-yyyy")}-tmp.csv");
         }
 
         public static string GetLDAArticles(string language)

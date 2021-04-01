@@ -1,6 +1,8 @@
-﻿namespace NewsAggregator.Api.Articles.Commands
+﻿using MediatR;
+
+namespace NewsAggregator.Api.Articles.Commands
 {
-    public class ViewArticleCommand
+    public class ViewArticleCommand : IRequest<bool>
     {
         public string SessionId { get; set; }
         public string UserId { get; set; }

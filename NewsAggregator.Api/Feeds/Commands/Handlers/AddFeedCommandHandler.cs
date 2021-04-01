@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using NewsAggregator.Api.Resources;
-using NewsAggregator.Common.Exceptions;
+using NewsAggregator.Core.Domains.Feeds;
+using NewsAggregator.Core.Exceptions;
 using NewsAggregator.Core.Repositories;
-using NewsAggregator.Domain.Feeds;
 using System.Threading;
 using System.Threading.Tasks;
 

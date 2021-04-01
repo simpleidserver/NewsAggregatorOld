@@ -1,9 +1,11 @@
 ﻿using Hangfire;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NewsAggregator.Domain.DataSources;
+using NewsAggregator.Core.Domains.DataSources;
 using NewsAggregator.EF;
+using NewsAggregator.ML.EventHandlers;
 using NewsAggregator.ML.Jobs;
 using System;
 using System.Reflection;
@@ -16,15 +18,10 @@ namespace NewsAggregator.ML.Startup
         public static void Launch()
         {
             const string connectionString = "Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=NewsAggregator;Integrated Security=True";
-            var migrationsAssembly = typeof(JobLauncher).GetTypeInfo().Assembly.GetName().Name;
             var serviceCollection = new ServiceCollection();
-            serviceCollection
-                .AddNewsAggregatorML()
-                .AddNewsAggregatorEF(o => o.UseSqlServer(connectionString, o => o.MigrationsAssembly(migrationsAssembly)));
-            serviceCollection.AddLogging(logging =>
-            {
-                logging.AddConsole();
-            });
+            RegisterNewsAggregatorML(serviceCollection, connectionString);
+            RegisterLogging(serviceCollection);
+            RegisterMassTransit(serviceCollection);
             var serviceProvider = serviceCollection.BuildServiceProvider();
             Seed(serviceProvider);
             GlobalConfiguration.Configuration
@@ -40,6 +37,44 @@ namespace NewsAggregator.ML.Startup
                 Console.WriteLine("Press Enter to quit the application !");
                 Console.ReadLine();
             }
+        }
+
+        private static void RegisterNewsAggregatorML(IServiceCollection serviceCollection, string connectionString)
+        {
+            var migrationsAssembly = typeof(JobLauncher).GetTypeInfo().Assembly.GetName().Name;
+            serviceCollection
+                .AddNewsAggregatorML()
+                .AddNewsAggregatorEF(o => o.UseSqlServer(connectionString, o => o.MigrationsAssembly(migrationsAssembly)))
+                .AddNewsAggregatorQuerySQL(connectionString);
+        }
+
+        private static void RegisterLogging(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddLogging(logging =>
+            {
+                logging.AddConsole();
+            });
+        }
+
+        private static void RegisterMassTransit(IServiceCollection services)
+        {
+            // TODO : UPDATE !!!!
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<ArticleLikedEventConsumer>();
+                x.AddConsumer<ArticleViewedEventConsumer>();
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.ReceiveEndpoint("article-like-listener", e =>
+                    {
+                        e.ConfigureConsumer<ArticleLikedEventConsumer>(context);
+                    });
+                    cfg.ReceiveEndpoint("article-view-listener", e =>
+                    {
+                        e.ConfigureConsumer<ArticleViewedEventConsumer>(context);
+                    });
+                });
+            });
         }
 
         private static void Seed(IServiceProvider serviceProvider)

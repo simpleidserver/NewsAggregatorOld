@@ -14,6 +14,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IFeedCommandRepository, FeedCommandRepository>();
             services.AddTransient<IArticleCommandRepository, ArticleCommandRepository>();
             services.AddTransient<IDataSourceCommandRepository, DataSourceCommandRepository>();
+            services.AddTransient<ISessionCommandRepository, SessionCommandRepository>();
+            services.AddTransient<IRecommendationCommandRepository, RecommendationCommandRepository>();
             return services;
         }
     }

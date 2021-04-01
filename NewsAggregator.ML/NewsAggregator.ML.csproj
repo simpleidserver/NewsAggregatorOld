@@ -5,15 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.Core" Version="1.7.20" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML" Version="1.5.5" />
     <PackageReference Include="Accord.Math" Version="3.8.0" />
+    <PackageReference Include="MassTransit" Version="7.1.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NewsAggregator.Core\NewsAggregator.Core.csproj" />
+    <ProjectReference Include="..\NewsAggregator.Query.SQL\NewsAggregator.Query.SQL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NewsAggregator.Core.Domains.DataSources;
 using NewsAggregator.Core.Repositories;
-using NewsAggregator.Domain.DataSources;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

@@ -4,15 +4,15 @@ namespace NewsAggregator.ML.Models
 {
     public class PopularArticle : IEquatable<PopularArticle>
     {
-        public PopularArticle(string personId, string articleId, string articleLanguage, double score)
+        public PopularArticle(string userId, string articleId, string articleLanguage, double score)
         {
-            PersonId = personId;
+            UserId = userId;
             ArticleId = articleId;
             ArticleLanguage = articleLanguage;
             Score = score;
         }
 
-        public string PersonId { get; set; }
+        public string UserId { get; set; }
         public string ArticleId { get; set; }
         public string ArticleLanguage { get; set; }
         public double Score { get; set; }

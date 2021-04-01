@@ -18,7 +18,7 @@ namespace NewsAggregator.ML
             NbArticlesToProcess = 5;
             NbRetry = 5;
             ApplicationAssembly = Assembly.GetCallingAssembly();
-
+            ConnectionString = "Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=NewsAggregator;Integrated Security=True";
         }
 
         public IEnumerable<WordEmbeddingOption> WordEmbeddingOptions { get; set; }
@@ -29,5 +29,6 @@ namespace NewsAggregator.ML
         public int NbArticlesToProcess { get; set; }
         public int NbRetry { get; set; }
         public Assembly ApplicationAssembly { get; set; }
+        public string ConnectionString { get; set; }
     }
 }

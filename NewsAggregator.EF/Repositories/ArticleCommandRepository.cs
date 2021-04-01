@@ -1,5 +1,6 @@
-﻿using NewsAggregator.Core.Repositories;
-using NewsAggregator.Domain.Articles;
+﻿using Microsoft.EntityFrameworkCore;
+using NewsAggregator.Core.Domains.Articles;
+using NewsAggregator.Core.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,9 +15,20 @@ namespace NewsAggregator.EF.Repositories
             _dbContext = dbContext;
         }
 
+        public Task<ArticleAggregate> Get(string articleId, CancellationToken cancellationToken)
+        {
+            return _dbContext.Articles.FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
+        }
+
         public Task Add(ArticleAggregate article, CancellationToken cancellationToken)
         {
-            _dbContext.Add(article);
+            _dbContext.Articles.Add(article);
+            return Task.CompletedTask;
+        }
+
+        public Task Update(ArticleAggregate article, CancellationToken cancellationToken)
+        {
+            _dbContext.Articles.Update(article);
             return Task.CompletedTask;
         }
 

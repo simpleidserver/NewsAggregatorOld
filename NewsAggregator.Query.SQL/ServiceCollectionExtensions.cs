@@ -13,6 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
             serviceCollection.AddTransient<IFeedQueryRepository, FeedQueryRepository>();
             serviceCollection.AddTransient<IDataSourceQueryRepository, DataSourceQueryRepository>();
             serviceCollection.AddTransient<IArticleQueryRepository, ArticleQueryRepository>();
+            serviceCollection.AddTransient<ISessionQueryRepository, SessionQueryRepository>();
             return serviceCollection;
         }
     }

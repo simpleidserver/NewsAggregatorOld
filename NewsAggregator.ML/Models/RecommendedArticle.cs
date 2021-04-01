@@ -5,7 +5,7 @@ namespace NewsAggregator.ML.Models
     public class RecommendedArticle : IEquatable<RecommendedArticle>
     {
         public string ArticleId { get; set; }
-        public string PersonId { get; set; }
+        public string UserId { get; set; }
         public double Score { get; set; }
 
         public bool Equals(RecommendedArticle other)

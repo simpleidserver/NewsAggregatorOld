@@ -1,4 +1,4 @@
-﻿using NewsAggregator.Domain.Feeds;
+﻿using NewsAggregator.Core.Domains.Feeds;
 using System.Threading;
 using System.Threading.Tasks;
 

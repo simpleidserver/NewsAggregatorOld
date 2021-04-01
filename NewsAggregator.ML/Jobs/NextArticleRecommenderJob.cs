@@ -1,12 +1,16 @@
 ﻿using Accord.Math.Distances;
+using Hangfire;
 using Microsoft.Extensions.Options;
 using Microsoft.ML;
-using NewsAggregator.Domain.Sessions.Enums;
+using Microsoft.ML.Data;
+using NewsAggregator.Core.Domains.Recommendations;
+using NewsAggregator.Core.Domains.Sessions.Enums;
+using NewsAggregator.Core.Repositories;
 using NewsAggregator.ML.Helpers;
-using NewsAggregator.ML.Infrastructures.Jobs;
 using NewsAggregator.ML.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,31 +20,52 @@ namespace NewsAggregator.ML.Jobs
     public class NextArticleRecommenderJob : INextArticleRecommenderJob
     {
         private readonly NewsAggregatorMLOptions _options;
+        private readonly IArticleQueryRepository _articleQueryRepository;
+        private readonly ISessionQueryRepository _sessionQueryRepository;
+        private readonly IRecommendationCommandRepository _recommendationCommandRepository;
 
-        public NextArticleRecommenderJob(IOptions<NewsAggregatorMLOptions> options)
+        public NextArticleRecommenderJob(
+            IOptions<NewsAggregatorMLOptions> options,
+            IArticleQueryRepository articleQueryRepository,
+            ISessionQueryRepository sessionQueryRepository,
+            IRecommendationCommandRepository recommendationCommandRepository)
         {
             _options = options.Value;
+            _articleQueryRepository = articleQueryRepository;
+            _sessionQueryRepository = sessionQueryRepository;
+            _recommendationCommandRepository = recommendationCommandRepository;
         }
 
-        public Task Run(CancellationToken cancellationToken)
+        [DisableConcurrentExecution(5 * 60)]
+        public async Task Run(CancellationToken cancellationToken)
         {
-            var popularArticles = GetPopularArticles();
+            var popularArticles = await GetPopularArticles(cancellationToken);
             var result = GetSimilarArticlesByWord2Vec(popularArticles).ToList();
-            // Store popular articles per session and user.
-            return Task.CompletedTask;
+            foreach (var articles in result)
+            {
+                var firstArticle = articles.First();
+                var recommendation = RecommendationAggregate.Create(firstArticle.UserId);
+                foreach(var article in articles)
+                {
+                    recommendation.Recommend(article.ArticleId);
+                }
+
+                await _recommendationCommandRepository.Add(recommendation, cancellationToken);
+                await _recommendationCommandRepository.SaveChanges(cancellationToken);
+            }
         }
 
-        protected virtual IEnumerable<PopularArticle> GetPopularArticles()
+        protected virtual async Task<IEnumerable<PopularArticle>> GetPopularArticles(CancellationToken cancellationToken)
         {
             var lst = new List<PopularArticle>();
-            var sessionFiles = DirectoryHelper.GetSessionFiles();
-            var lstGroup = sessionFiles.GroupBy(s => s.PersonId);
+            var sessionFiles = await _sessionQueryRepository.GetAll(cancellationToken);
+            var lstGroup = sessionFiles.GroupBy(s => s.UserId);
             foreach (var grp in lstGroup)
             {
                 var latestSessions = grp.OrderByDescending(f => f.CreateDateTime).Take(_options.NbSessionsToProcess);
                 foreach (var session in latestSessions)
                 {
-                    lst.AddRange(GetPopularArticles(session.PersonId, session.FilePath)
+                    lst.AddRange(GetPopularArticles(session.UserId, session.Id)
                         .OrderByDescending(a => a.Score)
                         .Take(_options.NbArticlesToProcess));
                 }
@@ -49,13 +74,16 @@ namespace NewsAggregator.ML.Jobs
             return lst;
         }
 
-        protected virtual ICollection<PopularArticle> GetPopularArticles(string personId, string path)
+        protected virtual ICollection<PopularArticle> GetPopularArticles(string personId, string sessionId)
         {
             var result = new List<PopularArticle>();
             var mlContext = new MLContext();
-            var fullDataView = mlContext.Data.LoadFromTextFile<SessionData>(path, hasHeader: false, separatorChar: ',');
+            var sqlCommand = _sessionQueryRepository.GetSessionActionsSQL(sessionId);
+            var dbSource = new DatabaseSource(SqlClientFactory.Instance, _options.ConnectionString, sqlCommand);
+            var loader = mlContext.Data.CreateDatabaseLoader<SessionData>();
+            var fullDataView = loader.Load(dbSource);
             var lookupMap = mlContext.Data.LoadFromEnumerable(InteractionTypes.InteractionTypeLookup);
-            var pipeline = mlContext.Transforms.Conversion.MapValue("Ponderation", lookupMap, lookupMap.Schema["Key"], lookupMap.Schema["Ponderation"], "EventType");
+            var pipeline = mlContext.Transforms.Conversion.MapValue("InteractionType", lookupMap, lookupMap.Schema["Key"], lookupMap.Schema["Ponderation"], "InteractionType");
             var transformedData = pipeline.Fit(fullDataView).Transform(fullDataView);
             var features = mlContext.Data.CreateEnumerable<TransformedSessionData>(transformedData, reuseRowObject: false).ToList();
             foreach (var grp in features.GroupBy(f => f.ArticleId))
@@ -70,18 +98,24 @@ namespace NewsAggregator.ML.Jobs
 
         protected virtual IEnumerable<IEnumerable<RecommendedArticle>> GetSimilarArticlesByWord2Vec(IEnumerable<PopularArticle> articles)
         {
-            foreach (var grp in articles.OrderByDescending(a => a.Score).GroupBy(a => a.ArticleLanguage))
+            foreach (var grpUser in articles.OrderByDescending(a => a.UserId).GroupBy(a => a.UserId))
             {
-                var firstArticle = grp.First();
-                var articleCSVPath = DirectoryHelper.GetCSVArticles(firstArticle.ArticleLanguage);
-                var wordEmbeddingPath = DirectoryHelper.GetTrainedWordEmbeddingFilePath(firstArticle.ArticleLanguage);
-                var mlContext = new MLContext();
-                ITransformer trainedModel = mlContext.Model.Load(wordEmbeddingPath, out DataViewSchema sc);
-                var predictionEngine = mlContext.Model.CreatePredictionEngine<ArticleData, TransformedArticleData>(trainedModel);
-                var transformedArticles = GetTransformedArticles(predictionEngine, firstArticle.PersonId, firstArticle.ArticleLanguage);
-                yield return CalculateSimilarityWithCOSIN(transformedArticles, grp.ToList())
-                    .Distinct()
-                    .OrderByDescending(o => o.Score);
+                var result = new List<RecommendedArticle>();
+                foreach(var grp in grpUser.OrderByDescending(a => a.Score).GroupBy(a => a.ArticleLanguage))
+                {
+                    var firstArticle = grp.First();
+                    var wordEmbeddingPath = DirectoryHelper.GetTrainedWordEmbeddingFilePath(firstArticle.ArticleLanguage);
+                    var mlContext = new MLContext();
+                    ITransformer trainedModel = mlContext.Model.Load(wordEmbeddingPath, out DataViewSchema sc);
+                    var predictionEngine = mlContext.Model.CreatePredictionEngine<ArticleData, TransformedArticleData>(trainedModel);
+                    // TODO : GET ALL ARTICLES EXCEPT THE ONE VISISTED BY THE USER ...
+                    var transformedArticles = GetTransformedArticles(predictionEngine, firstArticle.UserId, firstArticle.ArticleLanguage);
+                    result.AddRange(CalculateSimilarityWithCOSIN(transformedArticles, grp.ToList())
+                        .Distinct()
+                        .OrderByDescending(o => o.Score));
+                }
+
+                yield return result;
             }
         }
 
@@ -99,19 +133,18 @@ namespace NewsAggregator.ML.Jobs
                     }
 
                     var similarity = cosine.Similarity(ConvertToDouble(selectedArticleVector), ConvertToDouble(transformedArticle.Features));
-                    yield return new RecommendedArticle { ArticleId = transformedArticle.Id, PersonId = popularArticle.PersonId, Score = popularArticle.Score + similarity };
+                    yield return new RecommendedArticle { ArticleId = transformedArticle.Id, UserId = popularArticle.UserId, Score = popularArticle.Score + similarity };
                 }
             }
         }
 
         protected virtual IEnumerable<TransformedArticleData> GetTransformedArticles(PredictionEngine<ArticleData, TransformedArticleData> predictionEngine, string personId, string language)
         {
-            var csvFileReader = new CSVFileReader();
-            foreach (var articles in csvFileReader.Read<ArticleData>(DirectoryHelper.GetCSVArticles(language)))
+            foreach(var articles in _articleQueryRepository.GetAll(language))
             {
                 foreach(var article in articles)
                 {
-                    var transformedText = predictionEngine.Predict(article);
+                    var transformedText = predictionEngine.Predict(ArticleData.Transform(article));
                     yield return transformedText;
                 }
             }

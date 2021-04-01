@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -61,6 +62,10 @@ namespace NewsAggregator.Api.Startup
                 .AddNewsAggregatorEF(o => o.UseSqlServer(connectionString))
                 .AddNewsAggregatorQuerySQL(connectionString);
             services.AddHangfire(configuration => configuration.UseSqlServerStorage(connectionString));
+            services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq();
+            });
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
             services.Configure<ForwardedHeadersOptions>(options =>
             {

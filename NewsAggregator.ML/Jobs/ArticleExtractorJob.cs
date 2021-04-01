@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Hangfire;
+using Microsoft.Extensions.Logging;
+using NewsAggregator.Core.Domains.Articles;
+using NewsAggregator.Core.Domains.DataSources;
 using NewsAggregator.Core.Repositories;
-using NewsAggregator.Domain.Articles;
-using NewsAggregator.Domain.DataSources;
 using NewsAggregator.ML.Articles;
-using NewsAggregator.ML.Infrastructures.Locks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,57 +17,41 @@ namespace NewsAggregator.ML.Jobs
 {
     public class ArticleExtractorJob : IArticleExtractorJob
     {
-        private const string LockName = "extract-articles";
         private readonly IDataSourceCommandRepository _datasourceCommandRepository;
         private readonly IArticleCommandRepository _articleRepository;
         private readonly IArticleManager _articleManager;
-        private readonly IDistributedLock _distributedLock;
         private readonly ILogger<ArticleExtractorJob> _logger;
-        private static object _obj = new object();
 
         public ArticleExtractorJob(
             IDataSourceCommandRepository datasourceCommandRepository,
             IArticleCommandRepository articleRepository,
             IArticleManager articleManager,
-            IDistributedLock distributedLock,
             ILogger<ArticleExtractorJob> logger)
         {
             _datasourceCommandRepository = datasourceCommandRepository;
             _articleRepository = articleRepository;
             _articleManager = articleManager;
-            _distributedLock = distributedLock;
             _logger = logger;
         }
 
+        [DisableConcurrentExecution(5 * 60)]
         public async Task Run(CancellationToken cancellationToken)
         {
-            if (!await _distributedLock.TryAcquireLock(LockName, cancellationToken))
+            var datasources = await _datasourceCommandRepository.GetAll(cancellationToken);
+            foreach (var datasource in datasources)
             {
-                return;
-            }
-
-            try
-            {
-                var datasources = await _datasourceCommandRepository.GetAll(cancellationToken);
-                foreach (var datasource in datasources)
+                try
                 {
-                    try
-                    {
-                        await ExtractArticlesFromFeed(datasource, cancellationToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex.ToString());
-                    }
+                    await ExtractArticlesFromFeed(datasource, cancellationToken);
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                }
+            }
 
-                await _datasourceCommandRepository.Update(datasources, cancellationToken);
-                await _datasourceCommandRepository.SaveChanges(cancellationToken);
-            }
-            finally
-            {
-                await _distributedLock.ReleaseLock(LockName, cancellationToken);
-            }
+            await _datasourceCommandRepository.Update(datasources, cancellationToken);
+            await _datasourceCommandRepository.SaveChanges(cancellationToken);
         }
 
         private async Task ExtractArticlesFromFeed(DataSourceAggregate datasource, CancellationToken cancellationToken)
@@ -85,25 +69,27 @@ namespace NewsAggregator.ML.Jobs
                 }
             }
 
-            if (result.Any())
+            if (!result.Any())
             {
-                using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    _articleManager.AddArticles(result);
-                    foreach(var article in result)
-                    {
-                        await _articleRepository.Add(article, cancellationToken);
-                    }
+                return;
+            }
 
-                    await _articleRepository.SaveChanges(cancellationToken);
-                    transactionScope.Complete();
+            using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                foreach (var article in result)
+                {
+                    await _articleRepository.Add(article, cancellationToken);
                 }
 
-                var lastArticle = result.OrderByDescending(a => a.PublishDate).FirstOrDefault();
-                if (lastArticle != null)
-                {
-                    datasource.AddHistory(lastArticle.PublishDate, result.Count());
-                }
+                await _articleRepository.SaveChanges(cancellationToken);
+                transactionScope.Complete();
+            }
+
+            await _articleManager.TrainArticles(result.Select(r => r.Language).Distinct(), cancellationToken);
+            var lastArticle = result.OrderByDescending(a => a.PublishDate).FirstOrDefault();
+            if (lastArticle != null)
+            {
+                datasource.AddHistory(lastArticle.PublishDate, result.Count());
             }
         }
     }

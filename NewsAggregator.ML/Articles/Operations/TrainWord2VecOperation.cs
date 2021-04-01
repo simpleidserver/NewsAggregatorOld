@@ -1,12 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.ML;
-using NewsAggregator.Domain.Articles;
-using NewsAggregator.Domain.Articles.Events;
+using Microsoft.ML.Data;
+using NewsAggregator.Core.Repositories;
 using NewsAggregator.ML.Factories;
 using NewsAggregator.ML.Helpers;
 using NewsAggregator.ML.Models;
 using NewsAggregator.ML.Resources;
 using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -16,40 +18,43 @@ using System.Threading.Tasks;
 
 namespace NewsAggregator.ML.Articles.Operations
 {
-    public class TrainWord2VecOperation : IOperation
+    public class TrainWord2VecOperation : IArticleOperation
     {
-        private readonly ArticleAggregate _article;
+        private readonly IArticleQueryRepository _articleQueryRepository;
         private readonly NewsAggregatorMLOptions _options;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<ArticleManager> _logger;
+        private readonly ILogger<TrainWord2VecOperation> _logger;
 
         public TrainWord2VecOperation(
-            ArticleAggregate article,
-            NewsAggregatorMLOptions options,
+            IArticleQueryRepository articleQueryRepository,
             IHttpClientFactory httpClientFactory,
-             ILogger<ArticleManager> logger)
+            ILogger<TrainWord2VecOperation> logger,
+            IOptions<NewsAggregatorMLOptions> options)
         {
-            _article = article;
-            _options = options;
+            _articleQueryRepository = articleQueryRepository;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _options = options.Value;
         }
 
-        public virtual async Task Execute(CancellationToken cancellationToken)
+        public virtual async Task Execute(string language, CancellationToken cancellationToken)
         {
-            var vectorFilePath = await DownloadAndExtractWordEmbedding(_article.Language, cancellationToken);
-            if(Directory.Exists(DirectoryHelper.GetTrainedWordEmbeddingFilePath(_article.Language)))
+            var vectorFilePath = await DownloadAndExtractWordEmbedding(language, cancellationToken);
+            if(Directory.Exists(DirectoryHelper.GetTrainedWordEmbeddingFilePath(language)))
             {
                 return;
             }
 
             var mlContext = new MLContext();
-            var fullDataView = mlContext.Data.LoadFromTextFile<ArticleData>(DirectoryHelper.GetCSVArticles(_article.Language), hasHeader: false, separatorChar: ',');
+            string sqlCommand = _articleQueryRepository.GetArticlesByLanguageSQL(language);
+            var dbSource = new DatabaseSource(SqlClientFactory.Instance, _options.ConnectionString, sqlCommand);
+            var loader = mlContext.Data.CreateDatabaseLoader<ArticleData>();
+            var fullDataView = loader.Load(dbSource);
             var textPipeline = mlContext.Transforms.Text.NormalizeText("Text")
                 .Append(mlContext.Transforms.Text.TokenizeIntoWords("Tokens", "Text"))
                 .Append(mlContext.Transforms.Text.ApplyWordEmbedding("Features", vectorFilePath, "Tokens"));
             var trainedModel = textPipeline.Fit(fullDataView);
-            mlContext.Model.Save(trainedModel, fullDataView.Schema, DirectoryHelper.GetTrainedWordEmbeddingFilePath(_article.Language));
+            mlContext.Model.Save(trainedModel, fullDataView.Schema, DirectoryHelper.GetTrainedWordEmbeddingFilePath(language));
         }
 
         public void Rollback() { }

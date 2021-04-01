@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using NewsAggregator.Api.DataSources;
 using NewsAggregator.Api.Resources;
-using NewsAggregator.Common.Exceptions;
+using NewsAggregator.Core.Exceptions;
 using NewsAggregator.Core.Repositories;
 using System.Linq;
 using System.Threading;

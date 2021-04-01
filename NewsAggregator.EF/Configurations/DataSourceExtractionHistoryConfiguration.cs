@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NewsAggregator.Domain.DataSources;
+using NewsAggregator.Core.Domains.DataSources;
 
 namespace NewsAggregator.EF.Configurations
 {
