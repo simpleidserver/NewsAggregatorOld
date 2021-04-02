@@ -21,10 +21,15 @@ namespace NewsAggregator.ML.EventHandlers
             if (session == null)
             {
                 session = SessionAggregate.Create(sessionId, userId);
+                callback(session);
+                await _sessionCommandRepository.Add(session, CancellationToken.None);
+            }
+            else
+            {
+                callback(session);
+                await _sessionCommandRepository.Update(session, CancellationToken.None);
             }
 
-            callback(session);
-            await _sessionCommandRepository.Update(session, CancellationToken.None);
             await _sessionCommandRepository.SaveChanges(CancellationToken.None);
         }
     }

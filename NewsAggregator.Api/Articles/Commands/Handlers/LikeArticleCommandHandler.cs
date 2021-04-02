@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using NewsAggregator.Core.Domains.Articles.Events;
 using NewsAggregator.Core.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace NewsAggregator.Api.Articles.Commands.Handlers
 
         public Task<bool> Handle(LikeArticleCommand request, CancellationToken cancellationToken)
         {
-            return Handle(request.ArticleId, (article) =>
+            return Handle<ArticleLikedEvent>(request.ArticleId, (article) =>
             {
                 article.Like(request.UserId, request.SessionId);
             }, cancellationToken);

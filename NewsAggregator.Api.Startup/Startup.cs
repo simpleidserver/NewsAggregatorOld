@@ -19,6 +19,7 @@ namespace NewsAggregator.Api.Startup
 {
     public class Startup
     {
+        private const string CONNECTION_STRING = "Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=NewsAggregator;Integrated Security=True";
         private readonly IWebHostEnvironment _env;
 
         public Startup(IWebHostEnvironment env)
@@ -28,8 +29,7 @@ namespace NewsAggregator.Api.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
-            const string connectionString = "Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=NewsAggregator;Integrated Security=True";
-            GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
+            GlobalConfiguration.Configuration.UseSqlServerStorage(CONNECTION_STRING);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -59,33 +59,23 @@ namespace NewsAggregator.Api.Startup
             });
             services
                 .AddNewsAggregatorApi()
-                .AddNewsAggregatorEF(o => o.UseSqlServer(connectionString))
-                .AddNewsAggregatorQuerySQL(connectionString);
-            services.AddHangfire(configuration => configuration.UseSqlServerStorage(connectionString));
+                .AddNewsAggregatorEF(o => o.UseSqlServer(CONNECTION_STRING))
+                .AddNewsAggregatorQuerySQL(CONNECTION_STRING);
             services.AddMassTransit(x =>
             {
                 x.UsingRabbitMq();
             });
+            services.AddHangfire(configuration => configuration.UseSqlServerStorage(CONNECTION_STRING));
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-            services.AddSwaggerGen();
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
-            app.UseForwardedHeaders();
-            app.UseCors("AllowAll");
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "NewsAggregator API");
-            });
-            app.UseHangfireDashboard();
-            app.UseStaticFiles();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

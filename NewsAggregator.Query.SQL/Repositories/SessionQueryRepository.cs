@@ -18,15 +18,15 @@ namespace NewsAggregator.Query.SQL.Repositories
 
         public string GetSessionActionsSQL(string sessionId)
         {
-            return string.Format("SELECT [Id], "+
+            return string.Format("SELECT [dbo].[SessionAction].[Id], " +
                 "[UserId], "+
                 "[InteractionType], "+
                 "[ActionDateTime], " +
                 "[ArticleId], " +
                 "[ArticleLanguage] " +
-                "[FROM] [dbo].[SessionAction] " +
-                "INNER JOIN [dbo].[SessionAggregate] ON [dbo].[SessionAggregate].[Id] = [dbo].[SessionAction].[SessionAggregateId] " +
-                "WHERE [dbo].[SessionAction].[SessionAggregateId] = '{0}'");
+                "FROM [dbo].[SessionAction] " +
+                "INNER JOIN [dbo].[Sessions] ON [dbo].[Sessions].[Id] = [dbo].[SessionAction].[SessionAggregateId] " +
+                "WHERE [dbo].[SessionAction].[SessionAggregateId] = '{0}'", sessionId);
         }
 
         public Task<IEnumerable<SessionQueryResult>> GetAll(CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ namespace NewsAggregator.Query.SQL.Repositories
                             "[Id], " +
                             "[UserId], " +
                             "[CreateDateTime] " +
-                            "FROM [dbo].[SessionAggregate] " +
+                            "FROM [dbo].[Sessions] " +
                             "ORDER BY [CreateDateTime] DESC";
             var connection = _sqlConnectionFactory.GetOpenConnection();
             return connection.QueryAsync<SessionQueryResult>(sql);

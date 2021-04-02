@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Medallion.Threading;
+using Medallion.Threading.FileSystem;
 using Microsoft.Extensions.Logging;
 using NewsAggregator.Core.Domains.Articles;
 using NewsAggregator.Core.Domains.DataSources;
@@ -6,6 +7,7 @@ using NewsAggregator.Core.Repositories;
 using NewsAggregator.ML.Articles;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Threading;
@@ -34,24 +36,33 @@ namespace NewsAggregator.ML.Jobs
             _logger = logger;
         }
 
-        [DisableConcurrentExecution(5 * 60)]
         public async Task Run(CancellationToken cancellationToken)
         {
-            var datasources = await _datasourceCommandRepository.GetAll(cancellationToken);
-            foreach (var datasource in datasources)
+            var directoryInfo = GetDirectory();
+            var lck = new FileDistributedLock(directoryInfo, "extract-articles");
+            using (var distributedLock = await lck.TryAcquireAsync())
             {
-                try
+                if (distributedLock == null)
                 {
-                    await ExtractArticlesFromFeed(datasource, cancellationToken);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.ToString());
-                }
-            }
 
-            await _datasourceCommandRepository.Update(datasources, cancellationToken);
-            await _datasourceCommandRepository.SaveChanges(cancellationToken);
+                var datasources = await _datasourceCommandRepository.GetAll(cancellationToken);
+                foreach (var datasource in datasources)
+                {
+                    try
+                    {
+                        await ExtractArticlesFromFeed(datasource, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.ToString());
+                    }
+                }
+
+                await _datasourceCommandRepository.Update(datasources, cancellationToken);
+                await _datasourceCommandRepository.SaveChanges(cancellationToken);
+            }
         }
 
         private async Task ExtractArticlesFromFeed(DataSourceAggregate datasource, CancellationToken cancellationToken)
@@ -91,6 +102,12 @@ namespace NewsAggregator.ML.Jobs
             {
                 datasource.AddHistory(lastArticle.PublishDate, result.Count());
             }
+        }
+
+        public static DirectoryInfo GetDirectory()
+        {
+            var codeBase = typeof(ArticleExtractorJob).Assembly.Location;
+            return new DirectoryInfo(Path.GetDirectoryName(codeBase));
         }
     }
 }

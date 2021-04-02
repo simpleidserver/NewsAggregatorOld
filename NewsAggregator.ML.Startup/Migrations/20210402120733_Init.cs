@@ -75,7 +75,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SessionAggregate",
+                name: "Sessions",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -85,7 +85,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SessionAggregate", x => x.Id);
+                    table.PrimaryKey("PK_Sessions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -164,9 +164,9 @@ namespace NewsAggregator.ML.Startup.Migrations
                 {
                     table.PrimaryKey("PK_SessionAction", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SessionAction_SessionAggregate_SessionAggregateId",
+                        name: "FK_SessionAction_Sessions_SessionAggregateId",
                         column: x => x.SessionAggregateId,
-                        principalTable: "SessionAggregate",
+                        principalTable: "Sessions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -219,7 +219,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                 name: "Recommendations");
 
             migrationBuilder.DropTable(
-                name: "SessionAggregate");
+                name: "Sessions");
         }
     }
 }

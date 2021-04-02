@@ -10,7 +10,7 @@ using NewsAggregator.EF;
 namespace NewsAggregator.ML.Startup.Migrations
 {
     [DbContext(typeof(NewsAggregatorDBContext))]
-    [Migration("20210401194536_Init")]
+    [Migration("20210402120733_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -236,7 +236,7 @@ namespace NewsAggregator.ML.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SessionAggregate");
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceExtractionHistory", b =>

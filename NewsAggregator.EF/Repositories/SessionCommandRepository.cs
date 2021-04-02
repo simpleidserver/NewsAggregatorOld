@@ -1,4 +1,5 @@
-﻿using NewsAggregator.Core.Domains.Sessions;
+﻿using Microsoft.EntityFrameworkCore;
+using NewsAggregator.Core.Domains.Sessions;
 using NewsAggregator.Core.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,24 +15,26 @@ namespace NewsAggregator.EF.Repositories
             _dbContext = dbContext;
         }
 
-        public Task Add(SessionAggregate session, CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public Task<SessionAggregate> Get(string id, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            return _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken)
+        public Task Add(SessionAggregate session, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            _dbContext.Sessions.Add(session);
+            return Task.CompletedTask;
         }
 
         public Task Update(SessionAggregate session, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            _dbContext.Sessions.Update(session);
+            return Task.CompletedTask;
+        }
+
+        public Task<int> SaveChanges(CancellationToken cancellationToken)
+        {
+            return _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

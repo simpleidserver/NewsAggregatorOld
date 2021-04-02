@@ -51,7 +51,7 @@ namespace NewsAggregator.Query.SQL.Repositories
             {
                 language = language
             });
-            var nbPages = Math.Ceiling((decimal)((nbArticles / count) * 100) / 100);
+            var nbPages = Math.Ceiling((double)nbArticles / (double)count);
             for(int currentPage = 0; currentPage < nbPages; currentPage++)
             {
                 int startIndex = count * currentPage;

@@ -24,9 +24,9 @@ namespace NewsAggregator.Core.Domains.Recommendations
             return result;
         }
 
-        public void Recommend(string articleId)
+        public void Recommend(string articleId, double score)
         {
-            var evt = new ArticleRecommendedEvent(Guid.NewGuid().ToString(), Id, Version + 1, articleId);
+            var evt = new ArticleRecommendedEvent(Guid.NewGuid().ToString(), Id, Version + 1, articleId, score);
             Handle(evt);
             DomainEvts.Add(evt);
         }
@@ -46,7 +46,7 @@ namespace NewsAggregator.Core.Domains.Recommendations
 
         private void Handle(ArticleRecommendedEvent evt)
         {
-            Articles.Add(RecommendationArticle.Create(evt.ArticleId));
+            Articles.Add(RecommendationArticle.Create(evt.ArticleId, evt.Score));
             Version = evt.Version;
         }
     }

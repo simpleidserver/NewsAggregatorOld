@@ -8,6 +8,7 @@ namespace NewsAggregator.Core.Domains.Articles.Events
     {
         public ArticleLikedEvent(string id, string aggregateId, int version, string language, string userId, string sessionId, DateTime actionDateTime) : base(id, aggregateId, version)
         {
+            Language = language;
             UserId = userId;
             SessionId = sessionId;
             ActionDateTime = actionDateTime;

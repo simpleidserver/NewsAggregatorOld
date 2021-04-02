@@ -1,10 +1,12 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using NewsAggregator.Api.Resources;
+using NewsAggregator.Core.Domains;
 using NewsAggregator.Core.Domains.Articles;
 using NewsAggregator.Core.Exceptions;
 using NewsAggregator.Core.Repositories;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,7 +28,7 @@ namespace NewsAggregator.Api.Articles.Commands.Handlers
             _busControl = busControl;
         }
 
-        protected async Task<bool> Handle(string articleId, Action<ArticleAggregate> callback, CancellationToken cancellationToken)
+        protected async Task<bool> Handle<T>(string articleId, Action<ArticleAggregate> callback, CancellationToken cancellationToken) where T : DomainEvent
         {
             var article = await _articleCommandRepository.Get(articleId, cancellationToken);
             if (article == null)
@@ -38,10 +40,7 @@ namespace NewsAggregator.Api.Articles.Commands.Handlers
             callback(article);
             await _articleCommandRepository.Update(article, cancellationToken);
             await _articleCommandRepository.SaveChanges(cancellationToken);
-            foreach (var evt in article.DomainEvts)
-            {
-                await _busControl.Publish(evt, cancellationToken);
-            }
+            await _busControl.Publish((T)article.DomainEvts.First(), cancellationToken);
             return true;
         }
     }

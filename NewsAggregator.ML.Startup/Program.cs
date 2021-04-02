@@ -1,4 +1,6 @@
-﻿namespace NewsAggregator.ML.Startup
+﻿using System;
+
+namespace NewsAggregator.ML.Startup
 {
     class Program
     {

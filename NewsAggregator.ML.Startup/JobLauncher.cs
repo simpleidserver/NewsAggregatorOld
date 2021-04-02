@@ -24,6 +24,7 @@ namespace NewsAggregator.ML.Startup
             RegisterMassTransit(serviceCollection);
             var serviceProvider = serviceCollection.BuildServiceProvider();
             Seed(serviceProvider);
+            StartBus(serviceProvider);
             GlobalConfiguration.Configuration
                 .UseSqlServerStorage(connectionString)
                 .UseActivator(new HangfireActivator(serviceProvider));
@@ -58,7 +59,6 @@ namespace NewsAggregator.ML.Startup
 
         private static void RegisterMassTransit(IServiceCollection services)
         {
-            // TODO : UPDATE !!!!
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<ArticleLikedEventConsumer>();
@@ -90,6 +90,12 @@ namespace NewsAggregator.ML.Startup
                 dbContext.DataSources.Add(DataSourceAggregate.Create("BBC", "Top stories", "http://feeds.bbci.co.uk/news/rss.xml"));
                 dbContext.SaveChanges();
             }
+        }
+
+        private static void StartBus(IServiceProvider serviceProvider)
+        {
+            var busControl = serviceProvider.GetService<IBusControl>();
+            busControl.Start();
         }
     }
 }

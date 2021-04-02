@@ -1,16 +1,18 @@
 ﻿using Accord.Math.Distances;
-using Hangfire;
+using Medallion.Threading.FileSystem;
 using Microsoft.Extensions.Options;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using NewsAggregator.Core.Domains.Recommendations;
 using NewsAggregator.Core.Domains.Sessions.Enums;
 using NewsAggregator.Core.Repositories;
+using NewsAggregator.ML.Articles;
 using NewsAggregator.ML.Helpers;
 using NewsAggregator.ML.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,36 +24,48 @@ namespace NewsAggregator.ML.Jobs
         private readonly NewsAggregatorMLOptions _options;
         private readonly IArticleQueryRepository _articleQueryRepository;
         private readonly ISessionQueryRepository _sessionQueryRepository;
+        private readonly IArticleManager _articleManager;
         private readonly IRecommendationCommandRepository _recommendationCommandRepository;
 
         public NextArticleRecommenderJob(
             IOptions<NewsAggregatorMLOptions> options,
             IArticleQueryRepository articleQueryRepository,
             ISessionQueryRepository sessionQueryRepository,
+            IArticleManager articleManager,
             IRecommendationCommandRepository recommendationCommandRepository)
         {
             _options = options.Value;
             _articleQueryRepository = articleQueryRepository;
             _sessionQueryRepository = sessionQueryRepository;
+            _articleManager = articleManager;
             _recommendationCommandRepository = recommendationCommandRepository;
         }
 
-        [DisableConcurrentExecution(5 * 60)]
         public async Task Run(CancellationToken cancellationToken)
         {
-            var popularArticles = await GetPopularArticles(cancellationToken);
-            var result = GetSimilarArticlesByWord2Vec(popularArticles).ToList();
-            foreach (var articles in result)
+            var directoryInfo = ArticleExtractorJob.GetDirectory();
+            var lck = new FileDistributedLock(directoryInfo, "extract-recommendations");
+            using (var distributedLock = await lck.TryAcquireAsync())
             {
-                var firstArticle = articles.First();
-                var recommendation = RecommendationAggregate.Create(firstArticle.UserId);
-                foreach(var article in articles)
+                if (distributedLock == null)
                 {
-                    recommendation.Recommend(article.ArticleId);
+                    return;
                 }
 
-                await _recommendationCommandRepository.Add(recommendation, cancellationToken);
-                await _recommendationCommandRepository.SaveChanges(cancellationToken);
+                var popularArticles = await GetPopularArticles(cancellationToken);
+                var result = GetSimilarArticlesByWord2Vec(popularArticles).ToList();
+                foreach (var articles in result)
+                {
+                    var firstArticle = articles.First();
+                    var recommendation = RecommendationAggregate.Create(firstArticle.UserId);
+                    foreach (var article in articles)
+                    {
+                        recommendation.Recommend(article.ArticleId, article.Score);
+                    }
+
+                    await _recommendationCommandRepository.Add(recommendation, cancellationToken);
+                    await _recommendationCommandRepository.SaveChanges(cancellationToken);
+                }
             }
         }
 
@@ -83,7 +97,7 @@ namespace NewsAggregator.ML.Jobs
             var loader = mlContext.Data.CreateDatabaseLoader<SessionData>();
             var fullDataView = loader.Load(dbSource);
             var lookupMap = mlContext.Data.LoadFromEnumerable(InteractionTypes.InteractionTypeLookup);
-            var pipeline = mlContext.Transforms.Conversion.MapValue("InteractionType", lookupMap, lookupMap.Schema["Key"], lookupMap.Schema["Ponderation"], "InteractionType");
+            var pipeline = mlContext.Transforms.Conversion.MapValue("Ponderation", lookupMap, lookupMap.Schema["Key"], lookupMap.Schema["Ponderation"], "InteractionType");
             var transformedData = pipeline.Fit(fullDataView).Transform(fullDataView);
             var features = mlContext.Data.CreateEnumerable<TransformedSessionData>(transformedData, reuseRowObject: false).ToList();
             foreach (var grp in features.GroupBy(f => f.ArticleId))
@@ -124,7 +138,7 @@ namespace NewsAggregator.ML.Jobs
             var cosine = new Cosine();
             foreach (var popularArticle in popularArticles)
             {
-                var selectedArticleVector = transformedArticles.First(a => a.ExternalId == popularArticle.ArticleId).Features;
+                var selectedArticleVector = transformedArticles.First(a => a.Id == popularArticle.ArticleId).Features;
                 foreach (var transformedArticle in transformedArticles)
                 {
                     if (popularArticle.ArticleId == transformedArticle.Id)
