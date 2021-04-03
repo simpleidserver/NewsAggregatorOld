@@ -18,7 +18,7 @@ namespace NewsAggregator.Core.Domains.DataSources
 
         public bool IsArticleExtracted(DateTimeOffset publicationDate)
         {
-            var extractionHistory = ExtractionHistories.OrderBy(h => h.LastArticlePublicationDate).FirstOrDefault();
+            var extractionHistory = ExtractionHistories.OrderByDescending(h => h.LastArticlePublicationDate).FirstOrDefault();
             if (extractionHistory == null)
             {
                 return false;

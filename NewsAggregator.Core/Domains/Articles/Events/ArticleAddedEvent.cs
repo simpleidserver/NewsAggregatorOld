@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace NewsAggregator.Core.Domains.Articles.Events
 {
-    [DebuggerDisplay("Add article")]
+    [DebuggerDisplay("Add article {ExternalId}")]
     public class ArticleAddedEvent : DomainEvent
     {
         public ArticleAddedEvent(string id, string aggregateId, int version, string externalId, string title, string summary, string content, string language, string datasourceId, DateTimeOffset publishDate) : base(id, aggregateId, version) 

@@ -6,13 +6,11 @@ using Microsoft.ML.Data;
 using NewsAggregator.Core.Domains.Recommendations;
 using NewsAggregator.Core.Domains.Sessions.Enums;
 using NewsAggregator.Core.Repositories;
-using NewsAggregator.ML.Articles;
 using NewsAggregator.ML.Helpers;
 using NewsAggregator.ML.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,20 +22,17 @@ namespace NewsAggregator.ML.Jobs
         private readonly NewsAggregatorMLOptions _options;
         private readonly IArticleQueryRepository _articleQueryRepository;
         private readonly ISessionQueryRepository _sessionQueryRepository;
-        private readonly IArticleManager _articleManager;
         private readonly IRecommendationCommandRepository _recommendationCommandRepository;
 
         public NextArticleRecommenderJob(
             IOptions<NewsAggregatorMLOptions> options,
             IArticleQueryRepository articleQueryRepository,
             ISessionQueryRepository sessionQueryRepository,
-            IArticleManager articleManager,
             IRecommendationCommandRepository recommendationCommandRepository)
         {
             _options = options.Value;
             _articleQueryRepository = articleQueryRepository;
             _sessionQueryRepository = sessionQueryRepository;
-            _articleManager = articleManager;
             _recommendationCommandRepository = recommendationCommandRepository;
         }
 
