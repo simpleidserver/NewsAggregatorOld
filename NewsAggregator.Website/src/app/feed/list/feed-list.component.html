@@ -1,0 +1,70 @@
+<h1>{{ 'feed.list' | translate }}</h1>
+<button mat-raised-button color="primary" (click)="addFeed()">{{ 'feed.add' | translate }}</button>
+<table mat-table [dataSource]="feeds" class="mat-elevation-z8 full-width">
+  <!-- Actions -->
+  <ng-container matColumnDef="checkbox">
+    <th mat-header-cell *matHeaderCellDef>
+      <button mat-icon-button [disabled]="feedsToBeRemoved.length === 0" (click)="remove()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </th>
+    <td mat-cell *matCellDef="let element">
+      <mat-checkbox (click)="deleteFeed(element)"></mat-checkbox>
+    </td>
+  </ng-container>
+  <!-- Feed title -->
+  <ng-container matColumnDef="feedTitle">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-form-field>
+        <mat-label>Feed title</mat-label>
+        <input matInput type="text" [(ngModel)]="feedTitle" (ngModelChange)="refresh()" />
+      </mat-form-field>
+    </th>
+    <td mat-cell *matCellDef="let element">{{element.feedTitle}}</td>
+  </ng-container>
+  <!-- Datasource title -->
+  <ng-container matColumnDef="datasourceTitle">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-form-field>
+        <mat-label>Datasources</mat-label>
+        <input matInput type="text" [(ngModel)]="datasource" (ngModelChange)="refreshDatasource()" [matAutocomplete]="auto"/>
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let datasource of datasources" [value]="datasource.id">
+            {{ datasource.title }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </th>
+    <td mat-cell *matCellDef="let element">{{element.datasourceTitle}}</td>
+  </ng-container>
+  <!-- Number of followers -->
+  <ng-container matColumnDef="nbFollowers">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-form-field>
+        <mat-label>Followers</mat-label>
+        <mat-select [(ngModel)]="selectedFollower" (ngModelChange)="refresh()">
+          <mat-option value="0">> 1000 followers</mat-option>
+          <mat-option value="1"><= 1000 && >= 100 followers</mat-option>
+          <mat-option value="2">< 100 followers</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </th>
+    <td mat-cell *matCellDef="let element">{{element.nbFollowers}}</td>
+  </ng-container>
+  <!-- Number of stories per month -->
+  <ng-container matColumnDef="nbStoriesPerMonth">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-form-field>
+        <mat-label>Stories</mat-label>
+        <mat-select [(ngModel)]="selectedStory" (ngModelChange)="refresh()">
+          <mat-option value="0">> 1000 stories</mat-option>
+          <mat-option value="1"><= 1000 && >= 100 stories</mat-option>
+          <mat-option value="2">< 100 stories</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </th>
+    <td mat-cell *matCellDef="let element">{{element.nbStoriesPerMonth}}</td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

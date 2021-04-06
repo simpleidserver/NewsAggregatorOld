@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="src\assets\i18n\en.json" />
+    <Content Remove="src\assets\i18n\fr.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="src\app\shared\material.module.ts" />
+    <None Remove="src\app\stores\datasource\models\datasource.model.ts" />
+    <None Remove="src\app\stores\feed\models\feed.model.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\app\feed\view\" />
+    <Folder Include="src\app\stores\datasource\actions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="src\app\shared\material.module.ts" />
+    <TypeScriptCompile Include="src\app\stores\datasource\models\datasource.model.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\app\stores\feed\models\feed.model.ts" />
+    <TypeScriptCompile Include="src\assets\i18n\en.json">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\assets\i18n\fr.json" />
+  </ItemGroup>
+</Project>

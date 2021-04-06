@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. ML", "02. ML", "{F500AF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Store", "03. Store", "{75E1624B-BDFB-4BD4-862B-595BC4C6CA20}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Website", "NewsAggregator.Website\NewsAggregator.Website.csproj", "{2CB43820-9C8E-4C4D-9050-59372F25EA56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{C409E3E1-D68E-4B19-BE51-437F86CD95BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C409E3E1-D68E-4B19-BE51-437F86CD95BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C409E3E1-D68E-4B19-BE51-437F86CD95BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CB43820-9C8E-4C4D-9050-59372F25EA56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CB43820-9C8E-4C4D-9050-59372F25EA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CB43820-9C8E-4C4D-9050-59372F25EA56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CB43820-9C8E-4C4D-9050-59372F25EA56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +89,7 @@ Global
 		{EEF1404F-217C-43D0-9593-D21904ADF121} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
 		{F500AFB3-34B7-4B06-8C2D-9C6A1CC4F208} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
 		{75E1624B-BDFB-4BD4-862B-595BC4C6CA20} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
+		{2CB43820-9C8E-4C4D-9050-59372F25EA56} = {B7FEA081-88CA-49D7-8C0C-6B7A715F10CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C7BA5EB-A78B-4C72-BF92-AE810C98F64D}

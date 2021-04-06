@@ -48,6 +48,13 @@ namespace NewsAggregator.Api.Startup.Controllers
             return new OkObjectResult(result);
         }
 
+        [HttpPut("me/.search")]
+        [Authorize("Authenticated")]
+        public async Task<IActionResult> SearchMyFeeds()
+        {
+            return null;
+        }
+
         [HttpPost("{id}/datasources")]
         public async Task<IActionResult> Subscribe(string id, [FromBody] SubscribeDatasourceCommand cmd, CancellationToken cancellationToken)
         {

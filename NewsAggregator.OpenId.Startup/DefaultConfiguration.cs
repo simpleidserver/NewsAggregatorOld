@@ -107,7 +107,7 @@ namespace NewsAggregator.OpenId.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "https://localhost:5001/signin-oidc"
+                        "http://localhost:4200"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>

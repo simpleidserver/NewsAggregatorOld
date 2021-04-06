@@ -1,0 +1,43 @@
+.drawer-container
+ width: 100%
+ height: 100%
+
+.mat-drawer
+ width: 300px
+
+.spacer
+ flex: 1 1 auto
+
+.nav-link
+ padding: 0 20px 0 20px
+ border-left: 2px solid transparent
+ line-height: 30px
+ user-select: none
+
+.nav-link.selected
+ border-color: red
+
+.feed-item > .datasources
+ display: none
+ padding-left: 50px
+
+.feed-item > .link > .icon
+ display: inline-block
+ cursor: pointer
+ margin-right: 15px
+
+.feed-item > .link > .icon > .mat-icon
+ font-size: 15px
+ width: 15px
+ height: 15px
+ transition: transform .2s ease-in-out
+
+.feed-item > .link > .indicator
+ float: right
+ font-size: 8pt
+
+.feed-item.open > .link > .icon > .mat-icon
+ transform: rotate(90deg)
+
+.feed-item.open > .datasources
+ display: block
