@@ -55,6 +55,12 @@ namespace NewsAggregator.Api.Startup.Controllers
             return null;
         }
 
+        [HttpPost("{id}/articles/.search")]
+        public async Task<IActionResult> SearchArticles(CancellationToken cancellationToken)
+        {
+            return null;
+        }
+
         [HttpPost("{id}/datasources")]
         public async Task<IActionResult> Subscribe(string id, [FromBody] SubscribeDatasourceCommand cmd, CancellationToken cancellationToken)
         {

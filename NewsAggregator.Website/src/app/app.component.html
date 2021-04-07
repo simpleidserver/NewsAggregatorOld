@@ -1,14 +1,14 @@
 <mat-drawer-container class="drawer-container">
-  <mat-drawer mode="side" opened>
+  <mat-drawer mode="side" #drawer opened>
     <div class="nav-link">
-      <a href="#">{{ 'feed.list' | translate }}</a>
+      <a href="#" class="title" [routerLink]="['/feeds']">{{ 'feed.list' | translate }}</a>
     </div>
     <div class="feed-item" *ngFor="let grp of groupedFeeds" [class.open]="grp.isOpened">
       <div class="link nav-link">
         <div class="icon" (click)="switchOpen(grp)">
           <mat-icon>arrow_forward_ios</mat-icon>
         </div>
-        <span class="title">{{grp.title}}</span>
+        <a href="#" [routerLink]="['/feeds/' + grp.id]" class="title">{{grp.title}}</a>
         <span class="indicator">{{ grp.nbStoriesPerMonth }}</span>
       </div>
       <div *ngFor="let datasource of grp.datasources" class="datasources nav-link">
@@ -16,7 +16,7 @@
       </div>
     </div>
   </mat-drawer>
-  <div>
+  <mat-drawer-content #content>
     <mat-toolbar>
       <mat-toolbar-row>
         <span>News Aggregator</span>
@@ -24,6 +24,8 @@
         <a href="#" *ngIf="!isConnected" (click)="login($event)" mat-button>Authenticate</a>
       </mat-toolbar-row>
     </mat-toolbar>
-    <router-outlet></router-outlet>
-  </div>
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-drawer-content>
 </mat-drawer-container>

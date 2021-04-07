@@ -1,46 +1,57 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit, ViewChild, ɵclearResolutionOfComponentResourcesQueue } from '@angular/core';
+import { MatDrawerContent } from '@angular/material/sidenav';
+import * as fromAppState from '@app/stores/appstate';
+import { select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { JwksValidationHandler } from 'angular-oauth2-oidc-jwks';
 import { authConfig } from './auth.config';
+import { DrawerContentService } from './common/matDrawerContent.service';
 import { Datasource } from './stores/datasource/models/datasource.model';
 import { Feed } from './stores/feed/models/feed.model';
+import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.sass']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   sessionCheckTimer: any;
+  listener: any;
   isConnected: boolean = false;
-  feeds: Feed[] = [
-    { feedTitle: 'News', datasourceTitle: 'BBC', nbFollowers: 1000, nbStoriesPerMonth: 1000, language: 'en', datasourceId: 'bbc', feedId: 'news' },
-    { feedTitle: 'News', datasourceTitle: 'Sputnick', nbFollowers: 1000, nbStoriesPerMonth: 1000, language: 'fr', datasourceId: 'sputnick', feedId: 'news' },
-    { feedTitle: 'Gaming', datasourceTitle: 'JDV', nbFollowers: 1000, nbStoriesPerMonth: 1000, language: 'fr', datasourceId: 'JDV', feedId: 'gaming' }
-  ];
   groupedFeeds: { id: string, title: string, isOpened: boolean, nbStoriesPerMonth: number, datasources: Datasource[] }[];
+  @ViewChild('content', { static: true}) public matDrawer!: MatDrawerContent;
 
   constructor(
     private translateService: TranslateService,
     private oauthService: OAuthService,
-    private route: Router) {
+    private store: Store<fromAppState.AppState>,
+    private drawerContentService: DrawerContentService) {
     this.translateService.setDefaultLang('fr');
     this.translateService.use('fr');
     this.configureAuth();
-    this.groupedFeeds = [];
-    this.feeds.forEach((f: Feed) => {
-      const record = this.groupedFeeds.filter((r) => r.id === f.feedId);
-      if (record.length === 0) {
-        this.groupedFeeds.push({ id: f.feedId, title: f.feedTitle, nbStoriesPerMonth: f.nbStoriesPerMonth, isOpened: false, datasources: [{ description: '', id: f.datasourceId, title: f.datasourceTitle }] });
-      } else {
-        record[0].datasources.push({ description: '', id : f.datasourceId, title: f.datasourceTitle });
-      }
-    });
   }
 
   ngOnInit(): void {
+    const request = fromFeedActions.startGetAllFeeds();
+    this.store.dispatch(request);
+    this.listener = this.store.pipe(select(fromAppState.selectAllFeedsResult)).subscribe((r: Feed[] | null) => {
+      if (!r) {
+        return;
+      }
+
+      this.groupedFeeds = [];
+      r.forEach((f: Feed) => {
+        const record = this.groupedFeeds.filter((r) => r.id === f.feedId);
+        if (record.length === 0) {
+          this.groupedFeeds.push({ id: f.feedId, title: f.feedTitle, nbStoriesPerMonth: f.nbStoriesPerMonth, isOpened: false, datasources: [{ description: '', id: f.datasourceId, title: f.datasourceTitle }] });
+        } else {
+          record[0].datasources.push({ description: '', id: f.datasourceId, title: f.datasourceTitle });
+        }
+      });
+    });
+    this.drawerContentService.setDrawerContent(this.matDrawer);
     const claims : any = this.oauthService.getIdentityClaims();
     if (!claims) {
       this.isConnected = false;
@@ -48,6 +59,12 @@ export class AppComponent implements OnInit {
     }
 
     this.isConnected = true;
+  }
+
+  ngOnDestroy(): void {
+    if (this.listener) {
+      this.listener.unsubscribe();
+    }
   }
 
   switchOpen(record: { id: string, title: string, isOpened: boolean, datasources: Datasource[] }) {
@@ -78,7 +95,7 @@ export class AppComponent implements OnInit {
     this.sessionCheckTimer = setInterval(function () {
       if (!self.oauthService.hasValidIdToken()) {
         self.oauthService.logOut();
-        self.route.navigate(["/"]);
+        // self.route.navigate(["/"]);
       }
     }, 3000);
   }

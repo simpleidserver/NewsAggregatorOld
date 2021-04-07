@@ -5,11 +5,15 @@ import { SharedModule } from '../shared/shared.module';
 import { FeedRoutes } from './feed.routes';
 import { AddFeedDialog } from './list/add-feed.component';
 import { FeedListComponent } from './list/feed-list.component';
+import { FeedViewComponent } from './view/view-feed.component';
+import { DatasourceSelectorComponent } from '../common/datasourceselector/datasourceselector.component';
 
 @NgModule({
   declarations: [
     AddFeedDialog,
-    FeedListComponent
+    FeedListComponent,
+    FeedViewComponent,
+    DatasourceSelectorComponent
   ],
   entryComponents: [
     AddFeedDialog

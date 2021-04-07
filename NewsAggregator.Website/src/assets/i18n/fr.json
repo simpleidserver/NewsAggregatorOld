@@ -1,6 +1,17 @@
 {
   "feed": {
     "add": "Ajouter feed",
-    "list":  "Feeds"
+    "list": "Feeds",
+    "delete": "Supprimer les feeds"
+  },
+  "article": {
+    "publicationDate": "Publié le : {{date}}",
+    "actions": {
+      "read": "Lire",
+      "like": "Like"
+    }
+  },
+  "datasource": {
+    "list": "Datasources"
   }
 }

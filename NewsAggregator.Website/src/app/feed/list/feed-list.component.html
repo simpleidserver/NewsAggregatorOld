@@ -1,15 +1,17 @@
 <h1>{{ 'feed.list' | translate }}</h1>
-<button mat-raised-button color="primary" (click)="addFeed()">{{ 'feed.add' | translate }}</button>
+<div class="actions">
+  <button mat-raised-button color="primary" (click)="addFeed()">{{ 'feed.add' | translate }}</button>
+  <button mat-raised-button [disabled]="feedsToBeRemoved.length === 0" (click)="remove()">
+    {{ 'feed.delete' | translate }}
+  </button>
+</div>
 <table mat-table [dataSource]="feeds" class="mat-elevation-z8 full-width">
   <!-- Actions -->
   <ng-container matColumnDef="checkbox">
     <th mat-header-cell *matHeaderCellDef>
-      <button mat-icon-button [disabled]="feedsToBeRemoved.length === 0" (click)="remove()">
-        <mat-icon>delete</mat-icon>
-      </button>
     </th>
     <td mat-cell *matCellDef="let element">
-      <mat-checkbox (click)="deleteFeed(element)"></mat-checkbox>
+      <mat-checkbox (change)="deleteFeed(element)"></mat-checkbox>
     </td>
   </ng-container>
   <!-- Feed title -->
@@ -25,15 +27,7 @@
   <!-- Datasource title -->
   <ng-container matColumnDef="datasourceTitle">
     <th mat-header-cell *matHeaderCellDef>
-      <mat-form-field>
-        <mat-label>Datasources</mat-label>
-        <input matInput type="text" [(ngModel)]="datasource" (ngModelChange)="refreshDatasource()" [matAutocomplete]="auto"/>
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let datasource of datasources" [value]="datasource.id">
-            {{ datasource.title }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+      <datasource-selector></datasource-selector>
     </th>
     <td mat-cell *matCellDef="let element">{{element.datasourceTitle}}</td>
   </ng-container>

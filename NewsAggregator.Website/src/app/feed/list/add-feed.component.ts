@@ -8,14 +8,17 @@ import { MatDialogRef } from "@angular/material/dialog";
 })
 export class AddFeedDialog {
   addFeedForm: FormGroup = new FormGroup({
-    feedTitle: new FormControl('', Validators.required)
+    feedTitle: new FormControl('', Validators.required),
+    datasource: new FormControl('', Validators.required)
   });
 
-  constructor(public dialogRef : MatDialogRef<AddFeedDialog>) {
+  constructor(public dialogRef: MatDialogRef<AddFeedDialog>) { }
 
+  onDatasourceSelected(evt: any) {
+    this.addFeedForm.get('datasource')?.setValue(evt);
   }
 
-  addFeed(data : any) {
+  addFeed(data: any) {
     this.dialogRef.close(data);
   }
 }

@@ -8,14 +8,18 @@
 .spacer
  flex: 1 1 auto
 
+.container
+ padding: 10px
+
 .nav-link
  padding: 0 20px 0 20px
  border-left: 2px solid transparent
  line-height: 30px
  user-select: none
 
-.nav-link.selected
- border-color: red
+.nav-link .title
+ text-transform: uppercase
+ font-weight: bold
 
 .feed-item > .datasources
  display: none
@@ -41,3 +45,9 @@
 
 .feed-item.open > .datasources
  display: block
+
+.nav-link:hover
+ background-color: gray
+
+.nav-link.selected
+ border-color: red

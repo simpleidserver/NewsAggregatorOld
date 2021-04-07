@@ -7,12 +7,7 @@
       <input matInput type="text" formControlName="feedTitle" required />
     </mat-form-field>
     <!-- Datasources -->
-    <mat-form-field class="full-width">
-      <mat-label>Datasources</mat-label>
-      <mat-select>
-        <mat-option></mat-option>
-      </mat-select>
-    </mat-form-field>
+    <datasource-selector class="full-width" (selected)="onDatasourceSelected($event)"></datasource-selector>
     <button mat-raised-button color="primary">Add</button>
   </form>
 </mat-dialog-content>

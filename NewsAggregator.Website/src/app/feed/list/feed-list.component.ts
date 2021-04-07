@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as fromAppState from '@app/stores/appstate';
-import { DatasourceService } from '@app/stores/datasource/services/datasource.service';
+import { Datasource } from '@app/stores/datasource/models/datasource.model';
 import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 import { Feed } from '@app/stores/feed/models/feed.model';
 import { SearchFeedsResult } from '@app/stores/feed/models/search-feed.model';
 import { select, Store } from '@ngrx/store';
-import { Datasource } from '@app/stores/datasource/models/datasource.model';
 import { AddFeedDialog } from './add-feed.component';
 
 @Component({
@@ -14,7 +13,7 @@ import { AddFeedDialog } from './add-feed.component';
   templateUrl: './feed-list.component.html',
   styleUrls: ['./feed-list.component.sass']
 })
-export class FeedListComponent implements OnInit {
+export class FeedListComponent implements OnInit, OnDestroy {
   listener: any;
   displayedColumns: string[] = ['checkbox', 'feedTitle', 'datasourceTitle', 'nbFollowers', 'nbStoriesPerMonth'];
   feeds: Feed[] = [];
@@ -27,13 +26,11 @@ export class FeedListComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private store: Store<fromAppState.AppState>,
-    private datasourceService: DatasourceService) { }
+    private store: Store<fromAppState.AppState>) { }
 
   ngOnInit(): void {
     this.refresh();
-    this.refreshDatasource();
-    this.listener = this.store.pipe(select(fromAppState.selectFeedLstResult)).subscribe((r: SearchFeedsResult | null) => {
+    this.listener = this.store.pipe(select(fromAppState.selectFeedSearchResult)).subscribe((r: SearchFeedsResult | null) => {
       if (!r) {
         return;
       }
@@ -42,10 +39,17 @@ export class FeedListComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    if (this.listener) {
+      this.listener.unsubscribe();
+    }
+  }
+
   addFeed() {
     const dialogRef = this.dialog.open(AddFeedDialog);
     dialogRef.afterClosed().subscribe(result => {
-
+      const request = fromFeedActions.startAddFeed({ feedTitle: result.feedTitle, datasource: result.datasource });
+      this.store.dispatch(request);
     });
   }
 
@@ -57,10 +61,6 @@ export class FeedListComponent implements OnInit {
     }
 
     this.feedsToBeRemoved.push(feed);
-  }
-
-  refreshDatasource() {
-    this.datasourceService.searchDatasources(0, 5, this.datasource).subscribe((r) => this.datasources = r.content);;
   }
 
   remove() {
