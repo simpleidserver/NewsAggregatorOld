@@ -6,6 +6,7 @@
     "list": "Feeds",
     "delete": "Supprimer les feeds",
     "title": "Titre du feed",
+    "feedAdded": "Le feed a été ajouté",
     "moreThan1000Followers": "> 1000 followers",
     "moreThan100AndLessThan1000Followers": "<= 1000 followers && >= 100 followers",
     "lessThan100Followers": "< 100 followers",

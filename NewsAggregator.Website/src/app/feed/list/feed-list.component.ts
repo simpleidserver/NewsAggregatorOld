@@ -1,11 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromAppState from '@app/stores/appstate';
 import { Datasource } from '@app/stores/datasource/models/datasource.model';
 import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 import { Feed } from '@app/stores/feed/models/feed.model';
 import { SearchFeedsResult } from '@app/stores/feed/models/search-feed.model';
-import { select, Store } from '@ngrx/store';
+import { ScannedActionsSubject, select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { filter } from 'rxjs/operators';
 import { AddFeedDialog } from './add-feed.component';
 
 @Component({
@@ -27,10 +30,22 @@ export class FeedListComponent implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
-    private store: Store<fromAppState.AppState>) { }
+    private store: Store<fromAppState.AppState>,
+    private actions$: ScannedActionsSubject,
+    private snackBar: MatSnackBar,
+    private translateService: TranslateService) { }
 
   ngOnInit(): void {
+    const self = this;
     this.refresh();
+    this.actions$.pipe(
+      filter((action: any) => action.type === fromFeedActions.completeAddFeed.type))
+      .subscribe(() => {
+        self.snackBar.open(self.translateService.instant('feed.feedAdded'), self.translateService.instant('undo'), {
+          duration: 2000
+        });
+        self.refresh();
+      });
     this.listener = this.store.pipe(select(fromAppState.selectFeedSearchResult)).subscribe((r: SearchFeedsResult | null) => {
       if (!r) {
         return;
@@ -50,7 +65,7 @@ export class FeedListComponent implements OnInit, OnDestroy {
   addFeed() {
     const dialogRef = this.dialog.open(AddFeedDialog);
     dialogRef.afterClosed().subscribe(result => {
-      const request = fromFeedActions.startAddFeed({ feedTitle: result.feedTitle, datasource: result.datasource });
+      const request = fromFeedActions.startAddFeed({ feedTitle: result.feedTitle, datasourceIds: result.datasourceIds });
       this.store.dispatch(request);
     });
   }

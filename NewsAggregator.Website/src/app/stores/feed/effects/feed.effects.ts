@@ -98,9 +98,9 @@ export class FeedsEffects {
     .pipe(
       ofType(startAddFeed),
       mergeMap((evt) => {
-        return this.feedService.addFeed(evt.feedTitle, evt.datasource)
+        return this.feedService.addFeed(evt.feedTitle, evt.datasourceIds)
           .pipe(
-            map((feed) => completeAddFeed({ content: feed })),
+            map((feedId) => completeAddFeed({ content: feedId })),
             catchError(() => of(errorAddFeed()))
           );
       }

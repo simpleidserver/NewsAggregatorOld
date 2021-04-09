@@ -19,6 +19,7 @@ export class DatasourceSelectorComponent {
   datasources: DatasourceCheckbox[];
   datasource: string;
   displayText: string = "";
+  selectedIds: string[] = [];
   @Input() class: string;
   @Output() selected: EventEmitter<string[]> = new EventEmitter();
   @ViewChild('autoCompleteInput', { read: MatAutocompleteTrigger, static: true }) auto: MatAutocompleteTrigger;
@@ -31,13 +32,12 @@ export class DatasourceSelectorComponent {
     const self = this;
     this.isLoading = true;
     this.datasourceService.searchDatasources(0, 5, this.datasource).subscribe(function (r) {
-      const splitted = self.displayText.split(',');
       self.datasources = r.content.map(function (d) {
         var result = new DatasourceCheckbox();
         result.id = d.id;
         result.description = d.description;
         result.title = d.title;
-        result.isSelected = splitted.includes(d.id);
+        result.isSelected = self.selectedIds.includes(d.id);
         return result;
       });
       self.isLoading = false;
@@ -49,15 +49,16 @@ export class DatasourceSelectorComponent {
   }
 
   confirm() {
-    const ids = this.selectionList.selectedOptions.selected.map(s => s.value);
-    if (ids.length > 0) {
-      this.displayText = ids.join(',');
+    const self = this;
+    this.selectedIds = this.selectionList.selectedOptions.selected.map(s => s.value);
+    if (this.selectedIds.length > 0) {
+      this.displayText = this.datasources.filter((d) => self.selectedIds.includes(d.id)).map((d) => d.title).join(',');
     } else {
       this.displayText = '';
     }
 
     this.isOpen = false;
-    this.selected.emit(ids)
+    this.selected.emit(this.selectedIds)
   }
 
   click() {

@@ -19,6 +19,7 @@ namespace NewsAggregator.Query.SQL
         public Task<IEnumerable<DataSourceQueryResult>> Get(IEnumerable<string> datasourceIds, CancellationToken cancellationToken)
         {
             const string sql = "SELECT " +
+                            "[Id], " +
                             "[Title], " +
                             "[Description], " +
                             "[Url] " +

@@ -15,6 +15,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTreeModule } from '@angular/material/tree';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   exports: [
@@ -33,7 +34,8 @@ import { MatTreeModule } from '@angular/material/tree';
     MatTreeModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    OverlayModule
+    OverlayModule,
+    MatSnackBarModule
   ]
 })
 export class MaterialModule { }

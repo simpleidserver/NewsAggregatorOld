@@ -95,5 +95,14 @@ namespace NewsAggregator.Api.Resources {
                 return ResourceManager.GetString("FeedDoesntExist", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unknown datasource {0}.
+        /// </summary>
+        internal static string UnknownDataSource {
+            get {
+                return ResourceManager.GetString("UnknownDataSource", resourceCulture);
+            }
+        }
     }
 }

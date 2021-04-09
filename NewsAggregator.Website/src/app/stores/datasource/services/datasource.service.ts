@@ -6,9 +6,7 @@ import { Datasource } from "../models/datasource.model";
 import { SearchDatasourcesResult } from "../models/SearchDatasourcesResult";
 
 const datasources: Datasource[] = [
-  { description: 'BBC', id: 'bbc', title: 'BBC' },
-  { description: 'Sputnick', id: 'sputnick', title: 'Sputnick' },
-  { description: 'JDV', id: 'JDV', title: 'JDV' }
+  { description: 'BBC', id: '169de9bc-a389-4e21-b1a7-3d9ad25dfe5f', title: 'BBC' }
 ];
 
 @Injectable()

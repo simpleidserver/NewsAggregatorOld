@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@envs/environment';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable, of } from 'rxjs';
 import { Article } from '../../articles/models/article.model';
@@ -7,7 +8,6 @@ import { SearchArticlesResult } from '../../articles/models/search-article.model
 import { DeleteDatasource } from '../actions/feed.actions';
 import { Feed } from '../models/feed.model';
 import { SearchFeedsResult } from '../models/search-feed.model';
-import { environment } from '@envs/environment';
 
 const feeds: Feed[] = [
   { feedTitle: 'News', datasourceTitle: 'BBC', nbFollowers: 1000, nbStoriesPerMonth: 1000, language: 'en', datasourceId : 'bbc', feedId: 'news' },
@@ -89,19 +89,6 @@ export class FeedService {
     }
 
     return this.http.post<SearchFeedsResult>(targetUrl, JSON.stringify(request), { headers: headers });
-
-    /*
-
-    let filtered = feeds;
-    if (feedTitle && feedTitle !== '') {
-      filtered = feeds.filter((f: Feed) => {
-        return f.feedTitle.includes(feedTitle);
-      });
-    }
-
-    const result: SearchFeedsResult = { content: filtered, count: 100, startIndex: 0, totalLength: 100 };
-    return of(result);
-    */
   }
 
   deleteDatasources(parameters: DeleteDatasource[]) : Observable<boolean> {
@@ -119,9 +106,14 @@ export class FeedService {
     return of(feed);
   }
 
-  addFeed(feedTitle: string, datasourceId: string): Observable<Feed> {
-    const feed: Feed = { datasourceId: datasourceId, datasourceTitle: 'NewDatasource', feedId: 'feedid', feedTitle: feedTitle, language: 'en', nbFollowers: 0, nbStoriesPerMonth: 0 };
-    return of(feed);
+  addFeed(feedTitle: string, datasourceIds: string[]): Observable<string> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/feeds";
+    const request: any = { title: feedTitle, datasourceIds: datasourceIds };
+    return this.http.post<string>(targetUrl, JSON.stringify(request), { headers: headers });
   }
 
   getAllFeeds(): Observable<Feed[]> {

@@ -129,4 +129,7 @@
   <data name="FeedDoesntExist" xml:space="preserve">
     <value>Feed {0} doesn't exist</value>
   </data>
+  <data name="UnknownDataSource" xml:space="preserve">
+    <value>Unknown datasource {0}</value>
+  </data>
 </root>

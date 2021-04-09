@@ -1,6 +1,6 @@
 import { Action, createReducer, on } from "@ngrx/store";
 import { SearchArticlesResult } from "../../articles/models/search-article.model";
-import { completeAddFeed, completeDeleteDatasources, completeGetAllFeeds, completeGetFeed, completeSearchFeedArticles, completeSearchFeeds, DeleteDatasource } from '../actions/feed.actions';
+import { completeDeleteDatasources, completeGetAllFeeds, completeGetFeed, completeSearchFeedArticles, completeSearchFeeds, DeleteDatasource } from '../actions/feed.actions';
 import { Feed } from "../models/feed.model";
 import { SearchFeedsResult } from "../models/search-feed.model";
 
@@ -63,29 +63,12 @@ const searchFeedsReducer = createReducer(
     });
     const result: SearchFeedsResult = { content: content, startIndex: state.content.startIndex, count: state.content.count, totalLength: state.content.totalLength };
     return { content: result, isLoading: false, isErrorLoadOccured: false };
-  }),
-  on(completeAddFeed, (state, { content }) => {
-    const lst = state.content.content.map((f) => {
-      const r: Feed = { datasourceId: f.datasourceId, datasourceTitle: f.datasourceTitle, feedId: f.feedId, feedTitle: f.feedTitle, language: f.language, nbFollowers: f.nbFollowers, nbStoriesPerMonth: f.nbStoriesPerMonth };
-      return r;
-    });
-    lst.push(content);
-    const result: SearchFeedsResult = { content: lst, startIndex: state.content.startIndex, count: state.content.count, totalLength: state.content.totalLength };
-    return { content: result, isLoading: false, isErrorLoadOccured: false };
   })
 );
 
 const allFeedsReducer = createReducer(
   initialAllFeeds,
-  on(completeGetAllFeeds, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false })),
-  on(completeAddFeed, (state, { content }) => {
-    const lst = state.content.map((f) => {
-      const r: Feed = { datasourceId: f.datasourceId, datasourceTitle: f.datasourceTitle, feedId: f.feedId, feedTitle: f.feedTitle, language: f.language, nbFollowers: f.nbFollowers, nbStoriesPerMonth: f.nbStoriesPerMonth };
-      return r;
-    });
-    lst.push(content);
-    return { content: lst, isLoading: false, isErrorLoadOccured: false };
-  })
+  on(completeGetAllFeeds, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false }))
 );
 
 const feedArticleLstReducer = createReducer(
