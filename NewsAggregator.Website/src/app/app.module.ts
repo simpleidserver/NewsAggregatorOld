@@ -13,6 +13,8 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DrawerContentService } from './common/matDrawerContent.service';
+import { HomeComponent } from './home/home.component';
+import { AuthGuard } from './infrastructures/auth-guard.service';
 import { MaterialModule } from './shared/material.module';
 import { appReducer } from './stores/appstate';
 import { DatasourceService } from './stores/datasource/services/datasource.service';
@@ -27,7 +29,8 @@ export function createTranslateLoader(http: HttpClient) {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -55,7 +58,8 @@ export function createTranslateLoader(http: HttpClient) {
   providers: [
     FeedService,
     DatasourceService,
-    DrawerContentService
+    DrawerContentService,
+    AuthGuard
   ],
   bootstrap: [AppComponent]
 })

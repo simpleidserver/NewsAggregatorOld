@@ -42,7 +42,7 @@ export class FeedsEffects {
     .pipe(
       ofType(startSearchFeeds),
       mergeMap((evt) => {
-        return this.feedService.search(evt.startIndex, evt.count, evt.order, evt.direction, evt.feedTitle)
+        return this.feedService.search(evt.startIndex, evt.count, evt.order, evt.direction, evt.feedTitle, evt.datasourceIds, evt.followersFilter, evt.storiesFilter, evt.isPaginationEnabled)
           .pipe(
             map(feeds => completeSearchFeeds({ content: feeds })),
             catchError(() => of(errorSearchFeeds()))

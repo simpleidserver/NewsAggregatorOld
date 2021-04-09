@@ -1,6 +1,8 @@
-import { Component, OnDestroy, OnInit, ViewChild, ɵclearResolutionOfComponentResourcesQueue } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDrawerContent } from '@angular/material/sidenav';
+import { Router } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
+import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 import { select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { OAuthService } from 'angular-oauth2-oidc';
@@ -9,7 +11,6 @@ import { authConfig } from './auth.config';
 import { DrawerContentService } from './common/matDrawerContent.service';
 import { Datasource } from './stores/datasource/models/datasource.model';
 import { Feed } from './stores/feed/models/feed.model';
-import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private oauthService: OAuthService,
     private store: Store<fromAppState.AppState>,
-    private drawerContentService: DrawerContentService) {
+    private drawerContentService: DrawerContentService,
+    private router: Router) {
     this.translateService.setDefaultLang('fr');
     this.translateService.use('fr');
     this.configureAuth();
@@ -52,13 +54,22 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     });
     this.drawerContentService.setDrawerContent(this.matDrawer);
-    const claims : any = this.oauthService.getIdentityClaims();
-    if (!claims) {
-      this.isConnected = false;
-      return;
-    }
+    this.oauthService.events.subscribe((e: any) => {
+      if (e.type === "logout") {
+        this.isConnected = false;
+      } else if (e.type === "token_received") {
+        this.init();
+      }
+    });
 
-    this.isConnected = true;
+    this.init();
+  }
+
+  disconnect(evt: any) {
+    evt.preventDefault();
+    this.oauthService.logOut();
+    this.router.navigate(['/home']);
+    return false;
   }
 
   ngOnDestroy(): void {
@@ -98,5 +109,15 @@ export class AppComponent implements OnInit, OnDestroy {
         // self.route.navigate(["/"]);
       }
     }, 3000);
+  }
+
+  private init() {
+    const claims: any = this.oauthService.getIdentityClaims();
+    if (!claims) {
+      this.isConnected = false;
+      return;
+    }
+
+    this.isConnected = true;
   }
 }

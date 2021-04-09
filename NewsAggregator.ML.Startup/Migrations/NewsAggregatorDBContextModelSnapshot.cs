@@ -70,6 +70,12 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("NbFollowers")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NbStoriesPerMonth")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -82,6 +88,32 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DataSources");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceArticle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("DataSourceAggregateId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NbArticles")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSourceAggregateId");
+
+                    b.ToTable("DataSourceArticle");
                 });
 
             modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceExtractionHistory", b =>
@@ -240,6 +272,14 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.ToTable("Sessions");
                 });
 
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceArticle", b =>
+                {
+                    b.HasOne("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", null)
+                        .WithMany("Articles")
+                        .HasForeignKey("DataSourceAggregateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceExtractionHistory", b =>
                 {
                     b.HasOne("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", null)
@@ -274,6 +314,8 @@ namespace NewsAggregator.ML.Startup.Migrations
 
             modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", b =>
                 {
+                    b.Navigation("Articles");
+
                     b.Navigation("ExtractionHistories");
                 });
 

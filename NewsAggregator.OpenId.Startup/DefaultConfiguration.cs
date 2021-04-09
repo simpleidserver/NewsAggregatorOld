@@ -98,7 +98,9 @@ namespace NewsAggregator.OpenId.Startup
                     AllowedScopes = new List<OpenIdScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
-                        SIDOpenIdConstants.StandardScopes.Profile
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
                     },
                     GrantTypes = new List<string>
                     {

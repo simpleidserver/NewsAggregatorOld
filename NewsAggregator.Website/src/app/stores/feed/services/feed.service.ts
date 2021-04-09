@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable, of } from 'rxjs';
@@ -7,6 +7,7 @@ import { SearchArticlesResult } from '../../articles/models/search-article.model
 import { DeleteDatasource } from '../actions/feed.actions';
 import { Feed } from '../models/feed.model';
 import { SearchFeedsResult } from '../models/search-feed.model';
+import { environment } from '@envs/environment';
 
 const feeds: Feed[] = [
   { feedTitle: 'News', datasourceTitle: 'BBC', nbFollowers: 1000, nbStoriesPerMonth: 1000, language: 'en', datasourceId : 'bbc', feedId: 'news' },
@@ -51,14 +52,18 @@ const articles: Article[] = [
 export class FeedService {
   constructor(private http: HttpClient, private oauthService: OAuthService) { }
 
-  search(startIndex: number, count: number, order: string, direction: string, feedTitle: string): Observable<SearchFeedsResult> {
-    /*
+  search(startIndex: number | null, count: number | null, order: string, direction: string, feedTitle: string, datasourceIds: string[], followersFilter: number | null, storiesFitler: number | null, isPaginationEnabled : boolean): Observable<SearchFeedsResult> {
     let headers = new HttpHeaders();
     headers = headers.set('Accept', 'application/json');
     headers = headers.set('Content-Type', 'application/json');
     headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
     const targetUrl = environment.apiUrl + "/feeds/me/.search";
-    const request: any = { startIndex: startIndex, count: count };
+    const request: any = { isPaginationEnabled: isPaginationEnabled};
+    if (isPaginationEnabled) {
+      request["startIndex"] = startIndex;
+      request["count"] = count;
+    }
+
     if (order) {
       request["orderBy"] = order;
     }
@@ -71,8 +76,21 @@ export class FeedService {
       request['feedTitle'] = feedTitle;
     }
 
+    if (datasourceIds && datasourceIds.length > 0) {
+      request["datasourceIds"] = datasourceIds;
+    }
+
+    if (followersFilter) {
+      request["followersFilter"] = followersFilter;
+    }
+
+    if (storiesFitler) {
+      request["storiesFitler"] = storiesFitler;
+    }
+
     return this.http.post<SearchFeedsResult>(targetUrl, JSON.stringify(request), { headers: headers });
-    */
+
+    /*
 
     let filtered = feeds;
     if (feedTitle && feedTitle !== '') {
@@ -83,6 +101,7 @@ export class FeedService {
 
     const result: SearchFeedsResult = { content: filtered, count: 100, startIndex: 0, totalLength: 100 };
     return of(result);
+    */
   }
 
   deleteDatasources(parameters: DeleteDatasource[]) : Observable<boolean> {

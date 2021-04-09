@@ -19,10 +19,11 @@ export class FeedListComponent implements OnInit, OnDestroy {
   feeds: Feed[] = [];
   feedsToBeRemoved: Feed[] = [];
   feedTitle: string;
-  datasource: string;
-  selectedFollower: string;
-  selectedStory: string;
+  selectedDatasourceIds: string[];
+  selectedFollower: number | null = null;
+  selectedStory: number |  null = null;
   datasources: Datasource[];
+  isLoading: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -35,6 +36,7 @@ export class FeedListComponent implements OnInit, OnDestroy {
         return;
       }
 
+      this.isLoading = false;
       this.feeds = r.content;
     });
   }
@@ -51,6 +53,11 @@ export class FeedListComponent implements OnInit, OnDestroy {
       const request = fromFeedActions.startAddFeed({ feedTitle: result.feedTitle, datasource: result.datasource });
       this.store.dispatch(request);
     });
+  }
+
+  onDatasourceSelected(evt: string[]) {
+    this.selectedDatasourceIds = evt;
+    this.refresh();
   }
 
   deleteFeed(feed: Feed) {
@@ -73,9 +80,8 @@ export class FeedListComponent implements OnInit, OnDestroy {
   }
 
   refresh() {
-    const startIndex: number = 0;
-    const count: number = 100;
-    const request = fromFeedActions.startSearchFeeds({ order: 'createDateTime', direction: 'desc', count: count, startIndex: startIndex, feedTitle: this.feedTitle });
+    this.isLoading = true;
+    const request = fromFeedActions.startSearchFeeds({ order: 'createDateTime', direction: 'desc', count: null, startIndex: null, feedTitle: this.feedTitle, datasourceIds: this.selectedDatasourceIds, followersFilter: this.selectedFollower, storiesFilter: this.selectedStory, isPaginationEnabled: false });
     this.store.dispatch(request);
   }
 }

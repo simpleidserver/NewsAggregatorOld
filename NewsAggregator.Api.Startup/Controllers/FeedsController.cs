@@ -48,11 +48,14 @@ namespace NewsAggregator.Api.Startup.Controllers
             return new OkObjectResult(result);
         }
 
-        [HttpPut("me/.search")]
+        [HttpPost("me/.search")]
         [Authorize("Authenticated")]
-        public async Task<IActionResult> SearchMyFeeds()
+        public async Task<IActionResult> SearchMyFeeds([FromBody] SearchMyFeedsQuery parameter, CancellationToken cancellationToken)
         {
-            return null;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            parameter.UserId = userId;
+            var result = await _mediator.Send(parameter, cancellationToken);
+            return new OkObjectResult(result);
         }
 
         [HttpPost("{id}/articles/.search")]

@@ -1,8 +1,17 @@
 {
+  "erase": "Effacer",
+  "confirm": "Confirmer",
   "feed": {
     "add": "Ajouter feed",
     "list": "Feeds",
-    "delete": "Supprimer les feeds"
+    "delete": "Supprimer les feeds",
+    "title": "Titre du feed",
+    "moreThan1000Followers": "> 1000 followers",
+    "moreThan100AndLessThan1000Followers": "<= 1000 followers && >= 100 followers",
+    "lessThan100Followers": "< 100 followers",
+    "moreThan1000Stories": "> 1000 articles",
+    "moreThan100AndLessThan1000Stories": "<= 1000 articles && >= 100 articles",
+    "lessThan100Stories": "< 100 articles"
   },
   "article": {
     "publicationDate": "Publié le : {{date}}",
@@ -12,6 +21,14 @@
     }
   },
   "datasource": {
-    "list": "Datasources"
+    "list": "Sources de données",
+    "searchDatasource": "Chercher une source"
+  },
+  "status": {
+    "notfound": "Page pas trouvée"
+  },
+  "menu": {
+    "authenticate": "Authentifier",
+    "disconnect": "Déconnecter"
   }
 }

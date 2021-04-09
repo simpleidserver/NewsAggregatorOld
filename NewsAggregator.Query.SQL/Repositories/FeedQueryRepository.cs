@@ -1,7 +1,11 @@
 ﻿using Dapper;
 using NewsAggregator.Core.QueryResults;
 using NewsAggregator.Core.Repositories;
+using NewsAggregator.Core.Repositories.Parameters;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NewsAggregator.Query.SQL.Repositories
@@ -30,6 +34,94 @@ namespace NewsAggregator.Query.SQL.Repositories
             {
                 userId
             });
+        }
+
+        public async Task<SearchQueryResult<FeedQueryResult>> SearchFeeds(SearchFeedParameter parameter, CancellationToken cancellationToken)
+        {
+            string sql = "SELECT [feeds].[Id] as [FeedId], " +
+                        "[feeds].[Title] as [FeedTitle], " +
+                        "[NewsAggregator].[dbo].[DataSources].Id as [DatasourceId], " +
+                        "[NewsAggregator].[dbo].[DataSources].Title as [DatasourceTitle], " +
+                        "[NewsAggregator].[dbo].[DataSources].Description as [DatasourceDescription], " +
+                        "[NewsAggregator].[dbo].[DataSources].NbFollowers as [NbFollowers], " +
+                        "[NewsAggregator].[dbo].[DataSources].NbStoriesPerMonth as [NbStoriesPerMonth] " +
+                        "FROM [NewsAggregator].[dbo].[Feeds] as [feeds] " +
+                        "INNER JOIN [NewsAggregator].[dbo].[FeedDatasource] ON[NewsAggregator].[dbo].[FeedDatasource].[FeedAggregateId] = [feeds].[Id] " +
+                        "INNER JOIN [NewsAggregator].[dbo].[DataSources] ON[NewsAggregator].[dbo].[FeedDatasource].[DatasourceId] = [NewsAggregator].[dbo].[DataSources].[Id] " +
+                        "where [feeds].UserId = @userId ";
+            if (!string.IsNullOrWhiteSpace(parameter.FeedTitle))
+            {
+                sql += "AND [feeds].[Title] LIKE @feedTitle ";
+            }
+
+            if (parameter.DatasourceIds != null && parameter.DatasourceIds.Any())
+            {
+                sql += "AND [DataSources].[Id] IN @datasourceIds ";
+            }
+
+            if (parameter.FollowersFilter != null)
+            {
+                switch(parameter.FollowersFilter.Value)
+                {
+                    case FollowerFilterTypes.LessThen100Followers:
+                        sql += "AND [DataSources].[NbFollowers] < 100 ";
+                        break;
+                    case FollowerFilterTypes.MoreThan100AndLessThen1000Followers:
+                        sql += "AND [DataSources].[NbFollowers] >= 100 ";
+                        sql += "AND [DataSources].[NbFollowers] <= 1000 ";
+                        break;
+                    case FollowerFilterTypes.MoreThan1000Followers:
+                        sql += "AND [DataSources].[NbFollowers] > 1000 ";
+                        break;
+                }
+            }
+
+            if (parameter.StoriesFilter != null)
+            {
+                switch (parameter.StoriesFilter.Value)
+                {
+                    case NumberStoriesFilterTypes.LessThen100Stories:
+                        sql += "AND [DataSources].[NbStoriesPerMonth] < 100 ";
+                        break;
+                    case NumberStoriesFilterTypes.LessThan1000AndMoreThan100Stories:
+                        sql += "AND [DataSources].[NbStoriesPerMonth] >= 100 ";
+                        sql += "AND [DataSources].[NbStoriesPerMonth] <= 1000 ";
+                        break;
+                    case NumberStoriesFilterTypes.MoreThan1000Stories:
+                        sql += "AND [DataSources].[NbStoriesPerMonth] >= 1000 ";
+                        break;
+                }
+            }
+
+            if (parameter.IsPaginationEnabled)
+            {
+                sql += "ORDER BY [FeedTitle] ASC " +
+                       "OFFSET @startIndex ROWS " +
+                       "FETCH NEXT @count ROWS ONLY";
+            }
+
+            var connection = _sqlConnectionFactory.GetOpenConnection();
+            dynamic dynObject = new ExpandoObject();
+            dynObject.userId = parameter.UserId;
+            dynObject.startIndex = parameter.StartIndex;
+            dynObject.count = parameter.Count;
+            if (!string.IsNullOrWhiteSpace(parameter.FeedTitle))
+            {
+                dynObject.feedTitle = $"%{parameter.FeedTitle}%";
+            }
+
+            if (parameter.DatasourceIds != null && parameter.DatasourceIds.Any())
+            {
+                dynObject.datasourceIds = parameter.DatasourceIds;
+            }
+
+            var result = await connection.QueryAsync<FeedQueryResult>(sql, (object)dynObject);
+            return new SearchQueryResult<FeedQueryResult>
+            {
+                Content = result,
+                Count = parameter.Count,
+                StartIndex = parameter.StartIndex
+            };
         }
     }
 }

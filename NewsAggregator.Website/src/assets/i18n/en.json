@@ -1,8 +1,17 @@
 {
+  "erase": "Erase",
+  "confirm": "Confirm",
   "feed": {
     "add": "Add feed",
     "list": "Feeds",
-    "delete": "Delete feeds"
+    "delete": "Delete feeds",
+    "title": "Feed title",
+    "moreThan1000Followers": "> 1000 followers",
+    "moreThan100AndLessThan1000Followers": "<= 1000 followers && >= 100 followers",
+    "lessThan100Followers": "< 100 followers",
+    "moreThan1000Stories": "> 1000 stories",
+    "moreThan100AndLessThan1000Stories": "<= 1000 stories && >= 100 stories",
+    "lessThan100Stories": "< 100 stories"
   },
   "article": {
     "publicationDate": "Publish : {{date}}",
@@ -12,6 +21,14 @@
     }
   },
   "datasource": {
-    "list": "Datasources"
+    "list": "Datasources",
+    "searchDatasource": "Search datasource"
+  },
+  "status": {
+    "notfound": "Page not found"
+  },
+  "menu": {
+    "authenticate": "Authenticate",
+    "disconnect": "Disconnect"
   }
 }

@@ -16,6 +16,14 @@ namespace NewsAggregator.EF.Repositories
             _dbContext = dbContext;
         }
 
+        public Task<DataSourceAggregate> Get(string id, CancellationToken cancellationToken)
+        {
+            return _dbContext.DataSources
+                .Include(d => d.Articles)
+                .Include(d => d.ExtractionHistories)
+                .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+        }
+
         public async Task<IEnumerable<DataSourceAggregate>> GetAll(CancellationToken cancellationToken)
         {
             IEnumerable<DataSourceAggregate> result = await _dbContext.DataSources.Include(d => d.ExtractionHistories).ToListAsync(cancellationToken);
@@ -27,7 +35,6 @@ namespace NewsAggregator.EF.Repositories
             _dbContext.DataSources.UpdateRange(datasources);
             return Task.CompletedTask;
         }
-
         public Task<int> SaveChanges(CancellationToken cancellationToken)
         {
             return _dbContext.SaveChangesAsync(cancellationToken);

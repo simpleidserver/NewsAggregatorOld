@@ -67,6 +67,9 @@ namespace NewsAggregator.Api.Startup
             });
             services.AddHangfire(configuration => configuration.UseSqlServerStorage(CONNECTION_STRING));
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
+            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()));
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -75,6 +78,7 @@ namespace NewsAggregator.Api.Startup
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseMvc(routes =>
             {

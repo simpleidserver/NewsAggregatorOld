@@ -14,7 +14,10 @@ namespace NewsAggregator.Core.Domains.DataSources
         public string Title { get; set; }
         public string Description { get; set; }
         public string Url { get; set; }
+        public int NbFollowers { get; set; }
+        public int NbStoriesPerMonth { get; set; }
         public ICollection<DataSourceExtractionHistory> ExtractionHistories { get; set; }
+        public ICollection<DataSourceArticle> Articles { get; set; }
 
         public bool IsArticleExtracted(DateTimeOffset publicationDate)
         {
@@ -30,6 +33,31 @@ namespace NewsAggregator.Core.Domains.DataSources
         public void AddHistory(DateTimeOffset lastArticlePublicationDate, int nbExtractedArticles)
         {
             ExtractionHistories.Add(DataSourceExtractionHistory.Create(lastArticlePublicationDate, nbExtractedArticles));
+        }
+
+        public void IncrementFollower()
+        {
+            NbFollowers++;
+        }
+
+        public void DecrementFollower()
+        {
+            NbFollowers--;
+        }
+
+        public void AddArticle(DateTimeOffset publishDateTime)
+        {
+            var month = publishDateTime.Month;
+            var year = publishDateTime.Year;
+            var article = Articles.FirstOrDefault(a => a.Month == month && a.Year == year);
+            if (article == null)
+            {
+                article = DataSourceArticle.Create(month, year);
+                Articles.Add(article);
+            }
+
+            article.Increment();
+            NbStoriesPerMonth = Articles.Sum(a => a.NbArticles) / Articles.Count();
         }
 
         public static DataSourceAggregate Create(string title, string description, string url)

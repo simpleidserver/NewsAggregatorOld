@@ -19,9 +19,10 @@
   <mat-drawer-content #content>
     <mat-toolbar>
       <mat-toolbar-row>
-        <span>News Aggregator</span>
+        <a href="#" [routerLink]="['/home']">News Aggregator</a>
         <div class="spacer"></div>
-        <a href="#" *ngIf="!isConnected" (click)="login($event)" mat-button>Authenticate</a>
+        <a href="#" *ngIf="!isConnected" (click)="login($event)" mat-button>{{ 'menu.authenticate' | translate }}</a>
+        <a href="#" *ngIf="isConnected" (click)="disconnect($event)" mat-button>{{ 'menu.disconnect' | translate }}</a>
       </mat-toolbar-row>
     </mat-toolbar>
     <div class="container">

@@ -18,7 +18,7 @@
   <ng-container matColumnDef="feedTitle">
     <th mat-header-cell *matHeaderCellDef>
       <mat-form-field>
-        <mat-label>Feed title</mat-label>
+        <mat-label>{{ 'feed.title' | translate }}</mat-label>
         <input matInput type="text" [(ngModel)]="feedTitle" (ngModelChange)="refresh()" />
       </mat-form-field>
     </th>
@@ -27,7 +27,7 @@
   <!-- Datasource title -->
   <ng-container matColumnDef="datasourceTitle">
     <th mat-header-cell *matHeaderCellDef>
-      <datasource-selector></datasource-selector>
+      <datasource-selector (selected)="onDatasourceSelected($event)"></datasource-selector>
     </th>
     <td mat-cell *matCellDef="let element">{{element.datasourceTitle}}</td>
   </ng-container>
@@ -37,9 +37,9 @@
       <mat-form-field>
         <mat-label>Followers</mat-label>
         <mat-select [(ngModel)]="selectedFollower" (ngModelChange)="refresh()">
-          <mat-option value="0">> 1000 followers</mat-option>
-          <mat-option value="1"><= 1000 && >= 100 followers</mat-option>
-          <mat-option value="2">< 100 followers</mat-option>
+          <mat-option value="0">{{ 'feed.moreThan1000Followers' | translate }}</mat-option>
+          <mat-option value="1">{{ 'feed.moreThan100AndLessThan1000Followers' | translate }}</mat-option>
+          <mat-option value="2">{{ 'feed.lessThan100Followers' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
     </th>
@@ -51,9 +51,9 @@
       <mat-form-field>
         <mat-label>Stories</mat-label>
         <mat-select [(ngModel)]="selectedStory" (ngModelChange)="refresh()">
-          <mat-option value="0">> 1000 stories</mat-option>
-          <mat-option value="1"><= 1000 && >= 100 stories</mat-option>
-          <mat-option value="2">< 100 stories</mat-option>
+          <mat-option value="0">{{ 'feed.moreThan1000Stories' | translate }}</mat-option>
+          <mat-option value="1">{{ 'feed.moreThan100AndLessThan1000Stories' | translate }}</mat-option>
+          <mat-option value="2">{{ 'feed.lessThan100Stories' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
     </th>
@@ -62,3 +62,6 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+<mat-card *ngIf="isLoading" class="loading">
+  <mat-progress-spinner color="primary"mode="indeterminate"></mat-progress-spinner>
+</mat-card>

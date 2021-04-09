@@ -7,16 +7,23 @@
     <Content Remove="src\assets\i18n\fr.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="src\app\common\matDrawerContent.service.ts" />
+    <None Remove="src\app\infrastructures\auth-guard.service.ts" />
     <None Remove="src\app\shared\material.module.ts" />
+    <None Remove="src\app\status\status.routes.ts" />
+    <None Remove="src\app\stores\articles\models\article.model.ts" />
     <None Remove="src\app\stores\datasource\models\datasource.model.ts" />
     <None Remove="src\app\stores\feed\models\feed.model.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\app\feed\view\" />
     <Folder Include="src\app\stores\datasource\actions\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\app\common\matDrawerContent.service.ts" />
+    <TypeScriptCompile Include="src\app\infrastructures\auth-guard.service.ts" />
     <TypeScriptCompile Include="src\app\shared\material.module.ts" />
+    <TypeScriptCompile Include="src\app\status\status.routes.ts" />
+    <TypeScriptCompile Include="src\app\stores\articles\models\article.model.ts" />
     <TypeScriptCompile Include="src\app\stores\datasource\models\datasource.model.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

@@ -1,9 +1,33 @@
 <mat-form-field [class]="class">
   <mat-label>{{ 'datasource.list' | translate }}</mat-label>
-  <input matInput type="text" [(ngModel)]="datasource" (ngModelChange)="refreshDatasource()" [matAutocomplete]="auto" />
-  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectedOption($event)">
-    <mat-option *ngFor="let datasource of datasources" [value]="datasource.id">
-      {{ datasource.title }}
-    </mat-option>
-  </mat-autocomplete>
+  <input matInput
+         type="text"
+         cdkOverlayOrigin
+         (click)="click()"
+         #trigger="cdkOverlayOrigin"
+         [value]="displayText"
+         readonly
+         />
+  <ng-template cdkConnectedOverlay
+               [cdkConnectedOverlayOrigin]="trigger"
+               [cdkConnectedOverlayOpen]="isOpen">
+    <div class="datasource-selector">
+      <mat-form-field>
+        <mat-label>{{ 'datasource.searchDatasource' | translate }}</mat-label>
+        <input matInput [(ngModel)]="datasource" (ngModelChange)="refreshDatasource()" />
+      </mat-form-field>
+      <div>
+        <button mat-button color="primary" (click)="confirm()">{{ 'confirm' | translate }}</button>
+        <button mat-button color="warn" (click)="erase()">{{ 'erase' | translate }}</button>
+      </div>
+      <mat-selection-list [style.display]="isLoading ? 'none' : 'block'" #selectionList>
+        <mat-list-option *ngFor="let datasource of datasources" [value]="datasource.id" [selected]="datasource.isSelected">
+          {{ datasource.title }}
+        </mat-list-option>
+      </mat-selection-list>
+      <mat-card *ngIf="isLoading">
+        <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+      </mat-card>
+    </div>
+  </ng-template>
 </mat-form-field>

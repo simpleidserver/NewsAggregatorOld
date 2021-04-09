@@ -7,7 +7,7 @@ export class DeleteDatasource {
   constructor(public feedId: string, public datasourceId: string) { }
 }
 
-export const startSearchFeeds = createAction("[Feeds] START_SEARCH_FEEDS", props<{ order: string, direction: string, count: number, startIndex: number, feedTitle: string }>());
+export const startSearchFeeds = createAction("[Feeds] START_SEARCH_FEEDS", props<{ order: string, direction: string, count: number | null, startIndex: number | null, feedTitle: string, datasourceIds: string[], followersFilter: number | null, storiesFilter: number | null, isPaginationEnabled: boolean}>());
 export const errorSearchFeeds = createAction("[Feeds] ERROR_SEARCH_FEED");
 export const completeSearchFeeds = createAction("[Feeds] COMPLETE_SEARCH_FEEDS", props <{content: SearchFeedsResult}>());
 export const startDeleteDatasources = createAction("[Feeds] START_DELETE_DATASOURCES", props<{ parameters: DeleteDatasource[] }>());

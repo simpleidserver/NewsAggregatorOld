@@ -10,6 +10,7 @@ namespace NewsAggregator.EF.Configurations
         {
             builder.HasKey(r => r.Id);
             builder.HasMany(r => r.ExtractionHistories).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(r => r.Articles).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.Ignore(a => a.DomainEvts);
         }
     }
