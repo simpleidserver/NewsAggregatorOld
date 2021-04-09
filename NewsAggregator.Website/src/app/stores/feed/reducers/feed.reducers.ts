@@ -1,6 +1,6 @@
 import { Action, createReducer, on } from "@ngrx/store";
 import { SearchArticlesResult } from "../../articles/models/search-article.model";
-import { completeDeleteDatasources, completeGetAllFeeds, completeGetFeed, completeSearchFeedArticles, completeSearchFeeds, DeleteDatasource } from '../actions/feed.actions';
+import { completeGetAllFeeds, completeGetFeed, completeSearchFeedArticles, completeSearchFeeds } from '../actions/feed.actions';
 import { Feed } from "../models/feed.model";
 import { SearchFeedsResult } from "../models/search-feed.model";
 
@@ -54,16 +54,7 @@ export const initialFeedState: FeedState = {
 
 const searchFeedsReducer = createReducer(
   initialSearchFeeds,
-  on(completeSearchFeeds, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false })),
-  on(completeDeleteDatasources, (state, { parameters }) => {
-    const content = state.content.content.filter((f: Feed) => {
-      return parameters.filter((df: DeleteDatasource) => {
-        return f.datasourceId === df.datasourceId && f.feedId === df.feedId;
-      }).length === 0;
-    });
-    const result: SearchFeedsResult = { content: content, startIndex: state.content.startIndex, count: state.content.count, totalLength: state.content.totalLength };
-    return { content: result, isLoading: false, isErrorLoadOccured: false };
-  })
+  on(completeSearchFeeds, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false }))
 );
 
 const allFeedsReducer = createReducer(

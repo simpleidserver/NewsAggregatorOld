@@ -46,6 +46,14 @@ export class FeedListComponent implements OnInit, OnDestroy {
         });
         self.refresh();
       });
+    this.actions$.pipe(
+      filter((action: any) => action.type === fromFeedActions.completeDeleteDatasources.type))
+      .subscribe(() => {
+        self.snackBar.open(self.translateService.instant('feed.feedSourcesRemoved'), self.translateService.instant('undo'), {
+          duration: 2000
+        });
+        self.refresh();
+      });
     this.listener = this.store.pipe(select(fromAppState.selectFeedSearchResult)).subscribe((r: SearchFeedsResult | null) => {
       if (!r) {
         return;
@@ -53,6 +61,7 @@ export class FeedListComponent implements OnInit, OnDestroy {
 
       this.isLoading = false;
       this.feeds = r.content;
+      this.feedsToBeRemoved = [];
     });
   }
 
@@ -65,6 +74,10 @@ export class FeedListComponent implements OnInit, OnDestroy {
   addFeed() {
     const dialogRef = this.dialog.open(AddFeedDialog);
     dialogRef.afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+
       const request = fromFeedActions.startAddFeed({ feedTitle: result.feedTitle, datasourceIds: result.datasourceIds });
       this.store.dispatch(request);
     });

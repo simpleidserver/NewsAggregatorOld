@@ -91,8 +91,13 @@ export class FeedService {
     return this.http.post<SearchFeedsResult>(targetUrl, JSON.stringify(request), { headers: headers });
   }
 
-  deleteDatasources(parameters: DeleteDatasource[]) : Observable<boolean> {
-    return of(true);
+  unsubscribeDatasource(parameter: DeleteDatasource): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/feeds/" + parameter.feedId + "/datasources/" + parameter.datasourceId;
+    return this.http.delete<any>(targetUrl, { headers: headers });
   }
 
   searchArticles(feedId: string, startIndex: number, count: number, order: string, direction: string): Observable<SearchArticlesResult> {

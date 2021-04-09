@@ -9,6 +9,7 @@ namespace NewsAggregator.Core.Repositories
         Task<FeedAggregate> Get(string id, CancellationToken cancellationToken);
         Task<FeedAggregate> Get(string userId, string title, CancellationToken cancellationToken);
         Task Add(FeedAggregate feed, CancellationToken cancellationToken);
+        Task Delete(FeedAggregate feed, CancellationToken cancellation);
         Task Update(FeedAggregate feed, CancellationToken cancellation);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }

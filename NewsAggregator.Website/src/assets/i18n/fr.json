@@ -7,6 +7,7 @@
     "delete": "Supprimer les feeds",
     "title": "Titre du feed",
     "feedAdded": "Le feed a été ajouté",
+    "feedSourcesRemoved": "Les feeds sélectionnés ont été supprimés",
     "moreThan1000Followers": "> 1000 followers",
     "moreThan100AndLessThan1000Followers": "<= 1000 followers && >= 100 followers",
     "lessThan100Followers": "< 100 followers",
@@ -26,7 +27,7 @@
     "searchDatasource": "Chercher une source"
   },
   "status": {
-    "notfound": "Page pas trouvée"
+    "notfound": "Page n'a pas été trouvée"
   },
   "menu": {
     "authenticate": "Authentifier",

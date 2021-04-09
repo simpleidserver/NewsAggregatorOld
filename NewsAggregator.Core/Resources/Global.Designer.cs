@@ -61,6 +61,15 @@ namespace NewsAggregator.Core.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Feed cannot be removed by the user {0}.
+        /// </summary>
+        internal static string CannotRemoveFeed {
+            get {
+                return ResourceManager.GetString("CannotRemoveFeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à DataSource {0} already exists.
         /// </summary>
         internal static string DatasourceAlreadyExists {

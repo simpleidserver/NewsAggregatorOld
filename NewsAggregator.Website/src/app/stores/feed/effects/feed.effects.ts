@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import {
     completeAddFeed,
@@ -56,9 +56,10 @@ export class FeedsEffects {
     .pipe(
       ofType(startDeleteDatasources),
       mergeMap((evt) => {
-        return this.feedService.deleteDatasources(evt.parameters)
+        const calls = evt.parameters.map(p => this.feedService.unsubscribeDatasource(p));
+        return forkJoin(calls)
           .pipe(
-            map(() => completeDeleteDatasources({ parameters: evt.parameters })),
+            map(() => completeDeleteDatasources()),
             catchError(() => of(errorDeleteDatasources()))
           );
       }

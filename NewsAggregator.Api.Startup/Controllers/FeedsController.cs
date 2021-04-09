@@ -58,6 +58,16 @@ namespace NewsAggregator.Api.Startup.Controllers
             return new OkObjectResult(result);
         }
 
+        [HttpDelete("{id}")]
+        [Authorize("Authenticated")]
+        public async Task<IActionResult> DeleteFeed(string id, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var parameter = new DeleteFeedCommand { FeedId = id, UserId = userId };
+            await _mediator.Send(parameter, cancellationToken);
+            return new NoContentResult();
+        }
+
         [HttpPost("{id}/articles/.search")]
         public async Task<IActionResult> SearchArticles(CancellationToken cancellationToken)
         {

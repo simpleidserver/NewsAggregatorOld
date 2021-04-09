@@ -29,7 +29,14 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
 
         public async Task<string> Handle(AddFeedCommand request, CancellationToken cancellationToken)
         {
-            var newFeed = FeedAggregate.Create(request.UserId, request.Title);
+            var isNewFeed = false;
+            var feed = await _feedCommandRepository.Get(request.UserId, request.Title, cancellationToken);
+            if (feed == null)
+            {
+                feed = FeedAggregate.Create(request.UserId, request.Title);
+                isNewFeed = true;
+            }
+
             if (request.DatasourceIds != null)
             {
                 var datasources = await _dataSourceService.Get(request.DatasourceIds, cancellationToken);
@@ -41,21 +48,22 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
 
                 foreach(var datasource in datasources)
                 {
-                    newFeed.SubscribeDataSource(request.UserId, datasource.Id);
+                    feed.SubscribeDataSource(request.UserId, datasource.Id);
                 }
             }
 
-            var feed = await _feedCommandRepository.Get(request.UserId, request.Title, cancellationToken);
-            if (feed != null)
+            if (isNewFeed)
             {
-                _logger.LogError($"Feed with the title {request.Title} already exists");
-                throw new NewsAggregatorException(string.Format(Global.FeedAlreadyExists, request.Title));
+                await _feedCommandRepository.Add(feed, cancellationToken);
+            }
+            else
+            {
+                await _feedCommandRepository.Update(feed, cancellationToken);
             }
 
-            await _feedCommandRepository.Add(newFeed, cancellationToken);
             await _feedCommandRepository.SaveChanges(cancellationToken);
             _logger.LogInformation($"User {request.UserId} adds the feed {request.Title}");
-            return newFeed.Id;
+            return feed.Id;
         }
     }
 }

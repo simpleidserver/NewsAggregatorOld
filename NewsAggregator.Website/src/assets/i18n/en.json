@@ -7,6 +7,7 @@
     "delete": "Delete feeds",
     "title": "Feed title",
     "feedAdded": "Feed has been added",
+    "feedSourcesRemoved": "Selected feeds have been removed",
     "moreThan1000Followers": "> 1000 followers",
     "moreThan100AndLessThan1000Followers": "<= 1000 followers && >= 100 followers",
     "lessThan100Followers": "< 100 followers",

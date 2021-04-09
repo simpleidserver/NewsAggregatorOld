@@ -36,6 +36,13 @@ namespace NewsAggregator.Core.Domains.Feeds
             DomainEvts.Add(evt);
         }
 
+        public void Remove(string userId)
+        {
+            var evt = new FeedRemovedEvent(Guid.NewGuid().ToString(), Id, Version + 1, userId);
+            Handle(evt);
+            DomainEvts.Add(evt);
+        }
+
         #endregion
 
         public static FeedAggregate Create(string userId, string title)
@@ -102,6 +109,14 @@ namespace NewsAggregator.Core.Domains.Feeds
             DataSources.Remove(datasource);
             UpdateDateTime = evt.DeletionDateTime;
             Version = evt.Version;
+        }
+
+        private void Handle(FeedRemovedEvent evt)
+        {
+            if (UserId != evt.UserId)
+            {
+                throw new DomainException(string.Format(Global.CannotRemoveFeed, evt.UserId));
+            }
         }
     }
 }

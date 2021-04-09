@@ -31,6 +31,12 @@ namespace NewsAggregator.EF.Repositories
             return Task.CompletedTask;
         }
 
+        public Task Delete(FeedAggregate feed, CancellationToken cancellation)
+        {
+            _dbContext.Feeds.Remove(feed);
+            return Task.CompletedTask;
+        }
+
         public Task Update(FeedAggregate feed, CancellationToken cancellation)
         {
             _dbContext.Feeds.Update(feed);
