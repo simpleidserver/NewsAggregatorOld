@@ -12,7 +12,7 @@
         <span class="indicator">{{ grp.nbStoriesPerMonth }}</span>
       </div>
       <div *ngFor="let datasource of grp.datasources" class="datasources nav-link">
-        {{ datasource.title }}
+        <a href="#" [routerLink]="['/datasources/' + datasource.id ]">{{ datasource.title }}</a>
       </div>
     </div>
   </mat-drawer>

@@ -19,7 +19,7 @@ namespace NewsAggregator.Api.Startup.Controllers
         }
 
         [HttpPost("searchindatasource/{datasourceId}")]
-        public async Task<IActionResult> SeachInFeeds(string datasourceId, [FromBody] SearchArticlesInFeedQuery searchArticlesInFeedQuery, CancellationToken cancellationToken)
+        public async Task<IActionResult> SeachInFeeds(string datasourceId, [FromBody] SearchArticlesInDataSourceQuery searchArticlesInFeedQuery, CancellationToken cancellationToken)
         {
             searchArticlesInFeedQuery.DataSourceId = datasourceId;
             var result = await _mediator.Send(searchArticlesInFeedQuery, cancellationToken);

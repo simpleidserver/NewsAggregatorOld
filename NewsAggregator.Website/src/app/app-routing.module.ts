@@ -12,6 +12,11 @@ const routes: Routes = [
     canActivate: [ AuthGuard ]
   },
   {
+    path: 'datasources',
+    loadChildren: async () => (await import('./datasources/datasource.module')).DatasourceModule,
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'status',
     loadChildren: async () => (await import('./status/status.module')).StatusModule
   }

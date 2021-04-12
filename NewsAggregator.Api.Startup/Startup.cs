@@ -19,7 +19,7 @@ namespace NewsAggregator.Api.Startup
 {
     public class Startup
     {
-        private const string CONNECTION_STRING = "Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=NewsAggregator;Integrated Security=True";
+        private const string CONNECTION_STRING = "Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=NewsAggregator;Integrated Security=True;MultipleActiveResultSets=True";
         private readonly IWebHostEnvironment _env;
 
         public Startup(IWebHostEnvironment env)

@@ -1,6 +1,5 @@
 import { Action, createReducer, on } from "@ngrx/store";
-import { SearchArticlesResult } from "../../articles/models/search-article.model";
-import { completeGetAllFeeds, completeGetFeed, completeSearchFeedArticles, completeSearchFeeds } from '../actions/feed.actions';
+import { completeGetAllFeeds, completeGetFeed, completeSearchFeeds } from '../actions/feed.actions';
 import { Feed } from "../models/feed.model";
 import { SearchFeedsResult } from "../models/search-feed.model";
 
@@ -14,12 +13,6 @@ export interface AllFeedsState {
   isLoading: boolean;
   isErrorLoadOccured: boolean;
   content: Feed[];
-}
-
-export interface FeedArticleLstState {
-  isLoading: boolean;
-  isErrorLoadOccured: boolean;
-  content: SearchArticlesResult;
 }
 
 export interface FeedState {
@@ -40,12 +33,6 @@ export const initialAllFeeds: AllFeedsState = {
   isErrorLoadOccured: false
 };
 
-export const initialFeedArticleLstState: FeedArticleLstState = {
-  content: new SearchArticlesResult(),
-  isLoading: true,
-  isErrorLoadOccured: false
-};
-
 export const initialFeedState: FeedState = {
   content: new Feed(),
   isLoading: true,
@@ -62,11 +49,6 @@ const allFeedsReducer = createReducer(
   on(completeGetAllFeeds, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false }))
 );
 
-const feedArticleLstReducer = createReducer(
-  initialFeedArticleLstState,
-  on(completeSearchFeedArticles, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false }))
-);
-
 const feedReducer = createReducer(
   initialFeedState,
   on(completeGetFeed, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false }))
@@ -78,10 +60,6 @@ export function getSearchFeedsReducer(state: SearchFeedsState | undefined, actio
 
 export function getAllFeedsReducer(state: AllFeedsState | undefined, action: Action) {
   return allFeedsReducer(state, action);
-}
-
-export function getFeedArticleLstReducer(state: FeedArticleLstState | undefined, action: Action) {
-  return feedArticleLstReducer(state, action);
 }
 
 export function getFeedReducer(state: FeedState | undefined, action: Action) {

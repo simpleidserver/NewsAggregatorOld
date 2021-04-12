@@ -21,10 +21,13 @@ namespace NewsAggregator.Query.SQL.Repositories
 
         public Task<IEnumerable<FeedQueryResult>> GetFeeds(string userId)
         {
-            const string sql = "SELECT " +
+            const string sql = "SELECT [feeds].[Id] as [FeedId], " +
                             "[feeds].[Title] as [FeedTitle], " +
+                            "[datasources].[Id] as [DatasourceId], " +
                             "[datasources].[Title] as [DatasourceTitle], " +
-                            "[datasources].[Description] as [DatasourceDescription] " +
+                            "[datasources].[Description] as [DatasourceDescription], " +
+                            "[datasources].[NbFollowers] as [NbFollowers], " +
+                            "[datasources].[NbStoriesPerMonth] as [NbStoriesPerMonth] " +
                             "FROM [dbo].[Feeds] as [feeds] " +
                             "LEFT JOIN [dbo].[FeedDatasource] as [feedDatasource] ON [feedDatasource].[FeedAggregateId] = [feeds].[Id] " +
                             "LEFT JOIN [dbo].[DataSources] as [datasources] ON [datasources].[Id] = [feedDatasource].[DatasourceId] " +

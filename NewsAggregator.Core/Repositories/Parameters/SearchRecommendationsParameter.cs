@@ -1,4 +1,4 @@
-﻿namespace NewsAggregator.Core.Parameters
+﻿namespace NewsAggregator.Core.Repositories.Parameters
 {
     public class SearchRecommendationsParameter
     {

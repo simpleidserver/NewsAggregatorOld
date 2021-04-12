@@ -100,12 +100,6 @@ export class FeedService {
     return this.http.delete<any>(targetUrl, { headers: headers });
   }
 
-  searchArticles(feedId: string, startIndex: number, count: number, order: string, direction: string): Observable<SearchArticlesResult> {
-    const filtered = articles.slice(startIndex, startIndex + count);
-    let result: SearchArticlesResult = { content: filtered, count : filtered.length, startIndex: startIndex, totalLength: articles.length };
-    return of(result);
-  }
-
   getFeed(feedId: string): Observable<Feed> {
     const feed = feeds.filter((f: Feed) => f.feedId === feedId)[0];
     return of(feed);
@@ -122,6 +116,11 @@ export class FeedService {
   }
 
   getAllFeeds(): Observable<Feed[]> {
-    return of(feeds);
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/feeds/me";
+    return this.http.get<Feed[]>(targetUrl, { headers: headers });
   }
 }

@@ -5,28 +5,19 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import {
     completeAddFeed,
     completeDeleteDatasources,
-
-
     completeGetAllFeeds,
-
-
     completeGetFeed,
-
-
-    completeSearchFeedArticles, completeSearchFeeds,
+    completeSearchFeeds,
     errorAddFeed,
     errorDeleteDatasources,
-
     errorGetAllFeeds,
-
     errorGetFeed,
-
-    errorSearchFeedArticles, errorSearchFeeds,
+    errorSearchFeeds,
     startAddFeed,
     startDeleteDatasources,
     startGetAllFeeds,
     startGetFeed,
-    startSearchFeedArticles, startSearchFeeds
+    startSearchFeeds
 } from '../actions/feed.actions';
 import { FeedService } from '../services/feed.service';
 
@@ -61,20 +52,6 @@ export class FeedsEffects {
           .pipe(
             map(() => completeDeleteDatasources()),
             catchError(() => of(errorDeleteDatasources()))
-          );
-      }
-      )
-  );
-
-  @Effect()
-  searchFeedArticles$ = this.actions$
-    .pipe(
-      ofType(startSearchFeedArticles),
-      mergeMap((evt) => {
-        return this.feedService.searchArticles(evt.feedId, evt.startIndex, evt.count, evt.order, evt.direction)
-          .pipe(
-            map((articles) => completeSearchFeedArticles({ content: articles })),
-            catchError(() => of(errorSearchFeedArticles()))
           );
       }
       )

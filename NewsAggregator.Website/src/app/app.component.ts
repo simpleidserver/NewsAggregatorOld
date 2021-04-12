@@ -3,10 +3,11 @@ import { MatDrawerContent } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
 import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
-import { select, Store } from '@ngrx/store';
+import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { JwksValidationHandler } from 'angular-oauth2-oidc-jwks';
+import { filter } from 'rxjs/operators';
 import { authConfig } from './auth.config';
 import { DrawerContentService } from './common/matDrawerContent.service';
 import { Datasource } from './stores/datasource/models/datasource.model';
@@ -29,15 +30,25 @@ export class AppComponent implements OnInit, OnDestroy {
     private oauthService: OAuthService,
     private store: Store<fromAppState.AppState>,
     private drawerContentService: DrawerContentService,
-    private router: Router) {
+    private router: Router,
+    private actions$: ScannedActionsSubject) {
     this.translateService.setDefaultLang('fr');
     this.translateService.use('fr');
     this.configureAuth();
   }
 
   ngOnInit(): void {
-    const request = fromFeedActions.startGetAllFeeds();
-    this.store.dispatch(request);
+    const self = this;
+    this.actions$.pipe(
+      filter((action: any) => action.type === fromFeedActions.completeAddFeed.type))
+      .subscribe(() => {
+        self.refresh();
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === fromFeedActions.completeDeleteDatasources.type))
+      .subscribe(() => {
+        self.refresh();
+      });
     this.listener = this.store.pipe(select(fromAppState.selectAllFeedsResult)).subscribe((r: Feed[] | null) => {
       if (!r) {
         return;
@@ -60,9 +71,9 @@ export class AppComponent implements OnInit, OnDestroy {
       } else if (e.type === "token_received") {
         this.init();
       }
-    });
-
+    })
     this.init();
+    this.refresh();
   }
 
   disconnect(evt: any) {
@@ -119,5 +130,10 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     this.isConnected = true;
+  }
+
+  private refresh() {
+    const request = fromFeedActions.startGetAllFeeds();
+    this.store.dispatch(request);
   }
 }

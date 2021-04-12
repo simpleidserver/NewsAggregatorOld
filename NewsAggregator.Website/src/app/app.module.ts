@@ -17,6 +17,8 @@ import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './infrastructures/auth-guard.service';
 import { MaterialModule } from './shared/material.module';
 import { appReducer } from './stores/appstate';
+import { ArticlesEffects } from './stores/articles/effects/article.effects';
+import { ArticleService } from './stores/articles/services/article.service';
 import { DatasourceService } from './stores/datasource/services/datasource.service';
 import { FeedsEffects } from './stores/feed/effects/feed.effects';
 import { FeedService } from './stores/feed/services/feed.service';
@@ -41,7 +43,8 @@ export function createTranslateLoader(http: HttpClient) {
     FlexLayoutModule,
     OAuthModule.forRoot(),
     EffectsModule.forRoot([
-      FeedsEffects
+      FeedsEffects,
+      ArticlesEffects
     ]),
     StoreModule.forRoot(appReducer),
     TranslateModule.forRoot({
@@ -59,6 +62,7 @@ export function createTranslateLoader(http: HttpClient) {
     FeedService,
     DatasourceService,
     DrawerContentService,
+    ArticleService,
     AuthGuard
   ],
   bootstrap: [AppComponent]

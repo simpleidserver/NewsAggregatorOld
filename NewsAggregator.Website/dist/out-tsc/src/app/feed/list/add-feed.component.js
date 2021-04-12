@@ -5,15 +5,15 @@ let AddFeedDialog = class AddFeedDialog {
     constructor(dialogRef) {
         this.dialogRef = dialogRef;
         this.addFeedForm = new FormGroup({
-            feedTitle: new FormControl('', Validators.required),
-            datasource: new FormControl('', Validators.required)
+            feedTitle: new FormControl('', Validators.required)
         });
+        this.selectedDatasourceIds = [];
     }
     onDatasourceSelected(evt) {
-        var _a;
-        (_a = this.addFeedForm.get('datasource')) === null || _a === void 0 ? void 0 : _a.setValue(evt);
+        this.selectedDatasourceIds = evt;
     }
     addFeed(data) {
+        data.datasourceIds = this.selectedDatasourceIds;
         this.dialogRef.close(data);
     }
 };

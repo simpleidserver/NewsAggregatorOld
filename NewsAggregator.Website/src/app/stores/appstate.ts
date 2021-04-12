@@ -1,17 +1,18 @@
 import { createSelector } from '@ngrx/store';
+import * as fromArticle from './articles/reducers/article.reducers';
 import * as fromFeed from './feed/reducers/feed.reducers';
 
 export interface AppState {
   searchFeeds: fromFeed.SearchFeedsState,
   allFeeds: fromFeed.AllFeedsState,
-  feedArticleLst: fromFeed.FeedArticleLstState,
-  feed: fromFeed.FeedState
+  feed: fromFeed.FeedState,
+  searchArticles: fromArticle.SearchArticlesState
 }
 
 export const selectSearchFeeds = (state: AppState) => state.searchFeeds;
 export const selectAllFeeds = (state: AppState) => state.allFeeds;
-export const selectFeedArticleLst = (state: AppState) => state.feedArticleLst;
 export const selectFeed = (state: AppState) => state.feed;
+export const selectSearchArticles = (state: AppState) => state.searchArticles;
 
 export const selectFeedSearchResult = createSelector(
   selectSearchFeeds,
@@ -35,17 +36,6 @@ export const selectAllFeedsResult = createSelector(
   }
 );
 
-export const selectFeedArticleResult = createSelector(
-  selectFeedArticleLst,
-  (state: fromFeed.FeedArticleLstState) => {
-    if (!state || state.content === null) {
-      return null;
-    }
-
-    return state.content;
-  }
-);
-
 export const selectFeedResult = createSelector(
   selectFeed,
   (state: fromFeed.FeedState) => {
@@ -57,9 +47,20 @@ export const selectFeedResult = createSelector(
   }
 );
 
+export const selectSearchArticlesResult = createSelector(
+  selectSearchArticles,
+  (state: fromArticle.SearchArticlesState) => {
+    if (!state || state.content === null) {
+      return null;
+    }
+
+    return state.content;
+  }
+);
+
 export const appReducer = {
   searchFeeds: fromFeed.getSearchFeedsReducer,
   allFeeds: fromFeed.getAllFeedsReducer,
-  feedArticleLst: fromFeed.getFeedArticleLstReducer,
-  feed: fromFeed.getFeedReducer
+  feed: fromFeed.getFeedReducer,
+  searchArticles: fromArticle.getSearchArticlesReducer
 };

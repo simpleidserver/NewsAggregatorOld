@@ -1,7 +1,7 @@
 ﻿using Dapper;
-using NewsAggregator.Core.Parameters;
 using NewsAggregator.Core.QueryResults;
 using NewsAggregator.Core.Repositories;
+using NewsAggregator.Core.Repositories.Parameters;
 using System.Threading;
 using System.Threading.Tasks;
 

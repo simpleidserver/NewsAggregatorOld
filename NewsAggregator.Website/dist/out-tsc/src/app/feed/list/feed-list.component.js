@@ -3,22 +3,46 @@ import { Component } from '@angular/core';
 import * as fromAppState from '@app/stores/appstate';
 import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 import { select } from '@ngrx/store';
+import { filter } from 'rxjs/operators';
 import { AddFeedDialog } from './add-feed.component';
 let FeedListComponent = class FeedListComponent {
-    constructor(dialog, store) {
+    constructor(dialog, store, actions$, snackBar, translateService) {
         this.dialog = dialog;
         this.store = store;
+        this.actions$ = actions$;
+        this.snackBar = snackBar;
+        this.translateService = translateService;
         this.displayedColumns = ['checkbox', 'feedTitle', 'datasourceTitle', 'nbFollowers', 'nbStoriesPerMonth'];
         this.feeds = [];
         this.feedsToBeRemoved = [];
+        this.selectedFollower = null;
+        this.selectedStory = null;
+        this.isLoading = false;
     }
     ngOnInit() {
+        const self = this;
         this.refresh();
+        this.actions$.pipe(filter((action) => action.type === fromFeedActions.completeAddFeed.type))
+            .subscribe(() => {
+            self.snackBar.open(self.translateService.instant('feed.feedAdded'), self.translateService.instant('undo'), {
+                duration: 2000
+            });
+            self.refresh();
+        });
+        this.actions$.pipe(filter((action) => action.type === fromFeedActions.completeDeleteDatasources.type))
+            .subscribe(() => {
+            self.snackBar.open(self.translateService.instant('feed.feedSourcesRemoved'), self.translateService.instant('undo'), {
+                duration: 2000
+            });
+            self.refresh();
+        });
         this.listener = this.store.pipe(select(fromAppState.selectFeedSearchResult)).subscribe((r) => {
             if (!r) {
                 return;
             }
+            this.isLoading = false;
             this.feeds = r.content;
+            this.feedsToBeRemoved = [];
         });
     }
     ngOnDestroy() {
@@ -29,9 +53,16 @@ let FeedListComponent = class FeedListComponent {
     addFeed() {
         const dialogRef = this.dialog.open(AddFeedDialog);
         dialogRef.afterClosed().subscribe(result => {
-            const request = fromFeedActions.startAddFeed({ feedTitle: result.feedTitle, datasource: result.datasource });
+            if (!result) {
+                return;
+            }
+            const request = fromFeedActions.startAddFeed({ feedTitle: result.feedTitle, datasourceIds: result.datasourceIds });
             this.store.dispatch(request);
         });
+    }
+    onDatasourceSelected(evt) {
+        this.selectedDatasourceIds = evt;
+        this.refresh();
     }
     deleteFeed(feed) {
         const filtered = this.feedsToBeRemoved.filter((f) => f.datasourceId === feed.datasourceId && f.feedId === feed.feedId);
@@ -49,9 +80,8 @@ let FeedListComponent = class FeedListComponent {
         this.store.dispatch(request);
     }
     refresh() {
-        const startIndex = 0;
-        const count = 100;
-        const request = fromFeedActions.startSearchFeeds({ order: 'createDateTime', direction: 'desc', count: count, startIndex: startIndex, feedTitle: this.feedTitle });
+        this.isLoading = true;
+        const request = fromFeedActions.startSearchFeeds({ order: 'createDateTime', direction: 'desc', count: null, startIndex: null, feedTitle: this.feedTitle, datasourceIds: this.selectedDatasourceIds, followersFilter: this.selectedFollower, storiesFilter: this.selectedStory, isPaginationEnabled: false });
         this.store.dispatch(request);
     }
 };

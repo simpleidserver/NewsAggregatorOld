@@ -1,7 +1,7 @@
 ﻿using Dapper;
-using NewsAggregator.Core.Parameters;
 using NewsAggregator.Core.QueryResults;
 using NewsAggregator.Core.Repositories;
+using NewsAggregator.Core.Repositories.Parameters;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -67,7 +67,7 @@ namespace NewsAggregator.Query.SQL.Repositories
             yield return new ArticleQueryResult[0];
         }
 
-        public async Task<SearchQueryResult<ArticleQueryResult>> SearchInFeeds(SearchArticlesInFeedParameter parameter, CancellationToken cancellationToken)
+        public async Task<SearchQueryResult<ArticleQueryResult>> SearchInDataSource(SearchArticlesInDataSourceParameter parameter, CancellationToken cancellationToken)
         {
             const string sql = "SELECT " +
                             "[Id], "+
@@ -85,7 +85,7 @@ namespace NewsAggregator.Query.SQL.Repositories
             var connection = _sqlConnectionFactory.GetOpenConnection();
             var result = await connection.QueryAsync<ArticleQueryResult>(sql, new
             {
-                datasourceId =parameter.DataSourceId,
+                datasourceId = parameter.DataSourceId,
                 startIndex = parameter.StartIndex,
                 count = parameter.Count
             });

@@ -1,5 +1,7 @@
 import { __decorate } from "tslib";
+import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@envs/environment';
 import { of } from 'rxjs';
 const feeds = [
     { feedTitle: 'News', datasourceTitle: 'BBC', nbFollowers: 1000, nbStoriesPerMonth: 1000, language: 'en', datasourceId: 'bbc', feedId: 'news' },
@@ -44,39 +46,44 @@ let FeedService = class FeedService {
         this.http = http;
         this.oauthService = oauthService;
     }
-    search(startIndex, count, order, direction, feedTitle) {
-        /*
+    search(startIndex, count, order, direction, feedTitle, datasourceIds, followersFilter, storiesFitler, isPaginationEnabled) {
         let headers = new HttpHeaders();
         headers = headers.set('Accept', 'application/json');
         headers = headers.set('Content-Type', 'application/json');
         headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
         const targetUrl = environment.apiUrl + "/feeds/me/.search";
-        const request: any = { startIndex: startIndex, count: count };
+        const request = { isPaginationEnabled: isPaginationEnabled };
+        if (isPaginationEnabled) {
+            request["startIndex"] = startIndex;
+            request["count"] = count;
+        }
         if (order) {
-          request["orderBy"] = order;
+            request["orderBy"] = order;
         }
-    
         if (direction) {
-          request["order"] = direction;
+            request["order"] = direction;
         }
-    
         if (feedTitle) {
-          request['feedTitle'] = feedTitle;
+            request['feedTitle'] = feedTitle;
         }
-    
-        return this.http.post<SearchFeedsResult>(targetUrl, JSON.stringify(request), { headers: headers });
-        */
-        let filtered = feeds;
-        if (feedTitle && feedTitle !== '') {
-            filtered = feeds.filter((f) => {
-                return f.feedTitle.includes(feedTitle);
-            });
+        if (datasourceIds && datasourceIds.length > 0) {
+            request["datasourceIds"] = datasourceIds;
         }
-        const result = { content: filtered, count: 100, startIndex: 0, totalLength: 100 };
-        return of(result);
+        if (followersFilter) {
+            request["followersFilter"] = followersFilter;
+        }
+        if (storiesFitler) {
+            request["storiesFitler"] = storiesFitler;
+        }
+        return this.http.post(targetUrl, JSON.stringify(request), { headers: headers });
     }
-    deleteDatasources(parameters) {
-        return of(true);
+    unsubscribeDatasource(parameter) {
+        let headers = new HttpHeaders();
+        headers = headers.set('Accept', 'application/json');
+        headers = headers.set('Content-Type', 'application/json');
+        headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+        const targetUrl = environment.apiUrl + "/feeds/" + parameter.feedId + "/datasources/" + parameter.datasourceId;
+        return this.http.delete(targetUrl, { headers: headers });
     }
     searchArticles(feedId, startIndex, count, order, direction) {
         const filtered = articles.slice(startIndex, startIndex + count);
@@ -87,9 +94,14 @@ let FeedService = class FeedService {
         const feed = feeds.filter((f) => f.feedId === feedId)[0];
         return of(feed);
     }
-    addFeed(feedTitle, datasourceId) {
-        const feed = { datasourceId: datasourceId, datasourceTitle: 'NewDatasource', feedId: 'feedid', feedTitle: feedTitle, language: 'en', nbFollowers: 0, nbStoriesPerMonth: 0 };
-        return of(feed);
+    addFeed(feedTitle, datasourceIds) {
+        let headers = new HttpHeaders();
+        headers = headers.set('Accept', 'application/json');
+        headers = headers.set('Content-Type', 'application/json');
+        headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+        const targetUrl = environment.apiUrl + "/feeds";
+        const request = { title: feedTitle, datasourceIds: datasourceIds };
+        return this.http.post(targetUrl, JSON.stringify(request), { headers: headers });
     }
     getAllFeeds() {
         return of(feeds);

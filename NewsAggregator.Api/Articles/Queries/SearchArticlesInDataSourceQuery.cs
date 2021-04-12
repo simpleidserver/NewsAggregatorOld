@@ -3,9 +3,9 @@ using NewsAggregator.Core.QueryResults;
 
 namespace NewsAggregator.Api.Articles.Queries
 {
-    public class SearchArticlesInFeedQuery: IRequest<SearchQueryResult<ArticleQueryResult>>
+    public class SearchArticlesInDataSourceQuery : IRequest<SearchQueryResult<ArticleQueryResult>>
     {
-        public SearchArticlesInFeedQuery()
+        public SearchArticlesInDataSourceQuery()
         {
             StartIndex = 0;
             Count = 100;
@@ -14,5 +14,7 @@ namespace NewsAggregator.Api.Articles.Queries
         public int StartIndex { get; set; }
         public int Count { get; set; }
         public string DataSourceId { get; set; }
+        public string Order { get; set; }
+        public string Direction { get; set; }
     }
 }
