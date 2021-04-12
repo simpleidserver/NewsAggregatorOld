@@ -14,7 +14,7 @@ namespace NewsAggregator.Api.Feeds.Queries
         public string FeedTitle { get; set; }
         public IEnumerable<string> DatasourceIds { get; set; }
         public int? FollowersFilter { get; set; }
-        public int? StoriesFilter { get; set; }
+        public int? StoriesFitler { get; set; }
         public string UserId { get; set; }
     }
 }

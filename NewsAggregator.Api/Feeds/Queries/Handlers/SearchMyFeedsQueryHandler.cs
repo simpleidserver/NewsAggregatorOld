@@ -25,7 +25,7 @@ namespace NewsAggregator.Api.Feeds.Queries.Handlers
                 DatasourceIds = request.DatasourceIds,
                 FollowersFilter = Parse<FollowerFilterTypes>(request.FollowersFilter),
                 IsPaginationEnabled = request.IsPaginationEnabled,
-                StoriesFilter = Parse<NumberStoriesFilterTypes>(request.StoriesFilter),
+                StoriesFilter = Parse<NumberStoriesFilterTypes>(request.StoriesFitler),
                 Count = request.Count,
                 Direction = request.Direction,
                 FeedTitle = request.FeedTitle,

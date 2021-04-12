@@ -1,27 +1,25 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { environment } from '@envs/environment';
 import { OAuthService } from "angular-oauth2-oidc";
-import { Observable, of } from "rxjs";
-import { Datasource } from "../models/datasource.model";
+import { Observable } from "rxjs";
 import { SearchDatasourcesResult } from "../models/SearchDatasourcesResult";
-
-const datasources: Datasource[] = [
-  { description: 'BBC', id: '169de9bc-a389-4e21-b1a7-3d9ad25dfe5f', title: 'BBC' }
-];
 
 @Injectable()
 export class DatasourceService {
   constructor(private http: HttpClient, private oauthService: OAuthService) { }
 
   searchDatasources(startIndex: number, count: number, title: string): Observable<SearchDatasourcesResult> {
-    let filtered = datasources;
-    if (title && title !== '') {
-      filtered = datasources.filter((f: Datasource) => {
-        return f.title.includes(title);
-      });
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/datasources/.search";
+    const request: any = { isPaginationEnabled: true, startIndex: startIndex, count: count };
+    if (title) {
+      request["title"] = title;
     }
 
-    const result: SearchDatasourcesResult = { content: filtered, count: 100, startIndex: 0, totalLength: 100 };
-    return of(result);
+    return this.http.post<SearchDatasourcesResult>(targetUrl, JSON.stringify(request), { headers: headers });
   }
 }
