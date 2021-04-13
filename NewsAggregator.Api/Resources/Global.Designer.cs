@@ -70,6 +70,15 @@ namespace NewsAggregator.Api.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cannot access to the feed {0}.
+        /// </summary>
+        internal static string CannotAccessToTheFeed {
+            get {
+                return ResourceManager.GetString("CannotAccessToTheFeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Datasource {0} doesn&apos;t exist.
         /// </summary>
         internal static string DataSourceDoesntExist {

@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
 import { Store } from '@ngrx/store';
 import { DrawerContentService } from '../../common/matDrawerContent.service';
+import { DatasourceViewArticlesComponent } from './view-datasource-articles.component';
 
 @Component({
   selector: 'app-datasource-view',
@@ -11,6 +12,7 @@ import { DrawerContentService } from '../../common/matDrawerContent.service';
 export class DatasourceViewComponent implements OnInit, OnDestroy {
   // datasource: DataSource = new DataSource();
   datasourceListener: any;
+  @ViewChild('viewArticles', { static: true }) viewArticles: DatasourceViewArticlesComponent;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -27,6 +29,9 @@ export class DatasourceViewComponent implements OnInit, OnDestroy {
       this.feed = r;
     });
     */
+    this.activatedRoute.params.subscribe(() => {
+      this.viewArticles.reset();
+    });
   }
 
   ngOnDestroy(): void {

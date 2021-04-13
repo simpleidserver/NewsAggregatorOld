@@ -1,12 +1,14 @@
 {
   "erase": "Effacer",
   "confirm": "Confirmer",
+  "delete": "Supprimer",
   "feed": {
     "add": "Ajouter feed",
     "list": "Feeds",
     "delete": "Supprimer les feeds",
     "title": "Titre du feed",
     "feedAdded": "Le feed a été ajouté",
+    "feedRemoved": "Le feed a été supprimé",
     "feedSourcesRemoved": "Les feeds sélectionnés ont été supprimés",
     "moreThan1000Followers": "> 1000 followers",
     "moreThan100AndLessThan1000Followers": "<= 1000 followers && >= 100 followers",

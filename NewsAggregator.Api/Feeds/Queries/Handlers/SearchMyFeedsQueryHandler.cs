@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NewsAggregator.Api.Feeds.Queries.Handlers
 {
-    public class SearchMyFeedsQueryHandler : IRequestHandler<SearchMyFeedsQuery, SearchQueryResult<FeedQueryResult>>
+    public class SearchMyFeedsQueryHandler : IRequestHandler<SearchMyFeedsQuery, SearchQueryResult<DetailedFeedQueryResult>>
     {
         private readonly IFeedQueryRepository _feedQueryRepository;
 
@@ -18,7 +18,7 @@ namespace NewsAggregator.Api.Feeds.Queries.Handlers
             _feedQueryRepository = feedQueryRepository;
         }
 
-        public Task<SearchQueryResult<FeedQueryResult>> Handle(SearchMyFeedsQuery request, CancellationToken cancellationToken)
+        public Task<SearchQueryResult<DetailedFeedQueryResult>> Handle(SearchMyFeedsQuery request, CancellationToken cancellationToken)
         {
             return _feedQueryRepository.SearchFeeds(new SearchFeedParameter
             {

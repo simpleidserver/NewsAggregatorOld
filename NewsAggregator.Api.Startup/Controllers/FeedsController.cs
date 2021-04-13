@@ -27,7 +27,7 @@ namespace NewsAggregator.Api.Startup.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             addFeedCommand.UserId = userId;
-            var result = await _mediator.Send(addFeedCommand);
+            var result = await _mediator.Send(addFeedCommand, cancellationToken);
             return new ContentResult
             {
                 StatusCode = (int)HttpStatusCode.Created,
@@ -37,6 +37,25 @@ namespace NewsAggregator.Api.Startup.Controllers
                 }.ToString(),
                 ContentType = "application/json"
             };
+        }
+
+
+        [HttpGet("{feedId}")]
+        [Authorize("Authenticated")]
+        public async Task<IActionResult> GetFeed(string feedId, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetFeedQuery(feedId), cancellationToken);
+            return new OkObjectResult(result);
+        }
+
+
+        [HttpDelete("{feedId}")]
+        [Authorize("Authenticated")]
+        public async Task<IActionResult> DeleteFeed(string feedId, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            await _mediator.Send(new DeleteFeedCommand { FeedId = feedId, UserId = userId }, cancellationToken);
+            return new NoContentResult();
         }
 
         [HttpGet("me")]
@@ -56,16 +75,6 @@ namespace NewsAggregator.Api.Startup.Controllers
             parameter.UserId = userId;
             var result = await _mediator.Send(parameter, cancellationToken);
             return new OkObjectResult(result);
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize("Authenticated")]
-        public async Task<IActionResult> DeleteFeed(string id, CancellationToken cancellationToken)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var parameter = new DeleteFeedCommand { FeedId = id, UserId = userId };
-            await _mediator.Send(parameter, cancellationToken);
-            return new NoContentResult();
         }
 
         [HttpPost("{id}/datasources")]

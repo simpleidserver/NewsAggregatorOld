@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDrawerContent } from '@angular/material/sidenav';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
 import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
@@ -11,7 +12,7 @@ import { filter } from 'rxjs/operators';
 import { authConfig } from './auth.config';
 import { DrawerContentService } from './common/matDrawerContent.service';
 import { Datasource } from './stores/datasource/models/datasource.model';
-import { Feed } from './stores/feed/models/feed.model';
+import { DetailedFeed } from './stores/feed/models/detailedfeed.model';
 
 @Component({
   selector: 'app-root',
@@ -22,16 +23,17 @@ export class AppComponent implements OnInit, OnDestroy {
   sessionCheckTimer: any;
   listener: any;
   isConnected: boolean = false;
-  groupedFeeds: { id: string, title: string, isOpened: boolean, nbStoriesPerMonth: number, datasources: Datasource[] }[];
+  groupedFeeds: { id: string, title: string, nbStoriesPerMonth: number, datasources: Datasource[] }[];
   @ViewChild('content', { static: true}) public matDrawer!: MatDrawerContent;
 
   constructor(
+    public router: Router,
     private translateService: TranslateService,
     private oauthService: OAuthService,
     private store: Store<fromAppState.AppState>,
     private drawerContentService: DrawerContentService,
-    private router: Router,
-    private actions$: ScannedActionsSubject) {
+    private actions$: ScannedActionsSubject,
+    private snackBar: MatSnackBar) {
     this.translateService.setDefaultLang('fr');
     this.translateService.use('fr');
     this.configureAuth();
@@ -49,16 +51,24 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         self.refresh();
       });
-    this.listener = this.store.pipe(select(fromAppState.selectAllFeedsResult)).subscribe((r: Feed[] | null) => {
+    this.actions$.pipe(
+      filter((action: any) => action.type === fromFeedActions.completeDeleteFeed.type))
+      .subscribe(() => {
+        self.snackBar.open(self.translateService.instant('feed.feedRemoved'), self.translateService.instant('undo'), {
+          duration: 2000
+        });
+        self.refresh();
+      });
+    this.listener = this.store.pipe(select(fromAppState.selectAllFeedsResult)).subscribe((r: DetailedFeed[] | null) => {
       if (!r) {
         return;
       }
 
       this.groupedFeeds = [];
-      r.forEach((f: Feed) => {
+      r.forEach((f: DetailedFeed) => {
         const record = this.groupedFeeds.filter((r) => r.id === f.feedId);
         if (record.length === 0) {
-          this.groupedFeeds.push({ id: f.feedId, title: f.feedTitle, nbStoriesPerMonth: f.nbStoriesPerMonth, isOpened: false, datasources: [{ description: '', id: f.datasourceId, title: f.datasourceTitle }] });
+          this.groupedFeeds.push({ id: f.feedId, title: f.feedTitle, nbStoriesPerMonth: f.nbStoriesPerMonth, datasources: [{ description: '', id: f.datasourceId, title: f.datasourceTitle }] });
         } else {
           record[0].datasources.push({ description: '', id: f.datasourceId, title: f.datasourceTitle });
         }
@@ -71,7 +81,7 @@ export class AppComponent implements OnInit, OnDestroy {
       } else if (e.type === "token_received") {
         this.init();
       }
-    })
+    });
     this.init();
     this.refresh();
   }
@@ -89,10 +99,6 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  switchOpen(record: { id: string, title: string, isOpened: boolean, datasources: Datasource[] }) {
-    record.isOpened = !record.isOpened;
-  }
-
   chooseLanguage(lng: string) {
     this.translateService.use(lng);
   }
@@ -104,6 +110,11 @@ export class AppComponent implements OnInit, OnDestroy {
     };
     this.oauthService.initImplicitFlow();
     return false;
+  }
+
+  deleteFeed(feedId: string) {
+    const request = fromFeedActions.startDeleteFeed({ feedId: feedId });
+    this.store.dispatch(request);
   }
 
   private configureAuth() {

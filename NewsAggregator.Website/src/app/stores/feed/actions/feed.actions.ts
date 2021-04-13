@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store';
+import { DetailedFeed } from '../models/detailedfeed.model';
 import { Feed } from '../models/feed.model';
 import { SearchFeedsResult } from '../models/search-feed.model';
 
@@ -20,4 +21,7 @@ export const errorAddFeed = createAction("[Feeds] ERROR_ADD_FEED");
 export const completeAddFeed = createAction("[Feeds] COMPLETE_ADD_FEED", props<{ content: string }>());
 export const startGetAllFeeds = createAction("[Feeds] START_GET_ALL_FEEDS");
 export const errorGetAllFeeds = createAction("[Feeds] ERROR_GET_ALL_FEEDS");
-export const completeGetAllFeeds = createAction("[Feeds] COMPLETE_GET_ALL_FEEDS", props<{ content: Feed[] }>());
+export const completeGetAllFeeds = createAction("[Feeds] COMPLETE_GET_ALL_FEEDS", props<{ content: DetailedFeed[] }>());
+export const startDeleteFeed = createAction("[Feeds] START_DELETE_FEED", props<{ feedId: string }>());
+export const completeDeleteFeed = createAction("[Feeds] COMPLETE_DELETE_FEED")();
+export const errorDeleteFeed = createAction("[Feeds] ERROR_DELETE_FEED");

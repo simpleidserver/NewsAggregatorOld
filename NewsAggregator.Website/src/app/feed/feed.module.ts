@@ -3,6 +3,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '@app/shared/material.module';
 import { DatasourceSelectorComponent } from '../common/datasourceselector/datasourceselector.component';
 import { SharedModule } from '../shared/shared.module';
+import { DatasourceViewArticlesComponent } from './datasource/view-datasource-articles.component';
+import { DatasourceViewComponent } from './datasource/view-datasource.component';
 import { FeedRoutes } from './feed.routes';
 import { AddFeedDialog } from './list/add-feed.component';
 import { FeedListComponent } from './list/feed-list.component';
@@ -15,7 +17,9 @@ import { FeedViewComponent } from './view/view-feed.component';
     FeedListComponent,
     FeedViewComponent,
     DatasourceSelectorComponent,
-    FeedViewArticlesComponent
+    FeedViewArticlesComponent,
+    DatasourceViewComponent,
+    DatasourceViewArticlesComponent
   ],
   entryComponents: [
     AddFeedDialog

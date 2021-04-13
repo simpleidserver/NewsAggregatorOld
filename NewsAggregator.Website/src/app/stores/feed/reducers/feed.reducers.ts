@@ -1,5 +1,6 @@
 import { Action, createReducer, on } from "@ngrx/store";
 import { completeGetAllFeeds, completeGetFeed, completeSearchFeeds } from '../actions/feed.actions';
+import { DetailedFeed } from "../models/detailedfeed.model";
 import { Feed } from "../models/feed.model";
 import { SearchFeedsResult } from "../models/search-feed.model";
 
@@ -12,7 +13,7 @@ export interface SearchFeedsState {
 export interface AllFeedsState {
   isLoading: boolean;
   isErrorLoadOccured: boolean;
-  content: Feed[];
+  content: DetailedFeed[];
 }
 
 export interface FeedState {

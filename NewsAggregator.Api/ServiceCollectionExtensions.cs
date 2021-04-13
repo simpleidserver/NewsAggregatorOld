@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MediatR;
 using NewsAggregator.Api.DataSources;
+using NewsAggregator.Api.Feeds;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -11,6 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddMediatR(typeof(ServiceCollectionExtensions));
             services.AddTransient<IDataSourceService, DataSourceService>();
+            services.AddTransient<IFeedService, FeedService>();
             return services;
         }
     }

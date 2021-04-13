@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NewsAggregator.Api.Feeds.Queries
 {
-    public class SearchMyFeedsQuery : IRequest<SearchQueryResult<FeedQueryResult>>
+    public class SearchMyFeedsQuery : IRequest<SearchQueryResult<DetailedFeedQueryResult>>
     {
         public bool IsPaginationEnabled { get; set; }
         public int? StartIndex { get; set; }

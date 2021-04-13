@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NewsAggregator.Api.Feeds.Queries
 {
-    public class GetMyFeedsQuery : IRequest<IEnumerable<FeedQueryResult>>
+    public class GetMyFeedsQuery : IRequest<IEnumerable<DetailedFeedQueryResult>>
     {
         public GetMyFeedsQuery(string userId)
         {

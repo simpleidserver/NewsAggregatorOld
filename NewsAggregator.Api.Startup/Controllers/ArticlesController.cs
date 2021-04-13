@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewsAggregator.Api.Articles.Commands;
 using NewsAggregator.Api.Articles.Queries;
@@ -19,14 +20,26 @@ namespace NewsAggregator.Api.Startup.Controllers
         }
 
         [HttpPost("searchindatasource/{datasourceId}")]
-        public async Task<IActionResult> SeachInFeeds(string datasourceId, [FromBody] SearchArticlesInDataSourceQuery searchArticlesInFeedQuery, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchInDatasource(string datasourceId, [FromBody] SearchArticlesInDataSourceQuery searchArticlesInFeedQuery, CancellationToken cancellationToken)
         {
             searchArticlesInFeedQuery.DataSourceId = datasourceId;
             var result = await _mediator.Send(searchArticlesInFeedQuery, cancellationToken);
             return new OkObjectResult(result);
         }
 
+        [HttpPost("searchinfeed/{feedId}")]
+        [Authorize("Authenticated")]
+        public async Task<IActionResult> SearchInFeed(string feedId, [FromBody] SearchArticlesInFeedQuery searchArticlesInFeedQuery, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            searchArticlesInFeedQuery.UserId = userId;
+            searchArticlesInFeedQuery.FeedId = feedId;
+            var result = await _mediator.Send(searchArticlesInFeedQuery, cancellationToken);
+            return new OkObjectResult(result);
+        }
+
         [HttpGet("{articleId}/view")]
+        [Authorize("Authenticated")]
         public async Task<IActionResult> View(string articleId, CancellationToken cancellationToken)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -37,6 +50,7 @@ namespace NewsAggregator.Api.Startup.Controllers
         }
 
         [HttpGet("{articleId}/like")]
+        [Authorize("Authenticated")]
         public async Task<IActionResult> Like(string articleId, CancellationToken cancellationToken)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;

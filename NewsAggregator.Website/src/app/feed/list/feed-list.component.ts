@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromAppState from '@app/stores/appstate';
 import { Datasource } from '@app/stores/datasource/models/datasource.model';
 import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
-import { Feed } from '@app/stores/feed/models/feed.model';
+import { DetailedFeed } from '@app/stores/feed/models/detailedfeed.model';
 import { SearchFeedsResult } from '@app/stores/feed/models/search-feed.model';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,8 +19,8 @@ import { AddFeedDialog } from './add-feed.component';
 export class FeedListComponent implements OnInit, OnDestroy {
   listener: any;
   displayedColumns: string[] = ['checkbox', 'feedTitle', 'datasourceTitle', 'nbFollowers', 'nbStoriesPerMonth'];
-  feeds: Feed[] = [];
-  feedsToBeRemoved: Feed[] = [];
+  feeds: DetailedFeed[] = [];
+  feedsToBeRemoved: DetailedFeed[] = [];
   feedTitle: string;
   selectedDatasourceIds: string[];
   selectedFollower: number | null = null;
@@ -52,6 +52,11 @@ export class FeedListComponent implements OnInit, OnDestroy {
         self.snackBar.open(self.translateService.instant('feed.feedSourcesRemoved'), self.translateService.instant('undo'), {
           duration: 2000
         });
+        self.refresh();
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === fromFeedActions.completeDeleteFeed.type))
+      .subscribe(() => {
         self.refresh();
       });
     this.listener = this.store.pipe(select(fromAppState.selectFeedSearchResult)).subscribe((r: SearchFeedsResult | null) => {
@@ -88,10 +93,10 @@ export class FeedListComponent implements OnInit, OnDestroy {
     this.refresh();
   }
 
-  deleteFeed(feed: Feed) {
-    const filtered = this.feedsToBeRemoved.filter((f: Feed) => f.datasourceId === feed.datasourceId && f.feedId === feed.feedId);
+  deleteFeed(feed: DetailedFeed) {
+    const filtered = this.feedsToBeRemoved.filter((f: DetailedFeed) => f.datasourceId === feed.datasourceId && f.feedId === feed.feedId);
     if (filtered.length === 1) {
-      this.feedsToBeRemoved = this.feedsToBeRemoved.filter((f: Feed) => f.datasourceId !== feed.datasourceId || f.feedId !== feed.feedId);
+      this.feedsToBeRemoved = this.feedsToBeRemoved.filter((f: DetailedFeed) => f.datasourceId !== feed.datasourceId || f.feedId !== feed.feedId);
       return;
     }
 
@@ -103,7 +108,7 @@ export class FeedListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const request = fromFeedActions.startDeleteDatasources({ parameters: this.feedsToBeRemoved.map((v: Feed) => new fromFeedActions.DeleteDatasource(v.feedId, v.datasourceId)) });
+    const request = fromFeedActions.startDeleteDatasources({ parameters: this.feedsToBeRemoved.map((v: DetailedFeed) => new fromFeedActions.DeleteDatasource(v.feedId, v.datasourceId)) });
     this.store.dispatch(request);
   }
 

@@ -1,5 +1,5 @@
-<div fxLayout="row wrap" fxLayoutGap="5px" fxLayout.lt-md="column" fxLayoutAlign="start space-around">
-  <div *ngFor="let article of articles" class="article" fxFlex="48%">
+<div fxLayout="column" fxLayoutGap="5px">
+  <div *ngFor="let article of articles" class="article">
     <mat-card>
       <mat-card-header>
         <mat-card-title>{{ article.title }}</mat-card-title>

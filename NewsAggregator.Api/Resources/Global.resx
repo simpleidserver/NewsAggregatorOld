@@ -120,6 +120,9 @@
   <data name="ArticleDoesntExist" xml:space="preserve">
     <value>Article {0} doesn't exist</value>
   </data>
+  <data name="CannotAccessToTheFeed" xml:space="preserve">
+    <value>Cannot access to the feed {0}</value>
+  </data>
   <data name="DataSourceDoesntExist" xml:space="preserve">
     <value>Datasource {0} doesn't exist</value>
   </data>

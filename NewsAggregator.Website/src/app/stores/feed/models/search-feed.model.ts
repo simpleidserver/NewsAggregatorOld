@@ -1,4 +1,4 @@
-import { Feed } from "./feed.model";
+import { DetailedFeed } from "./detailedfeed.model";
 
 export class SearchFeedsResult {
   constructor() {
@@ -8,5 +8,5 @@ export class SearchFeedsResult {
   startIndex: number;
   count: number;
   totalLength: number;
-  content: Feed[];
+  content: DetailedFeed[];
 }

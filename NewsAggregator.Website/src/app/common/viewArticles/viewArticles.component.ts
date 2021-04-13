@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
 import { Article } from '@app/stores/articles/models/article.model';
-import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 import { select, Store } from '@ngrx/store';
 import { DrawerContentService } from '../../common/matDrawerContent.service';
 import { SearchArticlesResult } from '../../stores/articles/models/search-article.model';
@@ -44,12 +43,6 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
         this.refresh(this.startIndex + this.count);
       }
     });
-    this.activatedRoute.params.subscribe(() => {
-      const feedId = this.activatedRoute.snapshot.params['id'];
-      const request = fromFeedActions.startGetFeed({ feedId: feedId });
-      this.store.dispatch(request);
-      this.refresh(0);
-    });
   }
 
   ngOnDestroy(): void {
@@ -60,6 +53,11 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
     if (this.feedListener) {
       this.feedListener.unsubscribe();
     }
+  }
+
+  reset() {
+    this.articles = [];
+    this.refresh(0);
   }
 
   abstract refresh(startIndex: number) : void;

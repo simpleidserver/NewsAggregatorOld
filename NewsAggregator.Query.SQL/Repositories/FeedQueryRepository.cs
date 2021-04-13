@@ -19,7 +19,21 @@ namespace NewsAggregator.Query.SQL.Repositories
             _sqlConnectionFactory = sqlConnectionFactory;
         }
 
-        public Task<IEnumerable<FeedQueryResult>> GetFeeds(string userId)
+        public Task<FeedQueryResult> Get(string feedId, CancellationToken cancellationToken)
+        {
+            const string sql = "SELECT [feeds].[Id] as [FeedId], " +
+                            "[feeds].[Title] as [FeedTitle], " +
+                            "[feeds].[UserId] as [UserId] " +
+                            "FROM [dbo].[Feeds] as [feeds] " +
+                            "where [feeds].[Id] = @feedId";
+            var connection = _sqlConnectionFactory.GetOpenConnection();
+            return connection.QuerySingleOrDefaultAsync<FeedQueryResult>(sql, new
+            {
+                feedId
+            });
+        }
+
+        public Task<IEnumerable<DetailedFeedQueryResult>> GetFeeds(string userId)
         {
             const string sql = "SELECT [feeds].[Id] as [FeedId], " +
                             "[feeds].[Title] as [FeedTitle], " +
@@ -33,13 +47,13 @@ namespace NewsAggregator.Query.SQL.Repositories
                             "LEFT JOIN [dbo].[DataSources] as [datasources] ON [datasources].[Id] = [feedDatasource].[DatasourceId] " +
                             "where [feeds].[UserId] = @userId";
             var connection = _sqlConnectionFactory.GetOpenConnection();
-            return connection.QueryAsync<FeedQueryResult>(sql, new
+            return connection.QueryAsync<DetailedFeedQueryResult>(sql, new
             {
                 userId
             });
         }
 
-        public async Task<SearchQueryResult<FeedQueryResult>> SearchFeeds(SearchFeedParameter parameter, CancellationToken cancellationToken)
+        public async Task<SearchQueryResult<DetailedFeedQueryResult>> SearchFeeds(SearchFeedParameter parameter, CancellationToken cancellationToken)
         {
             string sql = "SELECT [feeds].[Id] as [FeedId], " +
                         "[feeds].[Title] as [FeedTitle], " +
@@ -118,8 +132,8 @@ namespace NewsAggregator.Query.SQL.Repositories
                 dynObject.datasourceIds = parameter.DatasourceIds;
             }
 
-            var result = await connection.QueryAsync<FeedQueryResult>(sql, (object)dynObject);
-            return new SearchQueryResult<FeedQueryResult>
+            var result = await connection.QueryAsync<DetailedFeedQueryResult>(sql, (object)dynObject);
+            return new SearchQueryResult<DetailedFeedQueryResult>
             {
                 Content = result,
                 Count = parameter.Count,

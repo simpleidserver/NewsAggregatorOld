@@ -8,7 +8,8 @@ namespace NewsAggregator.Core.Repositories
 {
     public interface IFeedQueryRepository
     {
-        Task<IEnumerable<FeedQueryResult>> GetFeeds(string userId);
-        Task<SearchQueryResult<FeedQueryResult>> SearchFeeds(SearchFeedParameter parameter, CancellationToken cancellationToken);
+        Task<FeedQueryResult> Get(string feedId, CancellationToken cancellationToken);
+        Task<IEnumerable<DetailedFeedQueryResult>> GetFeeds(string userId);
+        Task<SearchQueryResult<DetailedFeedQueryResult>> SearchFeeds(SearchFeedParameter parameter, CancellationToken cancellationToken);
     }
 }

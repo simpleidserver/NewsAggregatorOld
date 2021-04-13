@@ -1,18 +1,26 @@
 <mat-drawer-container class="drawer-container">
   <mat-drawer mode="side" #drawer opened>
-    <div class="nav-link">
+    <div class="nav-link" [class.active]="router.isActive('/feeds', true)">
       <a href="#" class="title" [routerLink]="['/feeds']">{{ 'feed.list' | translate }}</a>
     </div>
-    <div class="feed-item" *ngFor="let grp of groupedFeeds" [class.open]="grp.isOpened">
-      <div class="link nav-link">
-        <div class="icon" (click)="switchOpen(grp)">
+    <div class="feed-item" *ngFor="let grp of groupedFeeds" [class.open]="router.isActive('/feeds/' + grp.id, false)">
+      <div class="link nav-link" [class.active]="router.isActive('/feeds/' + grp.id, true)">
+        <div class="icon">
           <mat-icon>arrow_forward_ios</mat-icon>
         </div>
         <a href="#" [routerLink]="['/feeds/' + grp.id]" class="title">{{grp.title}}</a>
-        <span class="indicator">{{ grp.nbStoriesPerMonth }}</span>
+        <span class="indicator">
+          <button mat-icon-button class="small-icon-button" [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="deleteFeed(grp.id)">{{ 'delete' | translate }}</button>
+          </mat-menu>
+          {{ grp.nbStoriesPerMonth }}
+        </span>
       </div>
-      <div *ngFor="let datasource of grp.datasources" class="datasources nav-link">
-        <a href="#" [routerLink]="['/datasources/' + datasource.id ]">{{ datasource.title }}</a>
+      <div *ngFor="let datasource of grp.datasources" class="datasources nav-link" [class.active]="router.isActive('/feeds/' + grp.id + '/datasources/' + datasource.id, true)">
+        <a href="#" [routerLink]="['/feeds/' + grp.id + '/datasources/' + datasource.id ]">{{ datasource.title }}</a>
       </div>
     </div>
   </mat-drawer>

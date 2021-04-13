@@ -3,7 +3,10 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import {
-    completeSearchArticlesInDatasource, errorSearchArticlesInDatasource, startSearchArticlesInDatasource
+    completeSearchArticlesInDatasource,
+    completeSearchArticlesInFeed, errorSearchArticlesInDatasource,
+    errorSearchArticlesInFeed, startSearchArticlesInDatasource,
+    startSearchArticlesInFeed
 } from '../actions/article.actions';
 import { ArticleService } from '../services/article.service';
 
@@ -19,7 +22,7 @@ export class ArticlesEffects {
     .pipe(
       ofType(startSearchArticlesInDatasource),
       mergeMap((evt) => {
-        return this.articleService.search(evt.startIndex, evt.count, evt.order, evt.direction, evt.datasourceId)
+        return this.articleService.searchInDatasource(evt.startIndex, evt.count, evt.order, evt.direction, evt.datasourceId)
           .pipe(
             map(articles => completeSearchArticlesInDatasource({ content: articles })),
             catchError(() => of(errorSearchArticlesInDatasource()))
@@ -27,4 +30,18 @@ export class ArticlesEffects {
       }
       )
   );
+
+  @Effect()
+  searchArticlesInFeed$ = this.actions$
+    .pipe(
+      ofType(startSearchArticlesInFeed),
+      mergeMap((evt) => {
+        return this.articleService.searchInFeed(evt.startIndex, evt.count, evt.order, evt.direction, evt.feedId)
+          .pipe(
+            map(articles => completeSearchArticlesInFeed({ content: articles })),
+            catchError(() => of(errorSearchArticlesInFeed()))
+          );
+      }
+      )
+    );
 }

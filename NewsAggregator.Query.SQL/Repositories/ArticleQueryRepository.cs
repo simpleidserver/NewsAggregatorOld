@@ -96,5 +96,36 @@ namespace NewsAggregator.Query.SQL.Repositories
                 StartIndex = parameter.StartIndex
             };
         }
+
+        public async Task<SearchQueryResult<ArticleQueryResult>> SearchInFeed(SearchArticlesInFeedParameter parameter, CancellationToken cancellationToken)
+        {
+            const string sql = "SELECT  " +
+                    "[dbo].[Articles].[Id], " +
+                    "[ExternalId], " +
+                    "[Title], " +
+                    "[Summary], " +
+                    "[Language], " +
+                    "[PublishDate], " +
+                    " CONCAT([Title], ' ', [Summary]) as [Text] " +
+                    "FROM [dbo].[Articles] " +
+                    "INNER JOIN [dbo].[FeedDatasource] ON[dbo].[FeedDatasource].[DatasourceId] = [dbo].[Articles].[DataSourceId] " +
+                    "WHERE [dbo].[FeedDatasource].FeedAggregateId = @feedId " +
+                    "ORDER BY [PublishDate] DESC " +
+                    "OFFSET @startIndex ROWS " +
+                    "FETCH NEXT @count ROWS ONLY";
+            var connection = _sqlConnectionFactory.GetOpenConnection();
+            var result = await connection.QueryAsync<ArticleQueryResult>(sql, new
+            {
+                feedId = parameter.FeedId,
+                startIndex = parameter.StartIndex,
+                count = parameter.Count
+            });
+            return new SearchQueryResult<ArticleQueryResult>
+            {
+                Content = result,
+                Count = parameter.Count,
+                StartIndex = parameter.StartIndex
+            };
+        }
     }
 }

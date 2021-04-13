@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
+import * as fromArticleActions from '@app/stores/articles/actions/article.actions';
 import { Store } from '@ngrx/store';
 import { DrawerContentService } from '../../common/matDrawerContent.service';
 import { ViewArticlesComponent } from '../../common/viewArticles/viewArticles.component';
@@ -18,6 +19,12 @@ export class FeedViewArticlesComponent extends ViewArticlesComponent {
     super(activatedRoute, store, drawerContentService);
   }
 
-  refresh(startIndex : number) {
+  init(): void {
+  }
+
+  refresh(startIndex: number) {
+    const feedId = this.activatedRoute.snapshot.params['id'];
+    const request = fromArticleActions.startSearchArticlesInFeed({ count: this.count, startIndex: startIndex, order: 'createDateTime', direction: 'desc', feedId: feedId });
+    this.store.dispatch(request);
   }
 }

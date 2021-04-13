@@ -13,6 +13,7 @@
     <None Remove="src\app\status\status.routes.ts" />
     <None Remove="src\app\stores\articles\models\article.model.ts" />
     <None Remove="src\app\stores\datasource\models\datasource.model.ts" />
+    <None Remove="src\app\stores\feed\models\detailedfeed.model.ts" />
     <None Remove="src\app\stores\feed\models\feed.model.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +29,7 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\app\stores\feed\models\feed.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\feed\models\detailedfeed.model.ts" />
     <TypeScriptCompile Include="src\assets\i18n\en.json">
       <SubType>Code</SubType>
     </TypeScriptCompile>

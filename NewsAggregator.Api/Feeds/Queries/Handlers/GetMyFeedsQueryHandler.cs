@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NewsAggregator.Api.Feeds.Queries.Handlers
 {
-    public class GetMyFeedsQueryHandler : IRequestHandler<GetMyFeedsQuery, IEnumerable<FeedQueryResult>>
+    public class GetMyFeedsQueryHandler : IRequestHandler<GetMyFeedsQuery, IEnumerable<DetailedFeedQueryResult>>
     {
         private readonly IFeedQueryRepository _feedQueryRepository;
 
@@ -16,7 +16,7 @@ namespace NewsAggregator.Api.Feeds.Queries.Handlers
             _feedQueryRepository = feedQueryRepository;
         }
 
-        public Task<IEnumerable<FeedQueryResult>> Handle(GetMyFeedsQuery request, CancellationToken cancellationToken)
+        public Task<IEnumerable<DetailedFeedQueryResult>> Handle(GetMyFeedsQuery request, CancellationToken cancellationToken)
         {
             return _feedQueryRepository.GetFeeds(request.UserId);
         }
