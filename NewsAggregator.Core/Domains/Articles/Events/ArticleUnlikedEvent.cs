@@ -3,10 +3,10 @@ using System.Diagnostics;
 
 namespace NewsAggregator.Core.Domains.Articles.Events
 {
-    [DebuggerDisplay("Like article")]
-    public class ArticleLikedEvent : DomainEvent
+    [DebuggerDisplay("Unlike article")]
+    public class ArticleUnlikedEvent : DomainEvent
     {
-        public ArticleLikedEvent(string id, string aggregateId, int version, string language, string userId, string sessionId, DateTime actionDateTime) : base(id, aggregateId, version)
+        public ArticleUnlikedEvent(string id, string aggregateId, int version, string language, string userId, string sessionId, DateTime actionDateTime) : base(id, aggregateId, version)
         {
             Language = language;
             UserId = userId;

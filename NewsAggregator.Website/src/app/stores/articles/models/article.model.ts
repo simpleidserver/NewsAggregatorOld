@@ -6,4 +6,5 @@ export class Article {
   language: string;
   publishDate: Date;
   feedTitle: string;
+  likeActionDateTime: Date | null;
 }

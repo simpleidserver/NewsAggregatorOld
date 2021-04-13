@@ -10,6 +10,7 @@ namespace NewsAggregator.Core.QueryResults
         public string Summary { get; set; }
         public string Language { get; set; }
         public DateTimeOffset PublishDate { get; set; }
+        public DateTime? LikeActionDateTime { get; set; }
         public string Text { get; set; }
     }
 }

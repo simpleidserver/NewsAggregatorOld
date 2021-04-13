@@ -42,7 +42,8 @@ namespace NewsAggregator.Api.Articles.Queries.Handlers
                 DataSourceId = request.DataSourceId,
                 Direction = request.Direction,
                 Order = request.Order,
-                StartIndex = request.StartIndex
+                StartIndex = request.StartIndex,
+                UserId = request.UserId
             }, cancellationToken);
         }
     }

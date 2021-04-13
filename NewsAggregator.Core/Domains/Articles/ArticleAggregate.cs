@@ -1,11 +1,18 @@
 ﻿using NewsAggregator.Core.Domains.Articles.Events;
+using NewsAggregator.Core.Exceptions;
+using NewsAggregator.Core.Resources;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NewsAggregator.Core.Domains.Articles
 {
     public class ArticleAggregate : BaseAggregate
     {
-        private ArticleAggregate() { }
+        private ArticleAggregate() 
+        {
+            ArticleLikeLst = new List<ArticleLike>();
+        }
 
         public string ExternalId { get; set; }
         public string Title { get; set; }
@@ -17,6 +24,7 @@ namespace NewsAggregator.Core.Domains.Articles
         public int NbViews { get; set; }
         public int NbLikes { get; set; }
         public DateTime UpdateDateTime { get; set; }
+        public ICollection<ArticleLike> ArticleLikeLst { get; set; }
 
         public static ArticleAggregate Create(string externalId, string title, string summary, string content, string language, string datasourceId, DateTimeOffset publishDate)
         {
@@ -37,6 +45,13 @@ namespace NewsAggregator.Core.Domains.Articles
         public void Like(string userId, string sessionId)
         {
             var evt = new ArticleLikedEvent(Guid.NewGuid().ToString(), Id, Version + 1, Language, userId, sessionId, DateTime.UtcNow);
+            Handle(evt);
+            DomainEvts.Add(evt);
+        }
+
+        public void Unlike(string userId, string sessionId)
+        {
+            var evt = new ArticleUnlikedEvent(Guid.NewGuid().ToString(), Id, Version + 1, Language, userId, sessionId, DateTime.UtcNow);
             Handle(evt);
             DomainEvts.Add(evt);
         }
@@ -68,9 +83,29 @@ namespace NewsAggregator.Core.Domains.Articles
 
         private void Handle(ArticleLikedEvent evt)
         {
+            if (ArticleLikeLst.Any(l => l.UserId == evt.UserId))
+            {
+                throw new DomainException(Global.ArticleAlreadyLikedByTheUser);
+            }
+
             NbLikes++;
             Version = evt.Version;
             UpdateDateTime = evt.ActionDateTime;
+            ArticleLikeLst.Add(ArticleLike.Create(evt.UserId, evt.ActionDateTime));
+        }
+
+        private void Handle(ArticleUnlikedEvent evt)
+        {
+            var articleLike = ArticleLikeLst.FirstOrDefault(l => l.UserId == evt.UserId);
+            if (articleLike == null)
+            {
+                throw new DomainException(Global.ArticleNotLikedByTheUser);
+            }
+
+            NbLikes--;
+            Version = evt.Version;
+            UpdateDateTime = evt.ActionDateTime;
+            ArticleLikeLst.Remove(articleLike);
         }
     }
 }

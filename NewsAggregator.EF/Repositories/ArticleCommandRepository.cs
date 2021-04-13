@@ -17,7 +17,9 @@ namespace NewsAggregator.EF.Repositories
 
         public Task<ArticleAggregate> Get(string articleId, CancellationToken cancellationToken)
         {
-            return _dbContext.Articles.FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
+            return _dbContext.Articles
+                .Include(a => a.ArticleLikeLst)
+                .FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
         }
 
         public Task Add(ArticleAggregate article, CancellationToken cancellationToken)

@@ -28,4 +28,22 @@ export class ArticleService {
     const request: any = { startIndex: startIndex, count: count, order: order, direction: direction };
     return this.http.post<SearchArticlesResult>(targetUrl, JSON.stringify(request), { headers: headers });
   }
+
+  like(articleId: string) : Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/articles/" + articleId + "/like";
+    return this.http.get<any>(targetUrl, { headers: headers });
+  }
+
+  unlike(articleId: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/articles/" + articleId + "/unlike";
+    return this.http.get<any>(targetUrl, { headers: headers });
+  }
 }

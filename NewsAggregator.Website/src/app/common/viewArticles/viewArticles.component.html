@@ -15,8 +15,9 @@
           <mat-icon>visibility</mat-icon>
           {{ 'article.actions.read' | translate }}
         </button>
-        <button mat-button>
-          <mat-icon>thumb_up</mat-icon>
+        <button mat-button (click)="likeOrUnlike(article)">
+          <mat-icon *ngIf="article.likeActionDateTime">thumb_up</mat-icon>
+          <mat-icon *ngIf="!article.likeActionDateTime">thumb_up_off_alt</mat-icon>
           {{ 'article.actions.like' | translate }}
         </button>
       </mat-card-actions>

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
 import * as fromArticleActions from '@app/stores/articles/actions/article.actions';
-import { Store } from '@ngrx/store';
+import { ScannedActionsSubject, Store } from '@ngrx/store';
 import { DrawerContentService } from '../../common/matDrawerContent.service';
 import { ViewArticlesComponent } from '../../common/viewArticles/viewArticles.component';
 
@@ -15,11 +15,9 @@ export class FeedViewArticlesComponent extends ViewArticlesComponent {
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected store: Store<fromAppState.AppState>,
-    protected drawerContentService: DrawerContentService) {
-    super(activatedRoute, store, drawerContentService);
-  }
-
-  init(): void {
+    protected drawerContentService: DrawerContentService,
+    protected actions$: ScannedActionsSubject) {
+    super(activatedRoute, store, drawerContentService, actions$);
   }
 
   refresh(startIndex: number) {

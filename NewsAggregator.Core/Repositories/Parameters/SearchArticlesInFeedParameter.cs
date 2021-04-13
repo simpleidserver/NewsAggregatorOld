@@ -7,5 +7,6 @@
         public string Order { get; set; }
         public string Direction { get; set; }
         public string FeedId { get; set; }
+        public string UserId { get; set; }
     }
 }

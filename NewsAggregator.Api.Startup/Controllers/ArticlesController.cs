@@ -20,8 +20,11 @@ namespace NewsAggregator.Api.Startup.Controllers
         }
 
         [HttpPost("searchindatasource/{datasourceId}")]
+        [Authorize("Authenticated")]
         public async Task<IActionResult> SearchInDatasource(string datasourceId, [FromBody] SearchArticlesInDataSourceQuery searchArticlesInFeedQuery, CancellationToken cancellationToken)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            searchArticlesInFeedQuery.UserId = userId;
             searchArticlesInFeedQuery.DataSourceId = datasourceId;
             var result = await _mediator.Send(searchArticlesInFeedQuery, cancellationToken);
             return new OkObjectResult(result);
@@ -56,6 +59,17 @@ namespace NewsAggregator.Api.Startup.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var nonce = User.FindFirst("nonce").Value;
             var cmd = new LikeArticleCommand { ArticleId = articleId, SessionId = nonce, UserId = userId };
+            await _mediator.Send(cmd, cancellationToken);
+            return new NoContentResult();
+        }
+
+        [HttpGet("{articleId}/unlike")]
+        [Authorize("Authenticated")]
+        public async Task<IActionResult> Unlike(string articleId, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var nonce = User.FindFirst("nonce").Value;
+            var cmd = new UnlikeArticleCommand { ArticleId = articleId, SessionId = nonce, UserId = userId };
             await _mediator.Send(cmd, cancellationToken);
             return new NoContentResult();
         }

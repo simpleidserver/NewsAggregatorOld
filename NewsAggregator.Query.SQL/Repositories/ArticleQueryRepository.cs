@@ -70,15 +70,18 @@ namespace NewsAggregator.Query.SQL.Repositories
         public async Task<SearchQueryResult<ArticleQueryResult>> SearchInDataSource(SearchArticlesInDataSourceParameter parameter, CancellationToken cancellationToken)
         {
             const string sql = "SELECT " +
-                            "[Id], "+
+                            "[dbo].[Articles].[Id], " +
                             "[ExternalId], " +
                             "[Title], " +
                             "[Summary], " +
                             "[Language], " +
                             "[PublishDate], " +
-                            " CONCAT([Title], ' ', [Summary]) as [Text] " +
+                            "CONCAT([Title], ' ', [Summary]) as [Text], " +
+                            "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime] "+
                             "FROM [dbo].[Articles] " +
+                            "LEFT OUTER JOIN[dbo].[ArticleLike] ON [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] "+
                             "WHERE [DataSourceId] = @datasourceId " +
+                            "AND [UserId] = @userId OR [UserId] IS NULL " +
                             "ORDER BY [PublishDate] DESC " +
                             "OFFSET @startIndex ROWS " +
                             "FETCH NEXT @count ROWS ONLY";
@@ -86,6 +89,7 @@ namespace NewsAggregator.Query.SQL.Repositories
             var result = await connection.QueryAsync<ArticleQueryResult>(sql, new
             {
                 datasourceId = parameter.DataSourceId,
+                userId = parameter.UserId,
                 startIndex = parameter.StartIndex,
                 count = parameter.Count
             });
@@ -106,10 +110,13 @@ namespace NewsAggregator.Query.SQL.Repositories
                     "[Summary], " +
                     "[Language], " +
                     "[PublishDate], " +
-                    " CONCAT([Title], ' ', [Summary]) as [Text] " +
+                    "CONCAT([Title], ' ', [Summary]) as [Text], " +
+                    "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime] " +
                     "FROM [dbo].[Articles] " +
                     "INNER JOIN [dbo].[FeedDatasource] ON[dbo].[FeedDatasource].[DatasourceId] = [dbo].[Articles].[DataSourceId] " +
+                    "LEFT OUTER JOIN [dbo].[ArticleLike] ON [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] " +
                     "WHERE [dbo].[FeedDatasource].FeedAggregateId = @feedId " +
+                    "AND [dbo].[ArticleLike].[UserId] = @userId OR [dbo].[ArticleLike].[UserId] IS NULL " +
                     "ORDER BY [PublishDate] DESC " +
                     "OFFSET @startIndex ROWS " +
                     "FETCH NEXT @count ROWS ONLY";
@@ -117,6 +124,7 @@ namespace NewsAggregator.Query.SQL.Repositories
             var result = await connection.QueryAsync<ArticleQueryResult>(sql, new
             {
                 feedId = parameter.FeedId,
+                userId = parameter.UserId,
                 startIndex = parameter.StartIndex,
                 count = parameter.Count
             });
