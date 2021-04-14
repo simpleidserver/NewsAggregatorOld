@@ -56,6 +56,10 @@ namespace NewsAggregator.Api.Startup
                 {
                     builder.RequireAuthenticatedUser();
                 });
+                options.AddPolicy("IsAdmin", builder =>
+                {
+                    builder.RequireRole("admin");
+                });
             });
             services
                 .AddNewsAggregatorApi()

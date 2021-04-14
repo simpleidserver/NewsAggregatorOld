@@ -87,7 +87,7 @@ namespace NewsAggregator.OpenId.Startup
                     {
                         new ClientSecret(ClientSecretTypes.SharedSecret, "newsAggregatorWebsiteSecret", null)
                     },
-                    TokenEndPointAuthMethod = "client_secret_post",
+                    TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -104,8 +104,7 @@ namespace NewsAggregator.OpenId.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "authorization_code",
-                        "password"
+                        "authorization_code"
                     },
                     RedirectionUrls = new List<string>
                     {
@@ -114,9 +113,7 @@ namespace NewsAggregator.OpenId.Startup
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
-                        "code",
-                        "token",
-                        "id_token"
+                        "code"
                     }
                 }
             };

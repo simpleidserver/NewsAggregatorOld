@@ -6,7 +6,7 @@ import * as fromAppState from '@app/stores/appstate';
 import * as fromFeedActions from '@app/stores/feed/actions/feed.actions';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { OAuthService } from 'angular-oauth2-oidc';
+import { OAuthService, OAuthStorage } from 'angular-oauth2-oidc';
 import { JwksValidationHandler } from 'angular-oauth2-oidc-jwks';
 import { filter } from 'rxjs/operators';
 import { authConfig } from './auth.config';
@@ -20,7 +20,6 @@ import { DetailedFeed } from './stores/feed/models/detailedfeed.model';
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  sessionCheckTimer: any;
   listener: any;
   isConnected: boolean = false;
   groupedFeeds: { id: string, title: string, nbStoriesPerMonth: number, datasources: Datasource[] }[];
@@ -107,10 +106,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   login(evt: any) {
     evt.preventDefault();
-    this.oauthService.customQueryParams = {
-      'prompt': 'login'
-    };
-    this.oauthService.initImplicitFlow();
+    // this.oauthService.customQueryParams = {
+    //   'response_mode': 'fragment'
+    // };
+    this.oauthService.initCodeFlow();
     return false;
   }
 
@@ -121,18 +120,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private configureAuth() {
     this.oauthService.configure(authConfig);
-    this.oauthService.setStorage(localStorage);
+    // this.oauthService.setStorage(localStorage);
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
     let self = this;
     this.oauthService.loadDiscoveryDocumentAndTryLogin({
       disableOAuth2StateCheck: true
     });
-    this.sessionCheckTimer = setInterval(function () {
-      if (!self.oauthService.hasValidIdToken()) {
-        self.oauthService.logOut();
-        // self.route.navigate(["/"]);
-      }
-    }, 3000);
   }
 
   private init() {

@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             serviceCollection.AddTransient<IArticleQueryRepository, ArticleQueryRepository>();
             serviceCollection.AddTransient<ISessionQueryRepository, SessionQueryRepository>();
             serviceCollection.AddTransient<IRecommendationQueryRepository, RecommendationQueryRepository>();
+            serviceCollection.AddTransient<IHangfireQueryRepository, HangfireQueryRepository>();
             return serviceCollection;
         }
     }

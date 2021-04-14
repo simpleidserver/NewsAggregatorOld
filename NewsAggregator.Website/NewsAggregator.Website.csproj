@@ -15,6 +15,8 @@
     <None Remove="src\app\stores\datasource\models\datasource.model.ts" />
     <None Remove="src\app\stores\feed\models\detailedfeed.model.ts" />
     <None Remove="src\app\stores\feed\models\feed.model.ts" />
+    <None Remove="src\app\stores\hangfire\models\hangfirejob.model.ts" />
+    <None Remove="src\app\stores\hangfire\models\hangfirejobstate.model.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\app\common\matDrawerContent.service.ts" />
@@ -27,6 +29,8 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\app\stores\feed\models\feed.model.ts" />
     <TypeScriptCompile Include="src\app\stores\feed\models\detailedfeed.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\hangfire\models\hangfirejobstate.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\hangfire\models\hangfirejob.model.ts" />
     <TypeScriptCompile Include="src\assets\i18n\en.json">
       <SubType>Code</SubType>
     </TypeScriptCompile>

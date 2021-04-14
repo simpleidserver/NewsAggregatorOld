@@ -9,7 +9,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { OAuthModule } from 'angular-oauth2-oidc';
+import { OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DrawerContentService } from './common/matDrawerContent.service';
@@ -19,10 +19,12 @@ import { MaterialModule } from './shared/material.module';
 import { appReducer } from './stores/appstate';
 import { ArticlesEffects } from './stores/articles/effects/article.effects';
 import { ArticleService } from './stores/articles/services/article.service';
+import { DatasourcesEffects } from './stores/datasource/effects/datasource.effects';
 import { DatasourceService } from './stores/datasource/services/datasource.service';
 import { FeedsEffects } from './stores/feed/effects/feed.effects';
 import { FeedService } from './stores/feed/services/feed.service';
-import { DatasourcesEffects } from './stores/datasource/effects/datasource.effects';
+import { HangfireEffects } from './stores/hangfire/effects/hangfire.effects';
+import { HangfireService } from './stores/hangfire/services/hangfire.service';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -46,7 +48,8 @@ export function createTranslateLoader(http: HttpClient) {
     EffectsModule.forRoot([
       FeedsEffects,
       ArticlesEffects,
-      DatasourcesEffects
+      DatasourcesEffects,
+      HangfireEffects
     ]),
     StoreModule.forRoot(appReducer),
     TranslateModule.forRoot({
@@ -65,7 +68,8 @@ export function createTranslateLoader(http: HttpClient) {
     DatasourceService,
     DrawerContentService,
     ArticleService,
-    AuthGuard
+    AuthGuard,
+    HangfireService
   ],
   bootstrap: [AppComponent]
 })

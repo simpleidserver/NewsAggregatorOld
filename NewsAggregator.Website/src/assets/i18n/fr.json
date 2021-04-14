@@ -2,6 +2,13 @@
   "erase": "Effacer",
   "confirm": "Confirmer",
   "delete": "Supprimer",
+  "hangfire": {
+    "list": "Jobs",
+    "job": "Job",
+    "state": "Etat",
+    "createdAt": "Créé le",
+    "invocationData": "Données d'invocation"
+  },
   "feed": {
     "add": "Ajouter feed",
     "list": "Feeds",

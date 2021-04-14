@@ -6,5 +6,11 @@ export const authConfig: AuthConfig = {
   clientId: 'newsAggregatorWebsite',
   scope: 'openid profile email role',
   redirectUri: environment.redirectUrl,
-  requireHttps: false
+  requireHttps: false,
+  responseType: 'code',
+  showDebugInformation: true,
+  sessionChecksEnabled: true,
+  useSilentRefresh: true,
+  silentRefreshTimeout: 5000,
+  silentRefreshRedirectUri: window.location.origin + '/silent-refresh.html'
 }

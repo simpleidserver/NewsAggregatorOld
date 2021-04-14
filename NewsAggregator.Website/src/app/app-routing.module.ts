@@ -4,7 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './infrastructures/auth-guard.service';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'feeds', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   {
     path: 'feeds',
@@ -14,6 +14,10 @@ const routes: Routes = [
   {
     path: 'status',
     loadChildren: async () => (await import('./status/status.module')).StatusModule
+  },
+  {
+    path: 'hangfire',
+    loadChildren: async () => (await import('./hangfire/hangfire.module')).HangfireModule
   }
 ];
 
