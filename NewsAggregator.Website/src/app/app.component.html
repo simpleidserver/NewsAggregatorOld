@@ -1,6 +1,6 @@
 <mat-drawer-container class="drawer-container">
   <mat-drawer mode="side" #drawer opened>
-    <div class="nav-link" [class.active]="router.isActive('/feeds', true)">
+    <div *ngIf="isConnected" class="nav-link" [class.active]="router.isActive('/feeds', true)">
       <a href="#" class="title" [routerLink]="['/feeds']">{{ 'feed.list' | translate }}</a>
     </div>
     <div class="feed-item" *ngFor="let grp of groupedFeeds" [class.open]="router.isActive('/feeds/' + grp.id, false)">

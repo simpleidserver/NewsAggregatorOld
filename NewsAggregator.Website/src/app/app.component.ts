@@ -78,8 +78,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.oauthService.events.subscribe((e: any) => {
       if (e.type === "logout") {
         this.isConnected = false;
+        this.router.navigate(['/home']);
+        this.groupedFeeds = [];
       } else if (e.type === "token_received") {
         this.init();
+        this.refresh();
       }
     });
     this.init();
@@ -89,7 +92,6 @@ export class AppComponent implements OnInit, OnDestroy {
   disconnect(evt: any) {
     evt.preventDefault();
     this.oauthService.logOut();
-    this.router.navigate(['/home']);
     return false;
   }
 

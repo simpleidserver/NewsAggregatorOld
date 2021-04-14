@@ -17,9 +17,6 @@
     <None Remove="src\app\stores\feed\models\feed.model.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\app\stores\datasource\actions\" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptCompile Include="src\app\common\matDrawerContent.service.ts" />
     <TypeScriptCompile Include="src\app\infrastructures\auth-guard.service.ts" />
     <TypeScriptCompile Include="src\app\shared\material.module.ts" />

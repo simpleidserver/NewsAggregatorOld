@@ -20,9 +20,9 @@ export class FeedViewArticlesComponent extends ViewArticlesComponent {
     super(activatedRoute, store, drawerContentService, actions$);
   }
 
-  refresh(startIndex: number) {
+  refresh() {
     const feedId = this.activatedRoute.snapshot.params['id'];
-    const request = fromArticleActions.startSearchArticlesInFeed({ count: this.count, startIndex: startIndex, order: 'createDateTime', direction: 'desc', feedId: feedId });
+    const request = fromArticleActions.startSearchArticlesInFeed({ count: this.count, startIndex: 0, order: 'createDateTime', direction: 'desc', feedId: feedId });
     this.store.dispatch(request);
   }
 }

@@ -72,14 +72,19 @@ namespace NewsAggregator.Query.SQL.Repositories
             const string sql = "SELECT " +
                             "[dbo].[Articles].[Id], " +
                             "[ExternalId], " +
-                            "[Title], " +
+                            "[dbo].[Articles].[Title], " +
                             "[Summary], " +
                             "[Language], " +
                             "[PublishDate], " +
-                            "CONCAT([Title], ' ', [Summary]) as [Text], " +
-                            "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime] "+
+                            "CONCAT([dbo].[Articles].[Title], ' ', [Summary]) as [Text], " +
+                            "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime], "+
+                            "[dbo].[DataSources].[Id] as [DatasourceId], "+
+                            "[dbo].[DataSources].[Title] as [DatasourceTitle], "+
+                            "[NbViews], " +
+                            "[NbLikes] " +
                             "FROM [dbo].[Articles] " +
-                            "LEFT OUTER JOIN[dbo].[ArticleLike] ON [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] "+
+                            "LEFT OUTER JOIN [dbo].[ArticleLike] ON [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] "+
+                            "INNER JOIN [dbo].[DataSources] ON [dbo].[DataSources].[Id] = [dbo].[Articles].[DataSourceId] "+ 
                             "WHERE [DataSourceId] = @datasourceId " +
                             "AND [UserId] = @userId OR [UserId] IS NULL " +
                             "ORDER BY [PublishDate] DESC " +
@@ -103,18 +108,23 @@ namespace NewsAggregator.Query.SQL.Repositories
 
         public async Task<SearchQueryResult<ArticleQueryResult>> SearchInFeed(SearchArticlesInFeedParameter parameter, CancellationToken cancellationToken)
         {
-            const string sql = "SELECT  " +
+            const string sql = "SELECT " +
                     "[dbo].[Articles].[Id], " +
                     "[ExternalId], " +
-                    "[Title], " +
+                    "[dbo].[Articles].[Title], " +
                     "[Summary], " +
                     "[Language], " +
                     "[PublishDate], " +
-                    "CONCAT([Title], ' ', [Summary]) as [Text], " +
-                    "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime] " +
+                    "CONCAT([dbo].[Articles].[Title], ' ', [Summary]) as [Text], " +
+                    "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime], " +
+                    "[dbo].[DataSources].[Id] as [DatasourceId], " +
+                    "[dbo].[DataSources].[Title] as [DatasourceTitle], " +
+                    "[NbViews], " +
+                    "[NbLikes] " +
                     "FROM [dbo].[Articles] " +
                     "INNER JOIN [dbo].[FeedDatasource] ON[dbo].[FeedDatasource].[DatasourceId] = [dbo].[Articles].[DataSourceId] " +
                     "LEFT OUTER JOIN [dbo].[ArticleLike] ON [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] " +
+                    "INNER JOIN [dbo].[DataSources] ON [dbo].[DataSources].[Id] = [dbo].[Articles].[DataSourceId] " +
                     "WHERE [dbo].[FeedDatasource].FeedAggregateId = @feedId " +
                     "AND [dbo].[ArticleLike].[UserId] = @userId OR [dbo].[ArticleLike].[UserId] IS NULL " +
                     "ORDER BY [PublishDate] DESC " +

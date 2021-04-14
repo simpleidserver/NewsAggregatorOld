@@ -22,6 +22,7 @@ import { ArticleService } from './stores/articles/services/article.service';
 import { DatasourceService } from './stores/datasource/services/datasource.service';
 import { FeedsEffects } from './stores/feed/effects/feed.effects';
 import { FeedService } from './stores/feed/services/feed.service';
+import { DatasourcesEffects } from './stores/datasource/effects/datasource.effects';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -44,7 +45,8 @@ export function createTranslateLoader(http: HttpClient) {
     OAuthModule.forRoot(),
     EffectsModule.forRoot([
       FeedsEffects,
-      ArticlesEffects
+      ArticlesEffects,
+      DatasourcesEffects
     ]),
     StoreModule.forRoot(appReducer),
     TranslateModule.forRoot({

@@ -5,6 +5,9 @@ export class Article {
   summary: string;
   language: string;
   publishDate: Date;
-  feedTitle: string;
+  datasourceId: string;
+  datasourceTitle: string;
+  nbViews: number;
+  nbLikes: number;
   likeActionDateTime: Date | null;
 }

@@ -16,6 +16,13 @@ namespace NewsAggregator.Api.Startup.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetDataSourceQuery { DataSourceId = id }, cancellationToken);
+            return new OkObjectResult(result);
+        }
+
         [HttpPost(".search")]
         public async Task<IActionResult> Search([FromBody] SearchDataSourcesQuery query, CancellationToken cancellationToken)
         {

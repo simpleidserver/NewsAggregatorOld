@@ -13,11 +13,12 @@ import { Feed } from '../../stores/feed/models/feed.model';
   template: ''
 })
 export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
+  pagination: number = 10;
   articles: Article[] = [];
   feed: Feed = new Feed();
   feedArticlesListener: any;
   feedListener: any;
-  protected startIndex: number = 0;
+  refreshInterval: any;
   protected count: number = 10;
   protected isLoadingData: boolean = false;
 
@@ -47,17 +48,18 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
       }
 
       this.isLoadingData = false;
-      this.startIndex = r.startIndex;
       const copy = JSON.parse(JSON.stringify(r.content));
-      this.articles = this.articles.concat(copy);
+      this.articles = copy;
     });
+    this.refreshInterval = setInterval(this.refresh.bind(this), 1000);
     const drawerContent = this.drawerContentService.getDrawerContent();
     drawerContent.elementScrolled().subscribe((evt) => {
       const offset = drawerContent.measureScrollOffset("bottom");
       const o = Math.floor(offset);
       if (o === 0 && !this.isLoadingData) {
         this.isLoadingData = true;
-        this.refresh(this.startIndex + this.count);
+        this.count += this.pagination;
+        this.refresh();
       }
     });
   }
@@ -70,23 +72,33 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
     if (this.feedListener) {
       this.feedListener.unsubscribe();
     }
+
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
   }
 
   reset() {
     this.articles = [];
-    this.refresh(0);
+    this.count = this.pagination;
+    this.refresh();
   }
 
-  likeOrUnlike(article: Article) {
-    let request: any = null;
-    if (article.likeActionDateTime) {
-      request = fromArticleActions.startUnlikeArticle({ articleId: article.id });
-    } else {
-      request = fromArticleActions.startLikeArticle({ articleId: article.id });
-    }
-
+  like(article: Article) {
+    const request = fromArticleActions.startLikeArticle({ articleId: article.id });
     this.store.dispatch(request);
   }
 
-  abstract refresh(startIndex: number) : void;
+  unlike(article: Article) {
+    const request = fromArticleActions.startUnlikeArticle({ articleId: article.id });
+    this.store.dispatch(request);
+  }
+
+  navigate(article: Article) {
+    const request = fromArticleActions.startViewArticle({ articleId: article.id });
+    this.store.dispatch(request);
+    window.open(article.externalId, '_blank');
+  }
+
+  abstract refresh() : void;
 }

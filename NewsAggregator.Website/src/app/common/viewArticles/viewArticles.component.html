@@ -1,26 +1,29 @@
 <div fxLayout="column" fxLayoutGap="5px">
   <div *ngFor="let article of articles" class="article">
     <mat-card>
-      <mat-card-header>
+      <mat-card-header fxLayout="row">
         <mat-card-title>{{ article.title }}</mat-card-title>
-        <mat-card-subtitle>{{ article.feedTitle }}, {{ 'article.publicationDate' | translate : { date : article.publishDate | date } }}</mat-card-subtitle>
+        <mat-card-subtitle>
+          <div>
+            <b>{{ article.datasourceTitle }}</b>, {{ 'article.publicationDate' | translate : { date : article.publishDate | date:'medium' } }}
+          </div>
+          <div>
+            <span><mat-icon class="small-icon">thumb_up</mat-icon> {{article.nbLikes}}</span>
+            <span><mat-icon class="small-icon">visibility</mat-icon> {{article.nbViews}}</span>
+          </div>
+        </mat-card-subtitle>
+        <div fxFlex></div>
+        <div class="actions">
+          <mat-icon (click)="navigate(article)">visibility</mat-icon>
+          <mat-icon (click)="unlike(article)" *ngIf="article.likeActionDateTime">thumb_up</mat-icon>
+          <mat-icon (click)="like(article)" *ngIf="!article.likeActionDateTime">thumb_up_off_alt</mat-icon>
+        </div>
       </mat-card-header>
       <mat-card-content>
         <p>
           {{ article.summary }}
         </p>
       </mat-card-content>
-      <mat-card-actions>
-        <button mat-button>
-          <mat-icon>visibility</mat-icon>
-          {{ 'article.actions.read' | translate }}
-        </button>
-        <button mat-button (click)="likeOrUnlike(article)">
-          <mat-icon *ngIf="article.likeActionDateTime">thumb_up</mat-icon>
-          <mat-icon *ngIf="!article.likeActionDateTime">thumb_up_off_alt</mat-icon>
-          {{ 'article.actions.like' | translate }}
-        </button>
-      </mat-card-actions>
     </mat-card>
   </div>
 </div>

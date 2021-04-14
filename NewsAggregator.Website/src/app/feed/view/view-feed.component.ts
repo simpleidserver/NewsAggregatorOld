@@ -13,6 +13,7 @@ import { FeedViewArticlesComponent } from './view-feed-articles.component';
 export class FeedViewComponent implements OnInit, OnDestroy {
   feed: Feed = new Feed();
   feedListener: any;
+  datasourceListener: any;
   @ViewChild('viewArticles', { static: true}) viewArticles: FeedViewArticlesComponent;
 
   constructor(

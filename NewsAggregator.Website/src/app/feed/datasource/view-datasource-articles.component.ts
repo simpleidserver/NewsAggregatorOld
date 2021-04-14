@@ -20,9 +20,9 @@ export class DatasourceViewArticlesComponent extends ViewArticlesComponent {
     super(activatedRoute, store, drawerContentService, actions$);
   }
 
-  refresh(startIndex : number) {
+  refresh() {
     const datasourceId = this.activatedRoute.snapshot.params['datasourceid'];
-    const request = fromArticleActions.startSearchArticlesInDatasource({ count: this.count, startIndex: startIndex, order: 'createDateTime', direction: 'desc', datasourceId: datasourceId });
+    const request = fromArticleActions.startSearchArticlesInDatasource({ count: this.count, startIndex: 0, order: 'createDateTime', direction: 'desc', datasourceId: datasourceId });
     this.store.dispatch(request);
   }
 }

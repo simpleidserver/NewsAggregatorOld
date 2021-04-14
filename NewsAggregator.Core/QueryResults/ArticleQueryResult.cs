@@ -12,5 +12,9 @@ namespace NewsAggregator.Core.QueryResults
         public DateTimeOffset PublishDate { get; set; }
         public DateTime? LikeActionDateTime { get; set; }
         public string Text { get; set; }
+        public string DatasourceId { get; set; }
+        public string DatasourceTitle { get; set; }
+        public int NbViews { get; set; }
+        public int NbLikes { get; set; }
     }
 }
