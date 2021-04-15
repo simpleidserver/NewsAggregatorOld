@@ -1,6 +1,6 @@
 import { Action, createReducer, on } from "@ngrx/store";
 import { SearchArticlesResult } from "../../articles/models/search-article.model";
-import { completeSearchArticlesInDatasource, completeSearchArticlesInFeed } from '../actions/article.actions';
+import { completeSearchArticlesInDatasource, completeSearchArticlesInFeed, completeSearchRecommendations } from '../actions/article.actions';
 
 export interface SearchArticlesState {
   isLoading: boolean;
@@ -17,7 +17,8 @@ export const initialSearchArticles: SearchArticlesState = {
 const searchArticlesReducer = createReducer(
   initialSearchArticles,
   on(completeSearchArticlesInDatasource, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false })),
-  on(completeSearchArticlesInFeed, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false }))
+  on(completeSearchArticlesInFeed, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false })),
+  on(completeSearchRecommendations, (state, { content }) => ({ content: content, isLoading: false, isErrorLoadOccured: false }))
 );
 
 export function getSearchArticlesReducer(state: SearchArticlesState | undefined, action: Action) {

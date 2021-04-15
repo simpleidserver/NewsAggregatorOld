@@ -1,7 +1,8 @@
-﻿using Medallion.Threading;
+﻿using MassTransit;
 using Medallion.Threading.FileSystem;
 using Microsoft.Extensions.Logging;
 using NewsAggregator.Core.Domains.Articles;
+using NewsAggregator.Core.Domains.Articles.Events;
 using NewsAggregator.Core.Domains.DataSources;
 using NewsAggregator.Core.Repositories;
 using NewsAggregator.ML.Articles;
@@ -22,17 +23,20 @@ namespace NewsAggregator.ML.Jobs
         private readonly IDataSourceCommandRepository _datasourceCommandRepository;
         private readonly IArticleCommandRepository _articleRepository;
         private readonly IArticleManager _articleManager;
+        private readonly IBusControl _busControl;
         private readonly ILogger<ArticleExtractorJob> _logger;
 
         public ArticleExtractorJob(
             IDataSourceCommandRepository datasourceCommandRepository,
             IArticleCommandRepository articleRepository,
             IArticleManager articleManager,
+            IBusControl busControl,
             ILogger<ArticleExtractorJob> logger)
         {
             _datasourceCommandRepository = datasourceCommandRepository;
             _articleRepository = articleRepository;
             _articleManager = articleManager;
+            _busControl = busControl;
             _logger = logger;
         }
 
@@ -94,6 +98,11 @@ namespace NewsAggregator.ML.Jobs
 
                 await _articleRepository.SaveChanges(cancellationToken);
                 transactionScope.Complete();
+            }
+
+            foreach(var article in result)
+            {
+                await _busControl.Publish((ArticleAddedEvent)article.DomainEvts.First(), cancellationToken);
             }
 
             await _articleManager.TrainArticles(result.Select(r => r.Language).Distinct(), cancellationToken);

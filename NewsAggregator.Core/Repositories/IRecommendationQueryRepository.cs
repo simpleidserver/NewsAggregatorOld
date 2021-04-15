@@ -7,6 +7,6 @@ namespace NewsAggregator.Core.Repositories
 {
     public interface IRecommendationQueryRepository
     {
-        Task<SearchQueryResult<RecommendationQueryResult>> Search(SearchRecommendationsParameter parameter, CancellationToken cancellationToken);
+        Task<SearchQueryResult<ArticleQueryResult>> Search(SearchRecommendationsParameter parameter, CancellationToken cancellationToken);
     }
 }

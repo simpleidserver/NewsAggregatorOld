@@ -3,7 +3,7 @@ using NewsAggregator.Core.QueryResults;
 
 namespace NewsAggregator.Api.Recommendations.Queries
 {
-    public class SearchRecommendationsQuery : IRequest<SearchQueryResult<RecommendationQueryResult>>
+    public class SearchRecommendationsQuery : IRequest<SearchQueryResult<ArticleQueryResult>>
     {
         public SearchRecommendationsQuery()
         {

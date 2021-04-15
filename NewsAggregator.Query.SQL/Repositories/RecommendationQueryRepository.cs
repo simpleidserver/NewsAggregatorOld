@@ -16,32 +16,41 @@ namespace NewsAggregator.Query.SQL.Repositories
             _sqlConnectionFactory = sqlConnectionFactory;
         }
 
-        public async Task<SearchQueryResult<RecommendationQueryResult>> Search(SearchRecommendationsParameter parameter, CancellationToken cancellationToken)
+        public async Task<SearchQueryResult<ArticleQueryResult>> Search(SearchRecommendationsParameter parameter, CancellationToken cancellationToken)
         {
-            const string sql = "SELECT	[dbo].[RecommendationArticle].[Score] as [ArticleScore], "+
-                        "[dbo].[Articles].[Id] as [ArticleId], "+
-                        "[dbo].[Articles].[Language] as [ArticleLanguage], "+
-                        "[dbo].[Articles].[Title] as [ArticleTitle], "+
-                        "[dbo].[Articles].[Summary] as [ArticleSummary], "+
-                        "[dbo].[Articles].[ExternalId] as [ArticleExternalId] "+
-                        "FROM [dbo].[RecommendationArticle] "+
-                        "INNER JOIN [dbo].[Articles] ON [dbo].[RecommendationArticle].[ArticleId] = [dbo].[Articles].[Id] "+
-                        "WHERE [dbo].[RecommendationArticle].[RecommendationAggregateId] = ( " +
-                        "SELECT TOP(1) [Id] "+
-                        "FROM[dbo].[Recommendations] "+
-                        "WHERE [UserId] = @userId "+
-                        "ORDER BY [dbo].[Recommendations].[CreateDateTime] DESC )"+
-                        "ORDER BY[dbo].[RecommendationArticle].[Score] DESC "+
-                        "OFFSET @startIndex ROWS "+
-                        "FETCH NEXT @count ROWS ONLY";
+            const string sql = "SELECT [dbo].[RecommendationArticle].[Score] as [ArticleScore], "+
+                       "[dbo].[Articles].[Id] as [Id], " +
+                       "[dbo].[Articles].[ExternalId] as [ExternalId], " +
+                       "[dbo].[Articles].[Title] as [Title], " +
+                       "[dbo].[Articles].[Summary] as [Summary], " +
+                       "[dbo].[Articles].[Language] as [Language], " +
+                       "[dbo].[Articles].[PublishDate] as [PublishDate], " +
+                       "CONCAT([dbo].[Articles].[Title], ' ', [dbo].[Articles].[Summary]) as [Text], " +
+                       "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime], " +
+                       "[dbo].[DataSources].[Id] as [DatasourceId], " +
+                       "[dbo].[DataSources].[Title] as [DatasourceTitle], " +
+                       "[NbViews], " +
+                       "[NbLikes] " +
+                       " FROM[dbo].[RecommendationArticle] " +
+                       "INNER JOIN[dbo].[Articles] ON[dbo].[RecommendationArticle].[ArticleId] = [dbo].[Articles].[Id] " +
+                       "LEFT OUTER JOIN[dbo].[ArticleLike] ON[dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] " +
+                       "INNER JOIN[dbo].[DataSources] ON[dbo].[DataSources].[Id] = [dbo].[Articles].[DataSourceId] " +
+                       "WHERE[dbo].[RecommendationArticle].[RecommendationAggregateId] = ( " +
+                       "SELECT TOP(1)[Id] " +
+                       "FROM[dbo].[Recommendations] " +
+                       "WHERE[UserId] = 'administrator' " +
+                       "ORDER BY[dbo].[Recommendations].[CreateDateTime] DESC ) " +
+                       "ORDER BY[dbo].[RecommendationArticle].[Score] DESC " +
+                       "OFFSET 0 ROWS " +
+                       "FETCH NEXT 10 ROWS ONLY";
             var connection = _sqlConnectionFactory.GetOpenConnection();
-            var result = await connection.QueryAsync<RecommendationQueryResult>(sql, new
+            var result = await connection.QueryAsync<ArticleQueryResult>(sql, new
             {
                 userId = parameter.UserId,
                 startIndex = parameter.StartIndex,
                 count = parameter.Count
             });
-            return new SearchQueryResult<RecommendationQueryResult>
+            return new SearchQueryResult<ArticleQueryResult>
             {
                 Content = result,
                 Count = parameter.Count,

@@ -63,6 +63,7 @@ namespace NewsAggregator.ML.Startup
             {
                 x.AddConsumer<ArticleLikedEventConsumer>();
                 x.AddConsumer<ArticleViewedEventConsumer>();
+                x.AddConsumer<ArticleAddedEventConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.ReceiveEndpoint("article-like-listener", e =>
@@ -72,6 +73,10 @@ namespace NewsAggregator.ML.Startup
                     cfg.ReceiveEndpoint("article-view-listener", e =>
                     {
                         e.ConfigureConsumer<ArticleViewedEventConsumer>(context);
+                    });
+                    cfg.ReceiveEndpoint("article-add-listener", e =>
+                    {
+                        e.ConfigureConsumer<ArticleAddedEventConsumer>(context);
                     });
                 });
             });

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NewsAggregator.Api.Recommendations.Queries.Handlers
 {
-    public class SearchRecommendationsQueryHandler : IRequestHandler<SearchRecommendationsQuery, SearchQueryResult<RecommendationQueryResult>>
+    public class SearchRecommendationsQueryHandler : IRequestHandler<SearchRecommendationsQuery, SearchQueryResult<ArticleQueryResult>>
     {
         private readonly IRecommendationQueryRepository _recommendationQueryRepository;
 
@@ -16,7 +16,7 @@ namespace NewsAggregator.Api.Recommendations.Queries.Handlers
             _recommendationQueryRepository = recommendationQueryRepository;
         }
 
-        public Task<SearchQueryResult<RecommendationQueryResult>> Handle(SearchRecommendationsQuery request, CancellationToken cancellationToken)
+        public Task<SearchQueryResult<ArticleQueryResult>> Handle(SearchRecommendationsQuery request, CancellationToken cancellationToken)
         {
             return _recommendationQueryRepository.Search(new SearchRecommendationsParameter
             {

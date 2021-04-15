@@ -5,9 +5,10 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import {
     completeLikeArticle,
     completeSearchArticlesInDatasource,
-    completeSearchArticlesInFeed, completeUnLikeArticle, completeViewArticle, errorLikeArticle, errorSearchArticlesInDatasource,
-    errorSearchArticlesInFeed, errorUnLikeArticle, errorViewArticle, startLikeArticle, startSearchArticlesInDatasource,
+    completeSearchArticlesInFeed, completeSearchRecommendations, completeUnLikeArticle, completeViewArticle, errorLikeArticle, errorSearchArticlesInDatasource,
+    errorSearchArticlesInFeed, errorSearchRecommendations, errorUnLikeArticle, errorViewArticle, startLikeArticle, startSearchArticlesInDatasource,
     startSearchArticlesInFeed,
+    startSearchRecommendations,
     startUnlikeArticle,
     startViewArticle
 } from '../actions/article.actions';
@@ -85,6 +86,20 @@ export class ArticlesEffects {
           .pipe(
             map(articles => completeViewArticle({ articleId: evt.articleId })),
             catchError(() => of(errorViewArticle()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  searchRecommendations$ = this.actions$
+    .pipe(
+      ofType(startSearchRecommendations),
+      mergeMap((evt) => {
+        return this.articleService.searchRecommendations(evt.startIndex, evt.count)
+          .pipe(
+            map(content => completeSearchRecommendations({ content: content })),
+            catchError(() => of(errorSearchRecommendations()))
           );
       }
       )

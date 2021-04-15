@@ -16,4 +16,8 @@ export const errorUnLikeArticle = createAction("[Articles] ERROR_UNLIKE_ARTICLE"
 export const startViewArticle = createAction("[Articles] START_VIEW_ARTICLE", props<{ articleId: string }>());
 export const completeViewArticle = createAction("[Articles] COMPLETE_VIEW_ARTICLE", props<{ articleId: string }>());
 export const errorViewArticle = createAction("[Articles] ERROR_VIEW_ARTICLE");
+export const startSearchRecommendations = createAction("[Articles] START_SEARCH_RECOMMENDATIONS", props<{ count: number, startIndex: number }>());
+export const errorSearchRecommendations = createAction("[Articles] ERROR_SEARCH_RECOMMENDATIONS");
+export const completeSearchRecommendations = createAction("[Articles] COMPLETE_SEARCH_RECOMMENDATIONS", props<{ content: SearchArticlesResult }>());
+
 

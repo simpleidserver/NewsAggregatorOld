@@ -36,6 +36,9 @@
       "like": "Like"
     }
   },
+  "recommendation": {
+    "list": "Recommendations"
+  },
   "datasource": {
     "list": "Sources de données",
     "searchDatasource": "Chercher une source"

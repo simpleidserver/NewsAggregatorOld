@@ -18,6 +18,10 @@ const routes: Routes = [
   {
     path: 'hangfire',
     loadChildren: async () => (await import('./hangfire/hangfire.module')).HangfireModule
+  },
+  {
+    path: 'recommendations',
+    loadChildren: async () => (await import('./recommendation/recommendation.module')).RecommendationModule
   }
 ];
 

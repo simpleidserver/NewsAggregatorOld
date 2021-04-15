@@ -29,6 +29,16 @@ export class ArticleService {
     return this.http.post<SearchArticlesResult>(targetUrl, JSON.stringify(request), { headers: headers });
   }
 
+  searchRecommendations(startIndex: number, count: number): Observable<SearchArticlesResult> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/recommendations/.search";
+    const request: any = { startIndex: startIndex, count: count };
+    return this.http.post<SearchArticlesResult>(targetUrl, JSON.stringify(request), { headers: headers });
+  }
+
   like(articleId: string) : Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Accept', 'application/json');
@@ -55,4 +65,5 @@ export class ArticleService {
     const targetUrl = environment.apiUrl + "/articles/" + articleId + "/view";
     return this.http.get<any>(targetUrl, { headers: headers });
   }
+
 }
