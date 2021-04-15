@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
 import * as fromAppState from '@app/stores/appstate';
 import * as fromHangfire from '@app/stores/hangfire/actions/hangfire.actions';
 import { HangfireJob } from '@app/stores/hangfire/models/hangfirejob.model';
@@ -23,6 +22,7 @@ export class HangfireJobsComponent implements OnInit, OnDestroy {
   jobs: HangfireJobRow[] = [];
   displayedColumns: string[] = ['id', 'stateName', 'createdAt', 'invocationData'];
   length: number;
+  refreshInterval: any;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   constructor(
@@ -35,11 +35,23 @@ export class HangfireJobsComponent implements OnInit, OnDestroy {
       }
 
       this.isLoading = false;
+      this.length = r.count;
       this.jobs = r.content.map((j: HangfireJob) => {
         return new HangfireJobRow(j.id, j.stateName, j.createdAt, JSON.parse(j.invocationData)["Type"]);
       });
     });
+    this.refreshInterval = setInterval(this.refresh.bind(this), 1000);
     this.refresh();
+  }
+
+  launchArticlesExtraction() {
+    const request = fromHangfire.startExtractArticles();
+    this.store.dispatch(request);
+  }
+
+  launchRecommendationExtraction() {
+    const request = fromHangfire.startExtractRecommendations();
+    this.store.dispatch(request);
   }
 
   ngAfterViewInit() {
@@ -49,6 +61,10 @@ export class HangfireJobsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.listener) {
       this.listener.unsubscribe();
+    }
+
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
     }
   }
 

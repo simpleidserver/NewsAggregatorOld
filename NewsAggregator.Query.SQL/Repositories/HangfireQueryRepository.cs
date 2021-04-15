@@ -27,7 +27,10 @@ namespace NewsAggregator.Query.SQL.Repositories
                             "ORDER BY [CreatedAt] DESC " +
                             "OFFSET @startIndex ROWS " +
                             "FETCH NEXT @count ROWS ONLY";
+            const string countSql = "SELECT COUNT(*) " +
+                            "FROM [HangFire].[Job] ";
             var connection = _sqlConnectionFactory.GetOpenConnection();
+            var count = await connection.QuerySingleAsync<int>(countSql);
             var result = await connection.QueryAsync<HangfireJobQueryResult>(sql, new
             {
                 startIndex = parameter.StartIndex,
@@ -36,7 +39,7 @@ namespace NewsAggregator.Query.SQL.Repositories
             return new SearchQueryResult<HangfireJobQueryResult>
             {
                 Content = result,
-                Count = parameter.Count,
+                Count = count,
                 StartIndex = parameter.StartIndex
             };
         }
@@ -53,7 +56,14 @@ namespace NewsAggregator.Query.SQL.Repositories
                             "ORDER BY [CreatedAt] DESC " +
                             "OFFSET @startIndex ROWS " +
                             "FETCH NEXT @count ROWS ONLY";
+            const string countSql = "SELECT COUNT(*) " +
+                            "FROM [HangFire].[State] " +
+                            "WHERE [JobId] = @jobId ";
             var connection = _sqlConnectionFactory.GetOpenConnection();
+            var count = await connection.QuerySingleAsync<int>(countSql, new
+            {
+                jobId = parameter.JobId
+            });
             var result = await connection.QueryAsync<HangfireJobStateQueryResult>(sql, new
             {
                 jobId = parameter.JobId,
@@ -63,7 +73,7 @@ namespace NewsAggregator.Query.SQL.Repositories
             return new SearchQueryResult<HangfireJobStateQueryResult>
             {
                 Content = result,
-                Count = parameter.Count,
+                Count = count,
                 StartIndex = parameter.StartIndex
             };
         }

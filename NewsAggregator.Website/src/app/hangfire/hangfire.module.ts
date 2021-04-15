@@ -4,10 +4,12 @@ import { MaterialModule } from '@app/shared/material.module';
 import { SharedModule } from '../shared/shared.module';
 import { HangfireRoutes } from './hangfire.routes';
 import { HangfireJobsComponent } from './list/hangfire-jobs.component';
+import { HangfireJobStatesComponent } from './view/hangfire-jobstates.component';
 
 @NgModule({
   declarations: [
-    HangfireJobsComponent
+    HangfireJobsComponent,
+    HangfireJobStatesComponent
   ],
   entryComponents: [
   ],

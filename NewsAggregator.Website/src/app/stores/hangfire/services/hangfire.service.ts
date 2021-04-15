@@ -29,4 +29,22 @@ export class HangfireService {
     const request: any = { startIndex: startIndex, count: count, jobId: jobId };
     return this.http.post<SearchHangfireJobStatesResult>(targetUrl, JSON.stringify(request), { headers: headers });
   }
+
+  extractArticles(): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/hangfire/extract-articles";
+    return this.http.get<any>(targetUrl, { headers: headers });
+  }
+
+  extractRecommendations(): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/hangfire/extract-recommendations";
+    return this.http.get<any>(targetUrl, { headers: headers });
+  }
 }

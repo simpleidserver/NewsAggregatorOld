@@ -1,4 +1,8 @@
 <h1>{{ 'hangfire.list' | translate }}</h1>
+<div class="actions">
+  <button mat-raised-button (click)="launchArticlesExtraction()">{{ 'hangfire.launchArticlesExtraction' | translate }}</button>
+  <button mat-raised-button (click)="launchRecommendationExtraction()">{{ 'hangfire.launchRecommendationExtraction' | translate }}</button>
+</div>
 <div class="mat-elevation-z8">
   <table mat-table [dataSource]="jobs" class="full-width">
     <!-- Identifier -->
@@ -6,7 +10,9 @@
       <th mat-header-cell *matHeaderCellDef>
         {{ 'hangfire.job' | translate }}
       </th>
-      <td mat-cell *matCellDef="let element">{{element.id}}</td>
+      <td mat-cell *matCellDef="let element">
+        <a href="#" [routerLink]="['/hangfire/' + element.id]">{{element.id}}</a>
+      </td>
     </ng-container>
     <!-- State name -->
     <ng-container matColumnDef="stateName">

@@ -7,7 +7,12 @@
     "job": "Job",
     "state": "Etat",
     "createdAt": "Créé le",
-    "invocationData": "Données d'invocation"
+    "invocationData": "Données d'invocation",
+    "states": "Les états",
+    "stateName": "Etat",
+    "stateReason": "Raison",
+    "launchArticlesExtraction": "Extraire les articles",
+    "launchRecommendationExtraction": "Extraire les recommendations"
   },
   "feed": {
     "add": "Ajouter feed",

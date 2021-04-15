@@ -1,6 +1,6 @@
 <mat-drawer-container class="drawer-container">
   <mat-drawer mode="side" #drawer opened>
-    <div *ngIf="isConnected" class="nav-link" [class.active]="router.isActive('/hangfire', true)">
+    <div *ngIf="isConnected" class="nav-link" [class.active]="router.isActive('/hangfire', false)">
       <a href="#" class="title" [routerLink]="['/hangfire']">{{ 'hangfire.list' | translate }}</a>
     </div>
     <div *ngIf="isConnected" class="nav-link" [class.active]="router.isActive('/feeds', true)">

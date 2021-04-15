@@ -7,7 +7,12 @@
     "job": "Job",
     "state": "State",
     "createdAt": "Created at",
-    "invocationData": "Invocation data"
+    "invocationData": "Invocation data",
+    "states": "States",
+    "stateName": "State",
+    "stateReason": "Reason",
+    "launchArticlesExtraction": "Extract articles",
+    "launchRecommendationExtraction": "Extract recommendation"
   },
   "feed": {
     "add": "Add feed",
