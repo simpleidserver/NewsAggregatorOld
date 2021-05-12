@@ -5,7 +5,7 @@
         public Options()
         {
             VectorColumnName = "Vector";
-            DistanceMeasurement = DistanceMeasurementTypes.Eucledian;
+            DistanceMeasurement = DistanceMeasurementTypes.Euclidian;
             LinkageFunction = LinkageFunctionTypes.Single;
             NbClusters = 3;
         }

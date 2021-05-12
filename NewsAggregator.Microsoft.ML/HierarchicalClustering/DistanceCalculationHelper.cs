@@ -12,7 +12,7 @@ namespace Microsoft.ML.Trainers
             {
                 case DistanceMeasurementTypes.Canberra:
                     return CalculateCanberraDistance(vector1, vector2);
-                case DistanceMeasurementTypes.Eucledian:
+                case DistanceMeasurementTypes.Euclidian:
                     return CalculateEucledianDistance(vector1, vector2);
                 case DistanceMeasurementTypes.Manhattan:
                     return CalculateManhattanDistance(vector1, vector2);

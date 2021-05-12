@@ -54,7 +54,7 @@ namespace NewsAggregator.Microsoft.ML.Tests
             {
                 VectorColumnName = "NbTopics",
                 LinkageFunction = LinkageFunctionTypes.Single,
-                DistanceMeasurement = DistanceMeasurementTypes.Eucledian
+                DistanceMeasurement = DistanceMeasurementTypes.Euclidian
             };
             var trainingData = mlContext.Data.LoadFromEnumerable(BuildArmyRepartitions());
             var pipeline = mlContext.Clustering.Trainers.HierarchicalClustering(options);
@@ -70,7 +70,7 @@ namespace NewsAggregator.Microsoft.ML.Tests
             {
                 VectorColumnName = "NbTopics",
                 LinkageFunction = LinkageFunctionTypes.Complete,
-                DistanceMeasurement = DistanceMeasurementTypes.Eucledian
+                DistanceMeasurement = DistanceMeasurementTypes.Euclidian
             };
             var trainingData = mlContext.Data.LoadFromEnumerable(BuildArmyRepartitions());
             var pipeline = mlContext.Clustering.Trainers.HierarchicalClustering(options);

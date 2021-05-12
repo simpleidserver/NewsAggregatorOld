@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Microsoft.ML
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Microsoft.ML", "NewsAggregator.Microsoft.ML\NewsAggregator.Microsoft.ML.csproj", "{576E5661-FFF8-40F0-BAB4-5B2FFA4182E8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewsAggregator.Math.Startup", "NewsAggregator.Math.Startup\NewsAggregator.Math.Startup.csproj", "{64FD29BA-6A89-4214-8C0E-D6AFF0D9CC34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{576E5661-FFF8-40F0-BAB4-5B2FFA4182E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{576E5661-FFF8-40F0-BAB4-5B2FFA4182E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{576E5661-FFF8-40F0-BAB4-5B2FFA4182E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64FD29BA-6A89-4214-8C0E-D6AFF0D9CC34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64FD29BA-6A89-4214-8C0E-D6AFF0D9CC34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64FD29BA-6A89-4214-8C0E-D6AFF0D9CC34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64FD29BA-6A89-4214-8C0E-D6AFF0D9CC34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,6 +112,7 @@ Global
 		{2CB43820-9C8E-4C4D-9050-59372F25EA56} = {B7FEA081-88CA-49D7-8C0C-6B7A715F10CB}
 		{5A4665F7-7A8F-4407-9E33-13A3BCF6A33F} = {FD5E1B8A-F0D9-4E6E-A07F-6816F3F6138A}
 		{576E5661-FFF8-40F0-BAB4-5B2FFA4182E8} = {150A09F2-8F9D-4534-9EC1-41B82710095F}
+		{64FD29BA-6A89-4214-8C0E-D6AFF0D9CC34} = {B7FEA081-88CA-49D7-8C0C-6B7A715F10CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C7BA5EB-A78B-4C72-BF92-AE810C98F64D}
