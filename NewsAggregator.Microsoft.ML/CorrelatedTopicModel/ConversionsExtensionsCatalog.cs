@@ -5,9 +5,9 @@ namespace Microsoft.ML
 {
     public static class ConversionsExtensionsCatalog
     {
-        public static CorrelatedTopicModelEstimator ColleratedTopicModel(this TransformsCatalog.TextTransforms catalog, string outputColumnName, string inputColumnName)
+        public static CorrelatedTopicModelEstimator ColleratedTopicModel(this TransformsCatalog.TextTransforms catalog, string outputColumnName, string inputColumnName, int nbTopics = 3)
         {
-            return new CorrelatedTopicModelEstimator(outputColumnName, inputColumnName);
+            return new CorrelatedTopicModelEstimator(outputColumnName, inputColumnName, nbTopics);
         }
     }
 }

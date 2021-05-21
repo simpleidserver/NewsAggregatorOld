@@ -1,6 +1,5 @@
 ﻿using Microsoft.ML;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Xunit;
 
@@ -18,7 +17,7 @@ namespace NewsAggregator.Microsoft.ML.Tests
                  .Append(mlContext.Transforms.Text.TokenizeIntoWords("Tokens", "NormalizedText")) // Extract tokens.
                  // .Append(mlContext.Transforms.Text.RemoveDefaultStopWords("Tokens")) // Remove stop words.
                  .Append(mlContext.Transforms.Conversion.MapValueToKey("Tokens")
-                 .Append(mlContext.Transforms.Text.ColleratedTopicModel("TransformedTxt", "Tokens")));  // Convert keyword to integer (vocubulary)
+                 .Append(mlContext.Transforms.Text.ColleratedTopicModel("TransformedTxt", "Tokens", 10)));  // Convert keyword to integer (vocubulary)
             var textTransformer = textPipeline.Fit(trainingData);
             var tt = textTransformer.Transform(trainingData);
             /*

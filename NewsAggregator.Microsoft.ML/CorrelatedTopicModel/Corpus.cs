@@ -7,11 +7,8 @@ namespace NewsAggregator.Microsoft.ML.CorrelatedTopicModel
 {
     public class Corpus
     {
-        private readonly MersenneTwister _rnd;
-
         public Corpus()
         {
-            _rnd = new MersenneTwister(-1188926917);
             Documents = new List<CorpusDocument>();
         }
 
@@ -30,9 +27,9 @@ namespace NewsAggregator.Microsoft.ML.CorrelatedTopicModel
             return Documents.ElementAt(documentId);
         }
 
-        public CorpusDocument GetRandomDocument()
+        public CorpusDocument GetRandomDocument(MersenneTwister rnd)
         {
-            var n = _rnd.NextDouble();
+            var n = rnd.NextDouble();
             var documentId = (int)Math.Floor(n * (double)NbDocuments);
             return GetDocument(documentId);
         }

@@ -4,9 +4,12 @@ namespace NewsAggregator.Microsoft.ML.CorrelatedTopicModel
 {
     public class Bundle
     {
-        public Bundle(int k)
+        public Bundle(int k, CorpusDocument document, LLNAModel model, VariationalInferenceParameter inference)
         {
             SumPhi = Vector<double>.Build.Dense(k - 1, 0);
+            Document = document;
+            Model = model;
+            VarInference = inference;
             Init(k);
         }
 

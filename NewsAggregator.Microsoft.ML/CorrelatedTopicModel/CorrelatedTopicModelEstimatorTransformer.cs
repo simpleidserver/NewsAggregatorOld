@@ -4,6 +4,7 @@ using NewsAggregator.Microsoft.ML.CorrelatedTopicModel;
 using NewsAggregator.Microsoft.ML.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Microsoft.ML.Transforms.Text
@@ -12,27 +13,35 @@ namespace Microsoft.ML.Transforms.Text
     {
         private readonly string _outputColumnName;
         private readonly string _inputColumnName;
-        private readonly int _nbTopics = 3;
-        private readonly int _envMaxIter = 1000;
-        private readonly double _emConvergence = 1e-3;
-        private readonly int _varMaxIter = 500;
-        private readonly double _varConvergence = 1e-5;
+        private readonly int _nbTopics;
+        private readonly CorrelatedTopicModelParameters _parameters;
+        private LLNAModel _model;
 
-        public CorrelatedTopicModelEstimatorTransformer(string outputColumnName, string inputColumnName)
+        public CorrelatedTopicModelEstimatorTransformer(string outputColumnName, string inputColumnName, int nbTopics = 3)
         {
             _outputColumnName = outputColumnName;
             _inputColumnName = inputColumnName;
+            _nbTopics = nbTopics;
+            _parameters = new CorrelatedTopicModelParameters();
+        }
+
+        public LLNAModel Model
+        {
+            get
+            {
+                return _model;
+            }
         }
 
         public bool IsRowToRowMapper => false;
 
-        public void Fit(IDataView input)
+        internal void Fit(IDataView input)
         {
-            double convergence = 1, avgNiter = 0, lhood = 0, convergedPct = 0;
+            double convergence = 1, lHoodOld = 0;
             bool resetVar = true;
             var corpus = ExtractCorpus(input);
-            var llnaModel = LLNAModel.Create(_nbTopics, corpus);
-            llnaModel.LogBeta.Display();
+            var llnaModel = LLNAModel.Create(_nbTopics, corpus, _parameters);
+            _model = llnaModel;
             var sufficientStatistic = new LLNASufficientStatistics(llnaModel);
             var corpusLambda = Matrix<double>.Build.Dense(corpus.NbDocuments, llnaModel.K, 0);
             var corpusNu = Matrix<double>.Build.Dense(corpus.NbDocuments, llnaModel.K, 0);
@@ -41,10 +50,37 @@ namespace Microsoft.ML.Transforms.Text
             // Expectation - maximization algorithm (EM) algorithm.
             do
             {
-                Expectation(corpus, llnaModel, sufficientStatistic, avgNiter, lhood, corpusLambda, corpusNu, corpusPhiSum, resetVar, convergedPct);
-                iteration++;
+                var result = Expectation(corpus, 
+                    llnaModel, 
+                    sufficientStatistic, 
+                    corpusLambda, 
+                    corpusNu, 
+                    corpusPhiSum, 
+                    resetVar);
+                convergence = (lHoodOld - result.LHood) / lHoodOld;
+                if (convergence < 0)
+                {
+                    resetVar = false;
+                    if (_parameters.VarMaxIter > 0)
+                    {
+                        _parameters.VarMaxIter += 10;
+                    } 
+                    else
+                    {
+                        _parameters.VarConvergence /= 10;
+                    }
+                }
+                else
+                {
+                    llnaModel.Maximize(sufficientStatistic);
+                    lHoodOld = result.LHood;
+                    resetVar = true;
+                    iteration++;
+                }
+
+                sufficientStatistic.Reset();
             }
-            while ((iteration < _envMaxIter) && ((convergence > _emConvergence) || (convergence < 0)));
+            while ((iteration < _parameters.EmMaxIter) && ((convergence > _parameters.EmConvergence) || (convergence < 0)));
         }
 
         public DataViewSchema GetOutputSchema(DataViewSchema inputSchema)
@@ -67,23 +103,20 @@ namespace Microsoft.ML.Transforms.Text
             return null;
         }
 
-        private void Expectation(
+        private ExpectationResult Expectation(
             Corpus corpus, 
             LLNAModel llnaModel, 
             LLNASufficientStatistics llnaSufficientStatistics, 
-            double avgNiter, 
-            double lhood,
             Matrix<double> corpusLambda,
             Matrix<double> corpusNu,
             Matrix<double> corpusPhiSum,
-            bool resetVar,
-            double convergedPct)
+            bool resetVar)
         {
-            var phiSum = new double[llnaModel.K];
-            Vector<double> lambda, nu;
-            int total = 0;
+            double avgNIter = 0, avgConverged = 0;
+            double total = 0;
             for(int i = 0; i < corpus.NbDocuments; i++)
             {
+                Debug.WriteLine($"Document {i}");
                 var doc = corpus.GetDocument(i);
                 var varInference = new VariationalInferenceParameter(doc.NbTerms, llnaModel.K);
                 if(resetVar)
@@ -96,12 +129,27 @@ namespace Microsoft.ML.Transforms.Text
                     varInference.Nu = corpusNu.Row(i);
                     varInference.OptimizeZeta(llnaModel);
                     varInference.OptimizePhi(llnaModel, doc);
+                    varInference.NIter = 0;
                 }
 
                 var lHood = Inference(varInference, doc, llnaModel);
-                // Continue the implementation : https://github.com/blei-lab/ctm-c/blob/dfa139c3dac5d10059429f33faf90401a04125ea/estimate.c
-                // expectation
+                llnaSufficientStatistics.Update(varInference, doc);
+                total += lHood;
+                avgNIter += varInference.NIter;
+                if (varInference.Converged)
+                {
+                    avgConverged++;
+                }
+
+                corpusLambda.SetRow(i, varInference.Lambda);
+                corpusNu.SetRow(i, varInference.Nu);
+                var phiSum = varInference.Phi.ColumnSum();
+                corpusPhiSum.SetRow(i, phiSum);
             }
+
+            avgNIter = avgNIter / corpus.NbDocuments;
+            avgConverged = avgConverged / corpus.NbDocuments;
+            return new ExpectationResult(avgNIter, avgConverged, total);
         }
 
         private double Inference(
@@ -115,8 +163,26 @@ namespace Microsoft.ML.Transforms.Text
             {
                 varInference.IncrementIter();
                 varInference.OptimizeZeta(model);
+                varInference.OptimizeLambda(model, doc);
+                varInference.OptimizeZeta(model);
+                varInference.OptimizeNu(model, doc);
+                varInference.OptimizeZeta(model);
+                varInference.OptimizePhi(model, doc);
+                oldLHood = varInference.LHood;
+                varInference.UpdateLikelihoodBound(doc, model);
+                convergence = Math.Abs((oldLHood - varInference.LHood) / oldLHood);
             }
-            while ((convergence > _varConvergence) && (_varMaxIter < 0 || varInference.NIter < _varMaxIter));
+            while ((convergence > _parameters.VarConvergence) && (_parameters.VarMaxIter < 0 || varInference.NIter < _parameters.VarMaxIter));
+
+            if (convergence > _parameters.VarConvergence)
+            {
+                varInference.Converged = false;
+            }
+            else
+            {
+                varInference.Converged = true;
+            }
+
             return varInference.LHood;
         }
 
@@ -140,6 +206,20 @@ namespace Microsoft.ML.Transforms.Text
             }
 
             return result;
+        }
+
+        private class ExpectationResult
+        {
+            public ExpectationResult(double avgNIter, double avgConverged, double lHood)
+            {
+                AvgNIter = avgNIter;
+                AvgConverged = avgConverged;
+                LHood = lHood;
+            }
+
+            public double AvgNIter { get; set; }
+            public double AvgConverged { get; set; }
+            public double LHood { get; set; }
         }
 
         #region LDA algorithm
