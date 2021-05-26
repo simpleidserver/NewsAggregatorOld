@@ -67,9 +67,9 @@ export class AppComponent implements OnInit, OnDestroy {
       r.forEach((f: DetailedFeed) => {
         const record = this.groupedFeeds.filter((r) => r.id === f.feedId);
         if (record.length === 0) {
-          this.groupedFeeds.push({ id: f.feedId, title: f.feedTitle, nbStoriesPerMonth: f.nbStoriesPerMonth, datasources: [{ description: '', id: f.datasourceId, title: f.datasourceTitle }] });
+          this.groupedFeeds.push({ id: f.feedId, title: f.feedTitle, nbStoriesPerMonth: f.nbStoriesPerMonth, datasources: [{ description: '', id: f.datasourceId, title: f.datasourceTitle, nbFollowers: f.nbFollowers, nbStoriesPerMonth: f.nbStoriesPerMonth }] });
         } else {
-          record[0].datasources.push({ description: '', id: f.datasourceId, title: f.datasourceTitle });
+          record[0].datasources.push({ description: '', id: f.datasourceId, title: f.datasourceTitle, nbFollowers: f.nbFollowers, nbStoriesPerMonth: f.nbStoriesPerMonth });
         }
       });
     });

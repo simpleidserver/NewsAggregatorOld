@@ -24,15 +24,21 @@ namespace NewsAggregator.Core.Domains.Sessions
             return result;
         }
 
-        public void View(string articleId, string articleLanguage, DateTime actionDateTime)
+        public void Read(string articleId, string articleLanguage, DateTime actionDateTime)
         {
-            var evt = new SessionInteractionOccuredEvent(Guid.NewGuid().ToString(), Id, Version + 1, InteractionTypes.VIEW, articleId, articleLanguage, actionDateTime);
+            var evt = new SessionInteractionOccuredEvent(Guid.NewGuid().ToString(), Id, Version + 1, InteractionTypes.READ, articleId, articleLanguage, actionDateTime);
             Handle(evt);
         }
 
         public void Like(string articleId, string articleLanguage, DateTime actionDateTime)
         {
             var evt = new SessionInteractionOccuredEvent(Guid.NewGuid().ToString(), Id, Version + 1, InteractionTypes.LIKE, articleId,articleLanguage, actionDateTime);
+            Handle(evt);
+        }
+
+        public void Unread(string articleId, string articleLanguage, DateTime actionDateTime)
+        {
+            var evt = new SessionInteractionOccuredEvent(Guid.NewGuid().ToString(), Id, Version + 1, InteractionTypes.UNREAD, articleId, articleLanguage, actionDateTime);
             Handle(evt);
         }
 

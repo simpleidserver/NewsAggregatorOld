@@ -22,11 +22,12 @@ namespace NewsAggregator.Core.Domains.Feeds
 
         #region Actions
 
-        public void SubscribeDataSource(string userId, string datasourceId)
+        public FeedDataSourceSubscribedEvent SubscribeDataSource(string userId, string datasourceId)
         {
-            var evt = new FeedDataSourceSubscribedEvent(Guid.NewGuid().ToString(), Id, Version + 1, userId, datasourceId, DateTime.UtcNow);
+            var evt = new FeedDataSourceSubscribedEvent(Guid.NewGuid().ToString(), Id, Version + 1, Title, userId, datasourceId, DateTime.UtcNow);
             Handle(evt);
             DomainEvts.Add(evt);
+            return evt;
         }
 
         public void UnsubscribeDataSource(string userId, string datasourceId)

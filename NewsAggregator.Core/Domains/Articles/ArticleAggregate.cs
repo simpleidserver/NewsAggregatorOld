@@ -12,6 +12,7 @@ namespace NewsAggregator.Core.Domains.Articles
         private ArticleAggregate() 
         {
             ArticleLikeLst = new List<ArticleLike>();
+            ArticleReadLst = new List<ArticleRead>();
         }
 
         public string ExternalId { get; set; }
@@ -21,10 +22,11 @@ namespace NewsAggregator.Core.Domains.Articles
         public string Language { get; set; }
         public string DataSourceId { get; set; }
         public DateTimeOffset PublishDate { get; set; }
-        public int NbViews { get; set; }
+        public int NbRead { get; set; }
         public int NbLikes { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public ICollection<ArticleLike> ArticleLikeLst { get; set; }
+        public ICollection<ArticleRead> ArticleReadLst { get; set; }
 
         public static ArticleAggregate Create(string externalId, string title, string summary, string content, string language, string datasourceId, DateTimeOffset publishDate)
         {
@@ -35,11 +37,28 @@ namespace NewsAggregator.Core.Domains.Articles
             return result;
         }
 
-        public void View(string userId, string sessionId)
+        public void Read(string userId, string sessionId)
         {
-            var evt = new ArticleViewedEvent(Guid.NewGuid().ToString(), Id, Version + 1, Language, userId, sessionId, DateTime.UtcNow);
+            var evt = new ArticleReadEvent(Guid.NewGuid().ToString(), Id, Version + 1, Language, userId, sessionId, DateTime.UtcNow);
             Handle(evt);
             DomainEvts.Add(evt);
+        }
+
+        public void Unread(string userId, string sessionId)
+        {
+            var evt = new ArticleUnreadEvent(Guid.NewGuid().ToString(), Id, Version + 1, Language, userId, sessionId, DateTime.UtcNow);
+            Handle(evt);
+            DomainEvts.Add(evt);
+        }
+
+        public void ReadAndHide(string userId, string sessionId)
+        {
+            if (!ArticleReadLst.Any(l => l.UserId == userId))
+            {
+                Read(userId, sessionId);
+            }
+
+            ArticleReadLst.Last().IsHidden = true;
         }
 
         public void Like(string userId, string sessionId)
@@ -74,11 +93,31 @@ namespace NewsAggregator.Core.Domains.Articles
             Version = evt.Version;
         }
 
-        private void Handle(ArticleViewedEvent evt)
+        private void Handle(ArticleReadEvent evt)
         {
-            NbViews++;
+            if (ArticleReadLst.Any(l => l.UserId == evt.UserId))
+            {
+                throw new DomainException(Global.ArticleAlreadyReadByTheUser);
+            }
+
+            NbRead++;
             Version = evt.Version;
             UpdateDateTime = evt.ActionDateTime;
+            ArticleReadLst.Add(ArticleRead.Create(evt.UserId, evt.ActionDateTime));
+        }
+
+        private void Handle(ArticleUnreadEvent evt)
+        {
+            var articleRead = ArticleReadLst.FirstOrDefault(a => a.UserId == evt.UserId);
+            if (articleRead == null)
+            {
+                throw new DomainException(Global.ArticleNotReadByTheUser);
+            }
+
+            NbRead--;
+            Version = evt.Version;
+            UpdateDateTime = evt.ActionDateTime;
+            ArticleReadLst.Remove(articleRead);
         }
 
         private void Handle(ArticleLikedEvent evt)

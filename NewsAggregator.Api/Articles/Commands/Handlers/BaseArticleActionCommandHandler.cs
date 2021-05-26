@@ -40,7 +40,11 @@ namespace NewsAggregator.Api.Articles.Commands.Handlers
             callback(article);
             await _articleCommandRepository.Update(article, cancellationToken);
             await _articleCommandRepository.SaveChanges(cancellationToken);
-            await _busControl.Publish((T)article.DomainEvts.First(), cancellationToken);
+            if (article.DomainEvts.Any())
+            {
+                await _busControl.Publish((T)article.DomainEvts.First(), cancellationToken);
+            }
+
             return true;
         }
     }

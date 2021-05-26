@@ -23,7 +23,9 @@ namespace NewsAggregator.Query.SQL
                             "[Id], " +
                             "[Title], " +
                             "[Description], " +
-                            "[Url] " +
+                            "[Url], " +
+                            "[NbFollowers]," +
+                            "[NbStoriesPerMonth] " +
                             "FROM [dbo].[DataSources] "+
                             "where [Id] IN @ids";
             var connection = _sqlConnectionFactory.GetOpenConnection();

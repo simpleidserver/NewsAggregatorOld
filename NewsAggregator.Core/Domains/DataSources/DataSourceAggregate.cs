@@ -8,7 +8,6 @@ namespace NewsAggregator.Core.Domains.DataSources
     {
         private DataSourceAggregate()
         {
-
         }
 
         public string Title { get; set; }
@@ -18,6 +17,7 @@ namespace NewsAggregator.Core.Domains.DataSources
         public int NbStoriesPerMonth { get; set; }
         public ICollection<DataSourceExtractionHistory> ExtractionHistories { get; set; }
         public ICollection<DataSourceArticle> Articles { get; set; }
+        public ICollection<DataSourceTopic> Topics { get; set; }
 
         public bool IsArticleExtracted(DateTimeOffset publicationDate)
         {
@@ -43,6 +43,19 @@ namespace NewsAggregator.Core.Domains.DataSources
         public void DecrementFollower()
         {
             NbFollowers--;
+        }
+
+        public void IncrementTopic(string topicName)
+        {
+            var topic = Topics.FirstOrDefault(t => t.TopicName == topicName);
+            if (topic == null)
+            {
+                Topics.Add(DataSourceTopic.Create(topicName));
+            } 
+            else
+            {
+                topic.Increment();
+            }
         }
 
         public void AddArticle(DateTimeOffset publishDateTime)

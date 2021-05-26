@@ -1,10 +1,13 @@
-﻿using MediatR;
+﻿using MassTransit;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using NewsAggregator.Api.DataSources;
 using NewsAggregator.Api.Resources;
 using NewsAggregator.Core.Domains.Feeds;
+using NewsAggregator.Core.Domains.Feeds.Events;
 using NewsAggregator.Core.Exceptions;
 using NewsAggregator.Core.Repositories;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,15 +18,18 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
     {
         private readonly IFeedCommandRepository _feedCommandRepository;
         private readonly IDataSourceService _dataSourceService;
+        private readonly IBusControl _busControl;
         private readonly ILogger<AddFeedCommandHandler> _logger;
 
         public AddFeedCommandHandler(
             IFeedCommandRepository feedCommandRepository,
             IDataSourceService dataSourceService,
+            IBusControl busControl,
             ILogger<AddFeedCommandHandler> logger)
         {
             _feedCommandRepository = feedCommandRepository;
             _dataSourceService = dataSourceService;
+            _busControl = busControl;
             _logger = logger;
         }
 
@@ -31,6 +37,7 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
         {
             var isNewFeed = false;
             var feed = await _feedCommandRepository.Get(request.UserId, request.Title, cancellationToken);
+            var evts = new List<FeedDataSourceSubscribedEvent>();
             if (feed == null)
             {
                 feed = FeedAggregate.Create(request.UserId, request.Title);
@@ -48,7 +55,7 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
 
                 foreach(var datasource in datasources)
                 {
-                    feed.SubscribeDataSource(request.UserId, datasource.Id);
+                    evts.Add(feed.SubscribeDataSource(request.UserId, datasource.Id));
                 }
             }
 
@@ -63,6 +70,11 @@ namespace NewsAggregator.Api.Feeds.Commands.Handlers
 
             await _feedCommandRepository.SaveChanges(cancellationToken);
             _logger.LogInformation($"User {request.UserId} adds the feed {request.Title}");
+            foreach(var evt in evts)
+            {
+                await _busControl.Publish(evt, cancellationToken);
+            }
+
             return feed.Id;
         }
     }

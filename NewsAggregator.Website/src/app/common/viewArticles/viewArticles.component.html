@@ -2,27 +2,28 @@
   <div *ngFor="let article of articles" class="article">
     <mat-card>
       <mat-card-header fxLayout="row">
-        <mat-card-title>{{ article.title }}</mat-card-title>
+        <mat-card-title><a [href]="article.externalId" target="_blank" class="article-title" [class.read]="article.readActionDateTime">{{ article.title }}</a></mat-card-title>
         <mat-card-subtitle>
           <div>
             <b>{{ article.datasourceTitle }}</b>, {{ 'article.publicationDate' | translate : { date : article.publishDate | date:'medium' } }}
           </div>
           <div>
             <span><mat-icon class="small-icon">thumb_up</mat-icon> {{article.nbLikes}}</span>
-            <span><mat-icon class="small-icon">visibility</mat-icon> {{article.nbViews}}</span>
+            <span><mat-icon class="small-icon">visibility</mat-icon> {{article.nbRead}}</span>
           </div>
         </mat-card-subtitle>
         <div fxFlex></div>
-        <div class="actions">
-          <mat-icon (click)="navigate(article)">visibility</mat-icon>
-          <mat-icon (click)="unlike(article)" *ngIf="article.likeActionDateTime">thumb_up</mat-icon>
-          <mat-icon (click)="like(article)" *ngIf="!article.likeActionDateTime">thumb_up_off_alt</mat-icon>
+        <div class="actions" (click)="$event.stopPropagation()">
+          <mat-icon [matTooltip]="'article.actions.readLater' | translate">bookmark_border</mat-icon>
+          <mat-icon [matTooltip]="'article.actions.dislike' | translate" (click)="unlike(article)" *ngIf="article.likeActionDateTime">thumb_up</mat-icon>
+          <mat-icon [matTooltip]="'article.actions.like' | translate" (click)="like(article)" *ngIf="!article.likeActionDateTime">thumb_up_off_alt</mat-icon>
+          <mat-icon [matTooltip]="'article.actions.read' | translate" (click)="read(article)" *ngIf="!article.readActionDateTime">done</mat-icon>
+          <mat-icon [matTooltip]="'article.actions.unread' | translate" (click)="unread(article)" *ngIf="article.readActionDateTime">done</mat-icon>
+          <mat-icon [matTooltip]="'article.actions.readAndHide' | translate" (click)="readAndHide(article)">close</mat-icon>
         </div>
       </mat-card-header>
       <mat-card-content>
-        <p>
-          {{ article.summary }}
-        </p>
+        {{ article.summary }}
       </mat-card-content>
     </mat-card>
   </div>

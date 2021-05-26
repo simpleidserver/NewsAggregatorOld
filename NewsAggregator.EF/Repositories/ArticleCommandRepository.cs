@@ -19,6 +19,7 @@ namespace NewsAggregator.EF.Repositories
         {
             return _dbContext.Articles
                 .Include(a => a.ArticleLikeLst)
+                .Include(a => a.ArticleReadLst)
                 .FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
         }
 

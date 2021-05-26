@@ -7,7 +7,8 @@ export class Article {
   publishDate: Date;
   datasourceId: string;
   datasourceTitle: string;
-  nbViews: number;
+  nbRead: number;
   nbLikes: number;
   likeActionDateTime: Date | null;
+  readActionDateTime: Date | null;
 }

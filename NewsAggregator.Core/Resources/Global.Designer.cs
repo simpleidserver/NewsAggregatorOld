@@ -70,11 +70,29 @@ namespace NewsAggregator.Core.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Article is already read by the user.
+        /// </summary>
+        internal static string ArticleAlreadyReadByTheUser {
+            get {
+                return ResourceManager.GetString("ArticleAlreadyReadByTheUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Article is not liked by the user.
         /// </summary>
         internal static string ArticleNotLikedByTheUser {
             get {
                 return ResourceManager.GetString("ArticleNotLikedByTheUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Article has not been read by the user.
+        /// </summary>
+        internal static string ArticleNotReadByTheUser {
+            get {
+                return ResourceManager.GetString("ArticleNotReadByTheUser", resourceCulture);
             }
         }
         

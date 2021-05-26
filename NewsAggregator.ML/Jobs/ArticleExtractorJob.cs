@@ -105,7 +105,7 @@ namespace NewsAggregator.ML.Jobs
                 await _busControl.Publish((ArticleAddedEvent)article.DomainEvts.First(), cancellationToken);
             }
 
-            await _articleManager.TrainArticles(result.Select(r => r.Language).Distinct(), cancellationToken);
+            // await _articleManager.TrainArticles(result.Select(r => r.Language).Distinct(), cancellationToken);
             var lastArticle = result.OrderByDescending(a => a.PublishDate).FirstOrDefault();
             if (lastArticle != null)
             {

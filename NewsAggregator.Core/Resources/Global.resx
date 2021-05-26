@@ -120,8 +120,14 @@
   <data name="ArticleAlreadyLikedByTheUser" xml:space="preserve">
     <value>Article is already like by the user</value>
   </data>
+  <data name="ArticleAlreadyReadByTheUser" xml:space="preserve">
+    <value>Article is already read by the user</value>
+  </data>
   <data name="ArticleNotLikedByTheUser" xml:space="preserve">
     <value>Article is not liked by the user</value>
+  </data>
+  <data name="ArticleNotReadByTheUser" xml:space="preserve">
+    <value>Article has not been read by the user</value>
   </data>
   <data name="CannotRemoveFeed" xml:space="preserve">
     <value>Feed cannot be removed by the user {0}</value>

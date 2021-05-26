@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ɵclearResolutionOfComponentResourcesQueue } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as fromAppState from '@app/stores/appstate';
 import * as fromArticleActions from '@app/stores/articles/actions/article.actions';
@@ -18,7 +18,6 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
   feed: Feed = new Feed();
   feedArticlesListener: any;
   feedListener: any;
-  refreshInterval: any;
   protected count: number = 10;
   protected isLoadingData: boolean = false;
 
@@ -51,12 +50,11 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
       const copy = JSON.parse(JSON.stringify(r.content));
       this.articles = copy;
     });
-    this.refreshInterval = setInterval(this.refresh.bind(this), 1000);
     const drawerContent = this.drawerContentService.getDrawerContent();
     drawerContent.elementScrolled().subscribe((evt) => {
       const offset = drawerContent.measureScrollOffset("bottom");
       const o = Math.floor(offset);
-      if (o === 0 && !this.isLoadingData) {
+      if (o <= 0 && !this.isLoadingData) {
         this.isLoadingData = true;
         this.count += this.pagination;
         this.refresh();
@@ -71,10 +69,6 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
 
     if (this.feedListener) {
       this.feedListener.unsubscribe();
-    }
-
-    if (this.refreshInterval) {
-      clearInterval(this.refreshInterval);
     }
   }
 
@@ -94,9 +88,22 @@ export abstract class ViewArticlesComponent implements OnInit, OnDestroy {
     this.store.dispatch(request);
   }
 
-  navigate(article: Article) {
-    const request = fromArticleActions.startViewArticle({ articleId: article.id });
+  read(article: Article) {
+    const request = fromArticleActions.startReadArticle({ articleId: article.id });
     this.store.dispatch(request);
+  }
+
+  unread(article: Article) {
+    const request = fromArticleActions.startUnreadArticle({ articleId: article.id });
+    this.store.dispatch(request);
+  }
+
+  readAndHide(article: Article) {
+    const request = fromArticleActions.startReadAndHideArticle({ articleId: article.id });
+    this.store.dispatch(request);
+  }
+
+  navigate(article: Article) {
     window.open(article.externalId, '_blank');
   }
 

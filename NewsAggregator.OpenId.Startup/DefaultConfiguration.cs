@@ -108,7 +108,8 @@ namespace NewsAggregator.OpenId.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "http://localhost:4200"
+                        "http://localhost:4200",
+                        "http://localhost:4200/silent-refresh.html"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>

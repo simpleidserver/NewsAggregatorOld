@@ -41,13 +41,34 @@ namespace NewsAggregator.Api.Startup.Controllers
             return new OkObjectResult(result);
         }
 
-        [HttpGet("{articleId}/view")]
+        [HttpGet("{articleId}/read")]
         [Authorize("Authenticated")]
-        public async Task<IActionResult> View(string articleId, CancellationToken cancellationToken)
+        public async Task<IActionResult> Read(string articleId, CancellationToken cancellationToken)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var nonce = User.FindFirst("nonce").Value;
-            var cmd = new ViewArticleCommand {ArticleId = articleId, SessionId = nonce, UserId = userId };
+            var cmd = new ReadArticleCommand {ArticleId = articleId, SessionId = nonce, UserId = userId };
+            await _mediator.Send(cmd, cancellationToken);
+            return new NoContentResult();
+        }
+
+        [HttpGet("{articleId}/unread")]
+        [Authorize("Authenticated")]
+        public async Task<IActionResult> Unread(string articleId, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var nonce = User.FindFirst("nonce").Value;
+            var cmd = new UnreadArticleCommand { ArticleId = articleId, SessionId = nonce, UserId = userId };
+            await _mediator.Send(cmd, cancellationToken);
+            return new NoContentResult();
+        }
+
+        [HttpGet("{articleId}/readAndHide")]
+        public async Task<IActionResult> ReadAndHide(string articleId, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var nonce = User.FindFirst("nonce").Value;
+            var cmd = new ReadAndHideArticleCommand { ArticleId = articleId, SessionId = nonce, UserId = userId };
             await _mediator.Send(cmd, cancellationToken);
             return new NoContentResult();
         }

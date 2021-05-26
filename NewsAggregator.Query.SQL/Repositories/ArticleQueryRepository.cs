@@ -77,16 +77,26 @@ namespace NewsAggregator.Query.SQL.Repositories
                             "[Language], " +
                             "[PublishDate], " +
                             "CONCAT([dbo].[Articles].[Title], ' ', [Summary]) as [Text], " +
-                            "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime], "+
-                            "[dbo].[DataSources].[Id] as [DatasourceId], "+
+                            "[articleLike].[ActionDateTime] as [LikeActionDateTime], " +
+                            "[articleR].[ActionDateTime] as [ReadActionDateTime], " + 
+                            "[dbo].[DataSources].[Id] as [DatasourceId], " +
                             "[dbo].[DataSources].[Title] as [DatasourceTitle], "+
-                            "[NbViews], " +
+                            "[NbRead], " +
                             "[NbLikes] " +
                             "FROM [dbo].[Articles] " +
-                            "LEFT OUTER JOIN [dbo].[ArticleLike] ON [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] "+
-                            "INNER JOIN [dbo].[DataSources] ON [dbo].[DataSources].[Id] = [dbo].[Articles].[DataSourceId] "+ 
+                            "OUTER APPLY ( " +
+                                "SELECT TOP 1 [ActionDateTime] " +
+                                "FROM [dbo].[ArticleLike] " +
+                                "where [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] " +
+                            ") [articleLike] " +
+                            "OUTER APPLY ( " +
+                                "SELECT TOP 1 [UserId], [IsHidden], [ActionDateTime] " +
+                                "FROM [dbo].[ArticleRead] " +
+                                "WHERE [dbo].[ArticleRead].[ArticleAggregateId] = [dbo].[Articles].[Id]" +
+                            ") [articleR] " +
+                            "INNER JOIN [dbo].[DataSources] ON [dbo].[DataSources].[Id] = [dbo].[Articles].[DataSourceId] " + 
                             "WHERE [DataSourceId] = @datasourceId " +
-                            "AND [UserId] = @userId OR [UserId] IS NULL " +
+                            "AND ([articleR].[UserId] IS NOT NULL AND [articleR].[UserId] = @userId AND [articleR].IsHidden = 0) OR [articleR].[UserId] IS NULL " +
                             "ORDER BY [PublishDate] DESC " +
                             "OFFSET @startIndex ROWS " +
                             "FETCH NEXT @count ROWS ONLY";
@@ -116,17 +126,27 @@ namespace NewsAggregator.Query.SQL.Repositories
                     "[Language], " +
                     "[PublishDate], " +
                     "CONCAT([dbo].[Articles].[Title], ' ', [Summary]) as [Text], " +
-                    "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime], " +
+                    "[articleLike].[ActionDateTime] as [LikeActionDateTime], " +
+                    "[articleR].[ActionDateTime] as [ReadActionDateTime], " +
                     "[dbo].[DataSources].[Id] as [DatasourceId], " +
                     "[dbo].[DataSources].[Title] as [DatasourceTitle], " +
-                    "[NbViews], " +
+                    "[NbRead], " +
                     "[NbLikes] " +
                     "FROM [dbo].[Articles] " +
                     "INNER JOIN [dbo].[FeedDatasource] ON[dbo].[FeedDatasource].[DatasourceId] = [dbo].[Articles].[DataSourceId] " +
-                    "LEFT OUTER JOIN [dbo].[ArticleLike] ON [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] " +
+                    "OUTER APPLY ( "+
+                        "SELECT TOP 1 [ActionDateTime] " +
+                        "FROM [dbo].[ArticleLike] " +
+                        "where [dbo].[ArticleLike].[ArticleAggregateId] = [dbo].[Articles].[Id] "+
+                    ") [articleLike] "+
+                    "OUTER APPLY ( "+
+                        "SELECT TOP 1 [UserId], [IsHidden], [ActionDateTime] "+
+                        "FROM [dbo].[ArticleRead] " +
+                        "WHERE [dbo].[ArticleRead].[ArticleAggregateId] = [dbo].[Articles].[Id]" +
+                    ") [articleR] " +
                     "INNER JOIN [dbo].[DataSources] ON [dbo].[DataSources].[Id] = [dbo].[Articles].[DataSourceId] " +
                     "WHERE [dbo].[FeedDatasource].FeedAggregateId = @feedId " +
-                    "AND [dbo].[ArticleLike].[UserId] = @userId OR [dbo].[ArticleLike].[UserId] IS NULL " +
+                    "AND ([articleR].[UserId] IS NOT NULL AND [articleR].[UserId] = @userId AND [articleR].IsHidden = 0) OR [articleR].[UserId] IS NULL " +
                     "ORDER BY [PublishDate] DESC " +
                     "OFFSET @startIndex ROWS " +
                     "FETCH NEXT @count ROWS ONLY";

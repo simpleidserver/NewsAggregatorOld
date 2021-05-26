@@ -10,8 +10,8 @@ using NewsAggregator.EF;
 namespace NewsAggregator.ML.Startup.Migrations
 {
     [DbContext(typeof(NewsAggregatorDBContext))]
-    [Migration("20210409093805_EnrichDatasource")]
-    partial class EnrichDatasource
+    [Migration("20210526130015_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -41,7 +41,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.Property<int>("NbLikes")
                         .HasColumnType("int");
 
-                    b.Property<int>("NbViews")
+                    b.Property<int>("NbRead")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("PublishDate")
@@ -62,6 +62,55 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Articles");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Articles.ArticleLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("ActionDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ArticleAggregateId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleAggregateId");
+
+                    b.ToTable("ArticleLike");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Articles.ArticleRead", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("ActionDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ArticleAggregateId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleAggregateId");
+
+                    b.ToTable("ArticleRead");
                 });
 
             modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", b =>
@@ -137,6 +186,29 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.HasIndex("DataSourceAggregateId");
 
                     b.ToTable("DataSourceExtractionHistory");
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceTopic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("DataSourceAggregateId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Nb")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TopicName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSourceAggregateId");
+
+                    b.ToTable("DataSourceTopic");
                 });
 
             modelBuilder.Entity("NewsAggregator.Core.Domains.Feeds.FeedAggregate", b =>
@@ -274,6 +346,22 @@ namespace NewsAggregator.ML.Startup.Migrations
                     b.ToTable("Sessions");
                 });
 
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Articles.ArticleLike", b =>
+                {
+                    b.HasOne("NewsAggregator.Core.Domains.Articles.ArticleAggregate", null)
+                        .WithMany("ArticleLikeLst")
+                        .HasForeignKey("ArticleAggregateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Articles.ArticleRead", b =>
+                {
+                    b.HasOne("NewsAggregator.Core.Domains.Articles.ArticleAggregate", null)
+                        .WithMany("ArticleReadLst")
+                        .HasForeignKey("ArticleAggregateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceArticle", b =>
                 {
                     b.HasOne("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", null)
@@ -286,6 +374,14 @@ namespace NewsAggregator.ML.Startup.Migrations
                 {
                     b.HasOne("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", null)
                         .WithMany("ExtractionHistories")
+                        .HasForeignKey("DataSourceAggregateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceTopic", b =>
+                {
+                    b.HasOne("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", null)
+                        .WithMany("Topics")
                         .HasForeignKey("DataSourceAggregateId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -314,11 +410,20 @@ namespace NewsAggregator.ML.Startup.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("NewsAggregator.Core.Domains.Articles.ArticleAggregate", b =>
+                {
+                    b.Navigation("ArticleLikeLst");
+
+                    b.Navigation("ArticleReadLst");
+                });
+
             modelBuilder.Entity("NewsAggregator.Core.Domains.DataSources.DataSourceAggregate", b =>
                 {
                     b.Navigation("Articles");
 
                     b.Navigation("ExtractionHistories");
+
+                    b.Navigation("Topics");
                 });
 
             modelBuilder.Entity("NewsAggregator.Core.Domains.Feeds.FeedAggregate", b =>

@@ -22,7 +22,6 @@ export class HangfireJobsComponent implements OnInit, OnDestroy {
   jobs: HangfireJobRow[] = [];
   displayedColumns: string[] = ['id', 'stateName', 'createdAt', 'invocationData'];
   length: number;
-  refreshInterval: any;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   constructor(
@@ -40,7 +39,6 @@ export class HangfireJobsComponent implements OnInit, OnDestroy {
         return new HangfireJobRow(j.id, j.stateName, j.createdAt, JSON.parse(j.invocationData)["Type"]);
       });
     });
-    this.refreshInterval = setInterval(this.refresh.bind(this), 1000);
     this.refresh();
   }
 
@@ -61,10 +59,6 @@ export class HangfireJobsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.listener) {
       this.listener.unsubscribe();
-    }
-
-    if (this.refreshInterval) {
-      clearInterval(this.refreshInterval);
     }
   }
 

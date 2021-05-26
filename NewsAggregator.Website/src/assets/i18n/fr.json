@@ -32,8 +32,12 @@
   "article": {
     "publicationDate": "Publié le : {{date}}",
     "actions": {
-      "read": "Lire",
-      "like": "Like"
+      "read": "Marquer comme lu",
+      "unread": "Marquer comme non lu",
+      "like": "Like",
+      "dislike": "Dislike",
+      "readLater": "Lire plus tard",
+      "readAndHide": "Lire et cacher"
     }
   },
   "recommendation": {
@@ -41,7 +45,9 @@
   },
   "datasource": {
     "list": "Sources de données",
-    "searchDatasource": "Chercher une source"
+    "searchDatasource": "Chercher une source",
+    "followers": "{{nbFollowers}} followers",
+    "nbStoriesPerMonth": "{{nbStoriesPerMonth}} articles par semaine"
   },
   "status": {
     "notfound": "Page n'a pas été trouvée"

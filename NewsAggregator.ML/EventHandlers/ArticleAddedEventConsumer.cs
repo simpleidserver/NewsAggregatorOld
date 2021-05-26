@@ -4,8 +4,6 @@ using NewsAggregator.Core.Domains.Articles.Events;
 using NewsAggregator.Core.Repositories;
 using NewsAggregator.ML.Jobs;
 using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 

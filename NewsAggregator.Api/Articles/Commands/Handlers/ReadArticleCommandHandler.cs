@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace NewsAggregator.Api.Articles.Commands.Handlers
 {
-    public class ViewArticleCommandHandler : BaseArticleActionCommandHandler, IRequestHandler<ViewArticleCommand, bool>
+    public class ReadArticleCommandHandler : BaseArticleActionCommandHandler, IRequestHandler<ReadArticleCommand, bool>
     {
-        public ViewArticleCommandHandler(
+        public ReadArticleCommandHandler(
             ILogger<BaseArticleActionCommandHandler> logger,
             IArticleCommandRepository articleCommandRepository,
             IBusControl busControl) : base(logger, articleCommandRepository, busControl) { }
 
-        public Task<bool> Handle(ViewArticleCommand request, CancellationToken cancellationToken)
+        public Task<bool> Handle(ReadArticleCommand request, CancellationToken cancellationToken)
         {
-            return Handle<ArticleViewedEvent>(request.ArticleId, (article) =>
+            return Handle<ArticleReadEvent>(request.ArticleId, (article) =>
             {
-                article.View(request.UserId, request.SessionId);
+                article.Read(request.UserId, request.SessionId);
             }, cancellationToken);
         }
     }

@@ -29,7 +29,7 @@ namespace NewsAggregator.Query.SQL.Repositories
                        "[dbo].[ArticleLike].[ActionDateTime] as [LikeActionDateTime], " +
                        "[dbo].[DataSources].[Id] as [DatasourceId], " +
                        "[dbo].[DataSources].[Title] as [DatasourceTitle], " +
-                       "[NbViews], " +
+                       "[NbRead], " +
                        "[NbLikes] " +
                        " FROM[dbo].[RecommendationArticle] " +
                        "INNER JOIN[dbo].[Articles] ON[dbo].[RecommendationArticle].[ArticleId] = [dbo].[Articles].[Id] " +

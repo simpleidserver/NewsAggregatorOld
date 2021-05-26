@@ -4,13 +4,15 @@ import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import {
     completeLikeArticle,
-    completeSearchArticlesInDatasource,
-    completeSearchArticlesInFeed, completeSearchRecommendations, completeUnLikeArticle, completeViewArticle, errorLikeArticle, errorSearchArticlesInDatasource,
-    errorSearchArticlesInFeed, errorSearchRecommendations, errorUnLikeArticle, errorViewArticle, startLikeArticle, startSearchArticlesInDatasource,
+    completeReadAndHideArticle, completeReadArticle, completeSearchArticlesInDatasource,
+    completeSearchArticlesInFeed, completeSearchRecommendations, completeUnLikeArticle, completeUnreadArticle, errorLikeArticle,
+    errorReadAndHideArticle, errorReadArticle, errorSearchArticlesInDatasource,
+    errorSearchArticlesInFeed, errorSearchRecommendations, errorUnLikeArticle, errorUnreadArticle, startLikeArticle,
+    startReadAndHideArticle, startReadArticle, startSearchArticlesInDatasource,
     startSearchArticlesInFeed,
     startSearchRecommendations,
     startUnlikeArticle,
-    startViewArticle
+    startUnreadArticle
 } from '../actions/article.actions';
 import { ArticleService } from '../services/article.service';
 
@@ -78,18 +80,46 @@ export class ArticlesEffects {
   );
 
   @Effect()
-  viewArticle$ = this.actions$
+  readArticle$ = this.actions$
     .pipe(
-      ofType(startViewArticle),
+      ofType(startReadArticle),
       mergeMap((evt) => {
-        return this.articleService.view(evt.articleId)
+        return this.articleService.read(evt.articleId)
           .pipe(
-            map(articles => completeViewArticle({ articleId: evt.articleId })),
-            catchError(() => of(errorViewArticle()))
+            map(articles => completeReadArticle({ articleId: evt.articleId })),
+            catchError(() => of(errorReadArticle()))
           );
       }
       )
   );
+
+  @Effect()
+  unreadArticle$ = this.actions$
+    .pipe(
+      ofType(startUnreadArticle),
+      mergeMap((evt) => {
+        return this.articleService.unread(evt.articleId)
+          .pipe(
+            map(articles => completeUnreadArticle({ articleId: evt.articleId })),
+            catchError(() => of(errorUnreadArticle()))
+          );
+      }
+      )
+    );
+
+  @Effect()
+  readAndHideArticle$ = this.actions$
+    .pipe(
+      ofType(startReadAndHideArticle),
+      mergeMap((evt) => {
+        return this.articleService.readAndHide(evt.articleId)
+          .pipe(
+            map(articles => completeReadAndHideArticle({ articleId: evt.articleId })),
+            catchError(() => of(errorReadAndHideArticle()))
+          );
+      }
+      )
+    );
 
   @Effect()
   searchRecommendations$ = this.actions$

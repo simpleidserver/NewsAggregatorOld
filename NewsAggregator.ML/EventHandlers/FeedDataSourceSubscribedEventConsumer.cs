@@ -19,6 +19,7 @@ namespace NewsAggregator.ML.EventHandlers
         {
             var datasource = await _datasourceCommandRepository.Get(context.Message.DataSourceId, CancellationToken.None);
             datasource.IncrementFollower();
+            datasource.IncrementTopic(context.Message.Title);
             await _datasourceCommandRepository.Update(new[] { datasource }, CancellationToken.None);
             await _datasourceCommandRepository.SaveChanges(CancellationToken.None);
         }

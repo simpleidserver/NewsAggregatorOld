@@ -32,8 +32,12 @@
   "article": {
     "publicationDate": "Publish : {{date}}",
     "actions": {
-      "read": "Read",
-      "like": "Like"
+      "read": "Mark as read",
+      "unread": "Mark as unread",
+      "like": "Like",
+      "dislike": "Dislike",
+      "readLater": "Read later",
+      "readAndHide": "Read and hide"
     }
   },
   "recommendation": {
@@ -41,7 +45,9 @@
   },
   "datasource": {
     "list": "Datasources",
-    "searchDatasource": "Search datasource"
+    "searchDatasource": "Search datasource",
+    "followers": "{{nbFollowers}} followers",
+    "nbStoriesPerMonth": "{{nbStoriesPerMonth}} articles per week"
   },
   "status": {
     "notfound": "Page not found"

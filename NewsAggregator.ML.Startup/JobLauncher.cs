@@ -33,8 +33,9 @@ namespace NewsAggregator.ML.Startup
                 WorkerCount = 1
             }))
             {
+                var interval = Cron.MinuteInterval(5);
                 RecurringJob.AddOrUpdate<IArticleExtractorJob>("rssExtractArticles", j => j.Run(CancellationToken.None), Cron.MinuteInterval(5));
-                RecurringJob.AddOrUpdate<INextArticleRecommenderJob>("nextArticlesRecommender", j => j.Run(CancellationToken.None), Cron.HourInterval(1));
+                // RecurringJob.AddOrUpdate<INextArticleRecommenderJob>("nextArticlesRecommender", j => j.Run(CancellationToken.None), Cron.HourInterval(1));
                 Console.WriteLine("Press Enter to quit the application !");
                 Console.ReadLine();
             }
@@ -62,7 +63,8 @@ namespace NewsAggregator.ML.Startup
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<ArticleLikedEventConsumer>();
-                x.AddConsumer<ArticleViewedEventConsumer>();
+                x.AddConsumer<ArticleReadEventConsumer>();
+                x.AddConsumer<ArticleReadAndHideEventConsumer>();
                 x.AddConsumer<ArticleAddedEventConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -70,9 +72,13 @@ namespace NewsAggregator.ML.Startup
                     {
                         e.ConfigureConsumer<ArticleLikedEventConsumer>(context);
                     });
-                    cfg.ReceiveEndpoint("article-view-listener", e =>
+                    cfg.ReceiveEndpoint("article-read-listener", e =>
                     {
-                        e.ConfigureConsumer<ArticleViewedEventConsumer>(context);
+                        e.ConfigureConsumer<ArticleReadEventConsumer>(context);
+                    });
+                    cfg.ReceiveEndpoint("article-readandhide-listener", e =>
+                    {
+                        e.ConfigureConsumer<ArticleReadAndHideEventConsumer>(context);
                     });
                     cfg.ReceiveEndpoint("article-add-listener", e =>
                     {

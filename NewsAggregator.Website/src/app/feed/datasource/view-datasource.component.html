@@ -1,2 +1,3 @@
 <h1>{{ feed.feedTitle }} \ {{ datasource.title }}</h1>
+<p>{{ 'datasource.followers' | translate: { nbFollowers : datasource.nbFollowers } }} / {{ 'datasource.nbStoriesPerMonth' | translate : { nbStoriesPerMonth : datasource.nbStoriesPerMonth } }}</p>
 <app-datasource-view-articles #viewArticles></app-datasource-view-articles>

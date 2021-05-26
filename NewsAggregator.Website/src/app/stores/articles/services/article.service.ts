@@ -57,13 +57,30 @@ export class ArticleService {
     return this.http.get<any>(targetUrl, { headers: headers });
   }
 
-  view(articleId: string): Observable<any> {
+  read(articleId: string): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Accept', 'application/json');
     headers = headers.set('Content-Type', 'application/json');
     headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
-    const targetUrl = environment.apiUrl + "/articles/" + articleId + "/view";
+    const targetUrl = environment.apiUrl + "/articles/" + articleId + "/read";
     return this.http.get<any>(targetUrl, { headers: headers });
   }
 
+  unread(articleId: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/articles/" + articleId + "/unread";
+    return this.http.get<any>(targetUrl, { headers: headers });
+  }
+
+  readAndHide(articleId: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/articles/" + articleId + "/readAndHide";
+    return this.http.get<any>(targetUrl, { headers: headers });
+  }
 }

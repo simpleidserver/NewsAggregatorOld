@@ -19,7 +19,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                     Language = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DataSourceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PublishDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    NbViews = table.Column<int>(type: "int", nullable: false),
+                    NbRead = table.Column<int>(type: "int", nullable: false),
                     NbLikes = table.Column<int>(type: "int", nullable: false),
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false)
@@ -37,6 +37,8 @@ namespace NewsAggregator.ML.Startup.Migrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NbFollowers = table.Column<int>(type: "int", nullable: false),
+                    NbStoriesPerMonth = table.Column<int>(type: "int", nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -89,6 +91,71 @@ namespace NewsAggregator.ML.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ArticleLike",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ActionDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ArticleAggregateId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleLike", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArticleLike_Articles_ArticleAggregateId",
+                        column: x => x.ArticleAggregateId,
+                        principalTable: "Articles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArticleRead",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ActionDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsHidden = table.Column<bool>(type: "bit", nullable: false),
+                    ArticleAggregateId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleRead", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArticleRead_Articles_ArticleAggregateId",
+                        column: x => x.ArticleAggregateId,
+                        principalTable: "Articles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DataSourceArticle",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NbArticles = table.Column<int>(type: "int", nullable: false),
+                    Month = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    DataSourceAggregateId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DataSourceArticle", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DataSourceArticle_DataSources_DataSourceAggregateId",
+                        column: x => x.DataSourceAggregateId,
+                        principalTable: "DataSources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DataSourceExtractionHistory",
                 columns: table => new
                 {
@@ -102,6 +169,27 @@ namespace NewsAggregator.ML.Startup.Migrations
                     table.PrimaryKey("PK_DataSourceExtractionHistory", x => x.Id);
                     table.ForeignKey(
                         name: "FK_DataSourceExtractionHistory_DataSources_DataSourceAggregateId",
+                        column: x => x.DataSourceAggregateId,
+                        principalTable: "DataSources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DataSourceTopic",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TopicName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Nb = table.Column<int>(type: "int", nullable: false),
+                    DataSourceAggregateId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DataSourceTopic", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DataSourceTopic_DataSources_DataSourceAggregateId",
                         column: x => x.DataSourceAggregateId,
                         principalTable: "DataSources",
                         principalColumn: "Id",
@@ -135,6 +223,7 @@ namespace NewsAggregator.ML.Startup.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ArticleId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Score = table.Column<double>(type: "float", nullable: false),
                     RecommendationAggregateId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -172,8 +261,28 @@ namespace NewsAggregator.ML.Startup.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ArticleLike_ArticleAggregateId",
+                table: "ArticleLike",
+                column: "ArticleAggregateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleRead_ArticleAggregateId",
+                table: "ArticleRead",
+                column: "ArticleAggregateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSourceArticle_DataSourceAggregateId",
+                table: "DataSourceArticle",
+                column: "DataSourceAggregateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DataSourceExtractionHistory_DataSourceAggregateId",
                 table: "DataSourceExtractionHistory",
+                column: "DataSourceAggregateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSourceTopic_DataSourceAggregateId",
+                table: "DataSourceTopic",
                 column: "DataSourceAggregateId");
 
             migrationBuilder.CreateIndex(
@@ -195,10 +304,19 @@ namespace NewsAggregator.ML.Startup.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Articles");
+                name: "ArticleLike");
+
+            migrationBuilder.DropTable(
+                name: "ArticleRead");
+
+            migrationBuilder.DropTable(
+                name: "DataSourceArticle");
 
             migrationBuilder.DropTable(
                 name: "DataSourceExtractionHistory");
+
+            migrationBuilder.DropTable(
+                name: "DataSourceTopic");
 
             migrationBuilder.DropTable(
                 name: "FeedDatasource");
@@ -208,6 +326,9 @@ namespace NewsAggregator.ML.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "SessionAction");
+
+            migrationBuilder.DropTable(
+                name: "Articles");
 
             migrationBuilder.DropTable(
                 name: "DataSources");
